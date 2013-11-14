@@ -1,0 +1,12 @@
+# -*- coding: utf-8 ; mode: org -*-
+Filename: bibliography.org
+Title: "Bibliography"
+Author: "Michele Orru`"
+
+
+* [33%] [[crypto.stanford.edu/~dabo/pubs/papers/RSA-survey.pdf][Twenty Years of Attacks on the RSA Cryptosystem]]               :paper:
+  * [ ]  Prove Fact 1:
+    given the public key <N, e> and the private key <N, d> it is possible to
+    factorize N=pq.
+* [0%] Tesi Noemi                                                :bad:thesis:
+* [0%] [[http://www.johndcook.com/Beautiful_Testing_ch10.pdf][Beautiful Testing]] - how to test a random number generator       :book:
