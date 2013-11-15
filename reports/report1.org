@@ -1,0 +1,67 @@
+# -*- coding: utf-8 ; mode: org -*-
+
+#+TITLE:  First report
+#+DATE:   2013-11-15
+#+AUTHOR: Michele Orru`
+#+EMAIL:  maker@tumbolandia.net
+
+
+
+The last two weeks were centred only on retrieving nformations about general
+attacks over ssl and think about some ideas to better define the project.
+
+* DONE accumulate materials about common and studied attacks on RSA
+** [[http://crypto.stanford.edu/~dabo/pubs/papers/RSA-survey.pdf][Twenty Years of Attacks on the RSA Cryptosystem]]                    :paper:
+  * [ ]  Prove Fact 1:
+    given the public key <N, e> and the private key <N, d> it is possible to
+    factorize N=pq.
+** [[http://eprint.iacr.org/2012/064.pdf][Ron was wrong, Whit is right.]]                                      :paper:
+** Tesi Noemi                                                    :bad:thesis:
+** [[http://www.johndcook.com/Beautiful_Testing_ch10.pdf][Beautiful Testing]] - how to test a random number generator           :book:
+** [[https://www.eff.org/observatory][EFF SSL Observatory]]                                             :link:eff:
+** [[https://www.youtube.com/watch?v%3DDRjNV4YMvHI][Is the SSLiverse a safe place?]]                            :video:27c3:eff:
+   + ssl certificates scanning 0.0.0.0/0:443
+   + the database, uncompressed, is about 10G.
+   + filesystems like ext4 are no good.
+   + takes one day to load.
+
+* TODO ask for policies and access to cluster.science.unitn.it
+  Having to (i) scrape the web and (ii) process a lot of attacks at random, it
+  is needed to have a database and hopefully a cluster to compute on a remote
+  machine with a long-run job.
+  - [X] CISCA operator said to write to [[mailto:alessandro.villani@unitn.it][Alessandro Villani]] about it.
+* DONE ask EFF™ about a possible collaboration with the observatory, or ideas.
+ Follows a summary of the most interesting ideas that came out from the
+ conversation.
+ - Teus Hagen:
+   «investigations done by the observatory were merely technical, not
+   *conidering which category the organizations belong to*.»
+   Analyze if the security matches the organization's purpose:
+   1. bandwith of cert revocation
+   2. use of DNSSEC of the SSL website
+   3. revocation service
+   4. certificates erial number schema
+   5. reviews patterns used by CAs (some for examples may offer EV for money)
+   6. is the secrecy of the certificate really checked by the CA?
+ - Tom Ritter:
+   «just some random ideas»
+   + low-exponent DH surveys, with folowup investigations [[[http://permalink.gmane.org/gmane.comp.encryption.general/16172][Hasty PRISM proofing considered harmful]]];
+   + test servers not supporting parts of TLS;
+   + timing and cache attacks on AES-GCM
+   + unsafe defaults: a survey on ssl implementations and defaults which are
+     just wrong
+ - Philip William-Baker:
+   «we need a more rigorous examination of the trust models.
+   Assuming that we just cannot pretend that every sysadmin will ever make
+   mistakes in signing certificates, we should *create a metric* for evaluating
+   trust networks».
+   1. the metric shall be sililar to the metric used for evaluating algorithminc
+      complexity.
+   2. the measure could be based on how big is the effort (in social engenering)
+      to get the key;
+   3. consider the CA trust mode and keysigning as a form of endorsment for
+      CAs. [[[https://datatracker.ietf.org/doc/draft-hallambaker-prismproof-trust/][PRISM Proof Trust Model]]]
+* DONE ask hellais about ideas and cool projects
+  hellais has some interesting papers to show me personally, but on mail aswered
+  with two cool proejct named [[https://pki.net.in.tum.de/][Crossbear]], which held [[https://github.com/crossbear/Crossbear][a video]] @ 28C3 about
+  identifying man in the middle attacks and discovering the affected hop
