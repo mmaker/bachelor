@@ -1,0 +1,9 @@
+The main purpose of this project is to implement some of the most common
+mathematical attacks on the RSA cipher, and provide an executable capable of
+measuring the level of security into a ssl conversation.
+
+Given a website as input, the program should be able to download its
+certificate, and probe it with different tools.
+
+Examples of probes could be wrong information on the ssl certificate metadata,
+a vulnerability with wiener's attack, factorization, dixon, etc.
