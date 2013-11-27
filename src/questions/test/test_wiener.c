@@ -4,15 +4,22 @@
 #include "questions.h"
 #include "qwiener.h"
 
+
 /**
  * \brief Testing the continued fractions generator.
  */
 void test_cf(void)
 {
-  double x;
-  struct cf f;
-  struct fraction *it;
+  bigfraction_t x = {NULL, NULL};
+  cf_t* f;
   size_t i;
+  bigfraction_t *it;
+  BIGNUM* expected;
+
+  f = cf_new();
+  x.h = BN_new();
+  x.k = BN_new();
+  expected = BN_new();
 
    /*
    *  Testing aᵢ
@@ -24,17 +31,18 @@ void test_cf(void)
    *                 2 + …
    *
    */
-  x = sqrt(2);
-  cfrac_init(&f, x);
+  BN_dec2bn(&x.h, "14142135623730951");
+  BN_dec2bn(&x.k, "10000000000000000");
+  BN_dec2bn(&expected, "2");
+  cf_init(f, x.h, x.k);
 
-  it = cfrac_next(&f);
-  assert(it && f.a == 1);
-  it = cfrac_next(&f);
-  for (i=0; i!=10 && it; i++) {
-    assert(f.a == 2);
-    it = cfrac_next(&f);
+  it = cf_next(f);
+  assert(BN_is_one(f->a));
+  for (i=0; i!=5 && it; i++) {
+    it = cf_next(f);
+    assert(!BN_cmp(f->a, expected));
   }
-  assert(i==10);
+  assert(i==5);
 
   /*
    * Testing hᵢ/kᵢ
@@ -45,16 +53,20 @@ void test_cf(void)
    *                      1 + ⎽⎽⎽⎽⎽
    *                          1 + …
    */
-  int fib[] = {1, 1, 2, 3, 5, 8, 13};
-  x = (1 + sqrt(5))/2;
-  cfrac_init(&f, x);
-  it = cfrac_next(&f);
+  const char* fib[] = {"1", "1", "2", "3", "5", "8", "13"};
+  BN_dec2bn(&x.h, "323606797749979");
+  BN_dec2bn(&x.k, "200000000000000");
+  cf_init(f, x.h, x.k);
+  it = cf_next(f);
   for (i=1; i!=7; i++) {
-    assert(it->h == fib[i] &&
-           it->k == fib[i-1]);
-    it=cfrac_next(&f);
-  }
+    BN_dec2bn(&expected, fib[i]);
+    assert(!BN_cmp(it->h, expected));
 
+    BN_dec2bn(&expected, fib[i-1]);
+    assert(!BN_cmp(it->k, expected));
+
+    it=cf_next(f);
+  }
 }
 
 
