@@ -1,0 +1,34 @@
+# -*- coding: utf-8 ; mode: org -*-
+
+#+TITLE:  Second report
+#+DATE:   2013-11-27
+#+AUTHOR: Michele Orru`
+#+EMAIL:  maker@tumbolandia.net
+#+TODO:   DOING DONE TODO
+
+The second week has been spent mostly on coding, and experimenting with openssl.
+
+* DONE Design a good architecture for the project.
+  The project currently consists into a set of probes, which can test and try to
+  break X509 certificates. Each probe is a quartet of functions
+  <setup, teardown, test, ask>, where
+  {setup, teardown} are simple procedures.
+  test              maps (x509*) -> (bool), testing whether the hypotesis for
+                    the attack are satisfied.
+  ask               maps (X509*) -> (float), measuring the security of the
+                    certificate, and eventually printing informations about
+                    possible security threats.
+
+  The user, via command-line arguments -or whatever interface- selects the souce
+  for the X509 certificate, and which probes to use (filter/explicit selection).
+* DONE Write a small program that downloads the public key, given as input host/port
+* TODO Write a small program that fetches the public key, given as input a file.
+* DOING Weiner's Attack
+  1. Study the formal attack on Twenty Years'
+  2. Implement the attack:
+     + Implement a fast continued fraction generator.
+       The continued fraction generator has been implemented in 90195e0df81a,
+       though I am not really sure if a `double` type is suitable to approximate
+       N / e. Hence, I am studying a little bit more deppely floating point
+       arithmetic and looking around for extended decimal type extension
+       libraries.
