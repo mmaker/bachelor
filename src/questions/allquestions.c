@@ -6,7 +6,7 @@
 #define REGISTER_QUESTION(q)                      \
   {                                               \
       extern struct qa_question q;                \
-      LIST_INSERT_HEAD(&questions, &q, qs);        \
+      LIST_INSERT_HEAD(&questions, &q, qs);       \
   }
 
 /**
