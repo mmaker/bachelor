@@ -6,7 +6,7 @@
 #include <openssl/x509.h>
 
 
-struct qa_question {
+typedef struct qa_question {
   const char* name;
   int (* setup) (void);
   int (* teardown) ();
@@ -14,7 +14,7 @@ struct qa_question {
   int (* ask) (X509* cert);
 
   LIST_ENTRY(qa_question) qs;
-};
+} qa_question_t;
 
 
 LIST_HEAD(listhead, qa_question) questions;

@@ -5,4 +5,8 @@
 
 int init_client(const struct qa_conf *options);
 
-#endif
+int host_port(char *uri, char **host, char **service);
+
+X509* get_remote_cert(char *address);
+
+#endif   /* _QA_SOCK_H_ */
