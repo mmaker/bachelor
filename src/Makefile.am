@@ -1,6 +1,10 @@
-SUBDIRS = questions/
+SUBDIRS = questions/ apps/
+
 CC = clang
-AM_CFLAGS = --std=c99 -ggdb -lm -lssl -lcrypto -I include/ -I questions/
+
+AM_LDFLAGS = -lcrypto -lm -lssl
+AM_CFLAGS = --std=c99 -ggdb -I include/ -I questions/
+
 bin_PROGRAMS = qa
 qa_SOURCES = qa.c qa_sock.c cmdline.c
 qa_LDADD = questions/libquestions.a

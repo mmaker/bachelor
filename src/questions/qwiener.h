@@ -21,10 +21,15 @@ typedef struct cf {
   BN_CTX* ctx;
 } cf_t;
 
+/* continued fractions utilities. */
 cf_t* cf_new(void);
 cf_t* cf_init(cf_t *f, BIGNUM *num, BIGNUM *b);
 bigfraction_t* cf_next(cf_t *f);
 
+/* square root calculation */
+int BN_sqrtmod(BIGNUM* dv, BIGNUM* rem, BIGNUM* a, BN_CTX* ctx);
+
+/* the actual attack */
 extern struct qa_question WienerQuestion;
 
 #endif /* _QA_WIENER_H_ */

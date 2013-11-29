@@ -1,0 +1,36 @@
+\documentclass[10pt, a4paper]{report}
+\usepackage[a4paper,
+  inner=1.5cm, outer=3cm,
+  top=3cm, bottom=3cm,
+  bindingoffset=1cm]{geometry}
+\usepackage{minted}
+\usepackage{hyperref}
+
+\begin{document}
+
+\section{Bombelli's Algoritm}
+%% cuz python is pseudocode.
+\begin{minted}[fontsize=\small]{python}
+  def intsqrt(a):
+    i = 0
+    while a > 0:
+        g[i] = a % 100
+        a /= 100
+        i += 1
+
+    x = 0
+    r = 0
+    for j in range(L-1, -1, -1):
+        r = r*100 + g[j]
+        y = 0
+        for d in range(1, 10):
+            yn = d*(20*x + d)
+            if yn < r: y = yn
+            else: break
+        r -= y
+        x = 10*x + d-1
+    return (x, r)
+\end{minted}
+Has complexity $O(\log ^2 n)$.
+
+\end{document}

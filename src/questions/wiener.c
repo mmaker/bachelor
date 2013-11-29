@@ -1,3 +1,7 @@
+/**
+ * \file wiener.c
+ *
+ */
 #include <math.h>
 #include <stdlib.h>
 
@@ -7,17 +11,6 @@
 
 #include "questions.h"
 #include "qwiener.h"
-
-char * print_bignum(BIGNUM* n)
-{
-  char * dec;
-
-  dec = (char *) malloc(BN_num_bytes(n));
-  return dec = BN_bn2dec(n);
-  printf("%s\n", dec);
-
-  free(dec);
-}
 
 
 cf_t* cf_new(void)
@@ -145,7 +138,56 @@ bigfraction_t* cf_next(cf_t *f)
   exit(EXIT_FAILURE);
 }
 
+
+int BN_sqrtmod(BIGNUM* dv, BIGNUM* rem, BIGNUM* a, BN_CTX* ctx)
+{
+  char *abn2dec, *bbn2dec;
+  int g[100];
+  long al, bl;
+  long x = 0, r = 0;
+  int i, j;
+  int d;
+  long y, yn;
+
+  abn2dec = BN_bn2dec(a);
+  sscanf(abn2dec, "%ld", &al);
+
+  r = 0;
+  x = 0;
+  for (i=0; al > 0; i++) {
+    g[i] = al%100;
+    al /= 100;
+  }
+
+  for (j=i-1; j>=0; j--) {
+    r = r*100 + g[j];
+    y = 0;
+    for (d=1; d!=10; d++) {
+      yn = d*(20*x + d);
+      if (yn <= r) y = yn; else break;
+    }
+    r -= y;
+    x = 10*x + d -1;
+  }
+
+  sprintf(abn2dec, "%ld", r);
+  BN_dec2bn(&rem, abn2dec);
+  sprintf(abn2dec, "%ld", x);
+  BN_dec2bn(&dv, abn2dec);
+
+
+  OPENSSL_free(abn2dec);
+
+  return BN_is_zero(rem);
+}
+
+
+/*
+ *  Weiner Attack Implementation
+ */
+
 int wiener_question_setup(void) { return 0; }
+
 int wiener_question_teardown(void) { return 0; }
 
 int wiener_question_test(X509* cert) { return 1; }
@@ -153,26 +195,49 @@ int wiener_question_test(X509* cert) { return 1; }
 
 int wiener_question_ask(X509* cert)
 {
-  struct rsa_st *rsa;
-  BIGNUM *n, *e;
-  BN_CTX* ctx;
+  RSA *rsa;
+  BIGNUM *n, *e, *d, *phi;
+  BIGNUM *t, *tmp, *rem;
   cf_t* cf;
+  bigfraction_t *it;
+  size_t  i;
 
-  ctx = BN_CTX_new();
+  phi = BN_new();
+  tmp = BN_new();
+  rem = BN_new();
   rsa = X509_get_pubkey(cert)->pkey.rsa;
   n = rsa->n;
   e = rsa->e;
 
   cf = cf_init(NULL, n, e);
-  while
 
+  for (i=0, it = cf_next(cf);
+       i!=100 && it;
+       i++, it = cf_next(cf)) {
+    t = it->h;
+    d = it->k;
+    BN_mul(phi, e, d, cf->ctx);
+    BN_sub(tmp, phi, BN_value_one());
+    BN_div(phi, rem, tmp, t, cf->ctx);
 
+    /* test 1: there shall be no rem */
+    if (!BN_is_zero(rem)) continue;
+
+    printf("Found? ");
+    BN_print_fp(stdout, e);
+    printf(" ");
+    BN_print_fp(stdout, d);
+    printf(" ");
+    BN_print_fp(stdout, phi);
+  }
+
+  cf_free(cf);
   return 0;
 }
 
 
 
-struct qa_question WienerQuestion = {
+qa_question_t WienerQuestion = {
   .name = "Wiener",
   .setup = wiener_question_setup,
   .teardown = wiener_question_teardown,
