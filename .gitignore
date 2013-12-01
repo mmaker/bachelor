@@ -1,3 +1,27 @@
-
+# emacs-generated files.
 *~
-#*#
+\#*\#
+
+# autoconf/automake/autotools shit.
+compile
+depcomp
+aclocal.m4
+autom4te.cache
+install-sh
+Makefile.in
+Makefile
+config*
+.deps
+/missing
+
+# binaries, libraries, and objects
+*.[oa]
+qa
+gen
+unittest
+
+# latex-generated files.
+book/*.pdf
+book/*.out
+book/*.log
+book/*.aux
