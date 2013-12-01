@@ -1,6 +1,9 @@
 #include <assert.h>
 #include <math.h>
 
+#include <openssl/ssl.h>
+#include <openssl/x509.h>
+
 #include "questions.h"
 #include "qwiener.h"
 
@@ -67,6 +70,38 @@ void test_cf(void)
 
     it=cf_next(f);
   }
+
+  BN_dec2bn(&x.h, "60728973");
+  BN_dec2bn(&x.k, "160523347");
+  cf_init(f, x.h, x.k);
+  /* 0 */
+  it = cf_next(f);
+  /* 1 / 2 */
+  it = cf_next(f);
+  BN_dec2bn(&expected, "2");
+  assert(BN_is_one(it->h) && !BN_cmp(it->k, expected));
+  /* 1 / 3 */
+  it = cf_next(f);
+  BN_dec2bn(&expected, "3");
+  assert(BN_is_one(it->h) && !BN_cmp(it->k, expected));
+  /* 2 / 5 */
+  it = cf_next(f);
+  BN_dec2bn(&expected, "2");
+  assert(!BN_cmp(expected, it->h));
+  BN_dec2bn(&expected, "5");
+  assert(!BN_cmp(expected, it->k));
+  /* 3 / 8 */
+  it = cf_next(f);
+  BN_dec2bn(&expected, "3");
+  assert(!BN_cmp(expected, it->h));
+  BN_dec2bn(&expected, "8");
+  assert(!BN_cmp(expected, it->k));
+  /* 14/ 37 */
+  it = cf_next(f);
+  BN_dec2bn(&expected, "14");
+  assert(!BN_cmp(expected, it->h));
+  BN_dec2bn(&expected, "37");
+  assert(!BN_cmp(expected, it->k));
 }
 
 
@@ -94,6 +129,18 @@ void test_BN_sqrtmod(void)
   assert(!BN_cmp(root, expected));
   assert(BN_is_zero(rem));
 
+  BN_dec2bn(&a, "5");
+  BN_dec2bn(&expected, "2");
+  BN_sqrtmod(root, rem, a, ctx);
+  assert(!BN_cmp(root, expected));
+  assert(BN_is_one(rem));
+
+  BN_dec2bn(&a, "106929");
+  BN_dec2bn(&expected, "327");
+  BN_sqrtmod(root, rem, a, ctx);
+  assert(BN_is_zero(rem));
+  assert(!BN_cmp(root, expected));
+
   BN_free(root);
   BN_free(rem);
   BN_free(mayzero);
@@ -102,10 +149,29 @@ void test_BN_sqrtmod(void)
   BN_free(expected);
 }
 
+
+void test_wiener(void)
+{
+  X509 *crt;
+  FILE *fp = fopen("test/wiener_test.crt", "r");
+
+  crt = PEM_read_X509(fp, NULL, 0, NULL);
+  if (!crt) {
+    ERR_print_errors();
+    exit(EXIT_FAILURE);
+  }
+
+  WienerQuestion.setup();
+  assert(WienerQuestion.test(crt));
+  assert(WienerQuestion.ask(crt));
+  WienerQuestion.teardown();
+}
+
 int main(int argc, char ** argv)
 {
   test_cf();
   test_BN_sqrtmod();
+  test_wiener();
 
   return 0;
 }
