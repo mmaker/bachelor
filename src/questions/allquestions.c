@@ -20,5 +20,5 @@ void register_all_questions(void)
   LIST_INIT(&questions);
 
   REGISTER_QUESTION(ExampleQuestion);
-
+  REGISTER_QUESTION(PollardQuestion);
 }
