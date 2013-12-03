@@ -28,8 +28,8 @@ void qa_abort(const char *reason)
 
 X509* get_local_cert(const char *src)
 {
-  X509* crt;
-  FILE* fp;
+  X509 *crt;
+  FILE *fp;
 
   if (!strcmp(src, "-")) fp = stdin;
   else if (!(fp = fopen(src, "r")))
