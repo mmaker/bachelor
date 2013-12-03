@@ -5,11 +5,11 @@
 #include <math.h>
 #include <string.h>
 
-#include <openssl/x509.h>
-#include <openssl/pem.h>
 
+#include <openssl/pem.h>
 #include <openssl/ssl.h>
 #include <openssl/x509.h>
+#include <openssl/err.h>
 
 #include "questions.h"
 #include "qwiener.h"
@@ -120,6 +120,7 @@ void test_BN_sqrtmod(void)
   BIGNUM *mayzero;
   BN_CTX *ctx;
 
+  a = b = expected = NULL;
   root = BN_new();
   rem = BN_new();
   mayzero = BN_new();
@@ -161,11 +162,11 @@ void test_BN_sqrtmod(void)
 void test_wiener(void)
 {
   X509 *crt;
-  FILE *fp = fopen("test/wiener_test.crt", "r");
+  FILE *fp = fopen("questions/test/wiener_test.crt", "r");
 
+  if (!fp) exit(EXIT_FAILURE);
   crt = PEM_read_X509(fp, NULL, 0, NULL);
   if (!crt) {
-    ERR_print_errors();
     exit(EXIT_FAILURE);
   }
 

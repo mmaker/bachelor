@@ -150,44 +150,43 @@ static void BN_int2bn(BIGNUM** a, short int i)
 /**
  * \brief Square Root for bignums.
  *
+ * An implementation of Dijkstra's Square Root Algorithm.
+ * A Discipline of Programming, page 61 - Fifth Exercise.
+ *
  */
 int BN_sqrtmod(BIGNUM* dv, BIGNUM* rem, BIGNUM* a, BN_CTX* ctx)
 {
-  char *abn2dec;
-  int g[100];
-  long al;
-  long x = 0, r = 0;
-  int i, j;
-  int d;
-  long y, yn;
+  BIGNUM *shift;
+  BIGNUM *adj;
 
-  abn2dec = BN_bn2dec(a);
-  sscanf(abn2dec, "%ld", &al);
+  shift = BN_new();
+  adj = BN_new();
+  BN_zero(dv);
+  BN_copy(rem, a);
 
-  r = 0;
-  x = 0;
-  for (i=0; al > 0; i++) {
-    g[i] = al%100;
-    al /= 100;
-  }
+  /* hacking into internal sequence to skip some cycles. */
+  /* for  (BN_one(shift);     original */
+  for (bn_wexpand(shift, a->top+1), shift->top=a->top, shift->d[shift->top-1] = 1;
+       BN_ucmp(shift, rem) != 1;
+       /* BN_rshift(shift, shift, 2); */
+       BN_lshift1(shift, shift), BN_lshift1(shift, shift));
 
-  for (j=i-1; j>=0; j--) {
-    r = r*100 + g[j];
-    y = 0;
-    for (d=1; d!=10; d++) {
-      yn = d*(20*x + d);
-      if (yn <= r) y = yn; else break;
+
+  while (!BN_is_one(shift)) {
+    /* BN_rshift(shift, shift, 2); */
+    BN_rshift1(shift, shift);
+    BN_rshift1(shift, shift);
+
+    BN_uadd(adj, dv, shift);
+    BN_rshift1(dv, dv);
+    if (BN_ucmp(rem, adj) != -1) {
+      BN_uadd(dv, dv, shift);
+      BN_usub(rem, rem, adj);
     }
-    r -= y;
-    x = 10*x + d -1;
   }
 
-  sprintf(abn2dec, "%ld", r);
-  BN_dec2bn(&rem, abn2dec);
-  sprintf(abn2dec, "%ld", x);
-  BN_dec2bn(&dv, abn2dec);
-  OPENSSL_free(abn2dec);
-
+  BN_free(shift);
+  BN_free(adj);
   return BN_is_zero(rem);
 }
 
