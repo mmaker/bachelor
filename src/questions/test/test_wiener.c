@@ -1,5 +1,12 @@
 #include <assert.h>
+#include <error.h>
+#include <errno.h>
+#include <libgen.h>
 #include <math.h>
+#include <string.h>
+
+#include <openssl/x509.h>
+#include <openssl/pem.h>
 
 #include <openssl/ssl.h>
 #include <openssl/x509.h>
@@ -7,9 +14,10 @@
 #include "questions.h"
 #include "qwiener.h"
 
-
 /**
  * \brief Testing the continued fractions generator.
+ *
+ *
  */
 void test_cf(void)
 {
