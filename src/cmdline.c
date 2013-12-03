@@ -16,44 +16,6 @@
 
 #include "qa.h"
 
-#define QA_DEFAULT_PORT "443"
-
-
-/**
- * \brief Converts a uri into a tuple {host, service}.
- *
- * Parses an input string containing a host and (maybe) a service/port.
- * Valid options are:
- *  - service://hostname
- *  - hostname
- *  - hostname:port
- * The resulting tuple will be stored in params \ref host and \ref service.
- *
- * \param[in]  uri     The input uri.
- * \param[out] host    Place where to store parsed host.
- * \param[out] service Place where to store parsed service.
- *
- * \note \ref uri might be modified during parsing.
- */
-static void host_port(char* uri, char** host, char** service)
-{
-  char* c;
-
-  if (!(c = strchr(uri, ':')))
-    *host = uri;
-  else {
-    *c = '\0';
-    if (c[1] != '/' && c[2] == '/') {
-      *service = uri;
-      *host = c+3;
-    } else {
-      *service = c+1;
-      *host = uri;
-    }
-  }
-}
-
-
 /**
  * \brief Prints the usage message, then exit.
  *
@@ -63,14 +25,19 @@ static void host_port(char* uri, char** host, char** service)
 void usage(void)
 {
   static const char* help_message = "%s usage: %s"
-    " [-p PORT]"
-    " <target>"
+    " [-r HOST:port | -f FILE]"
     " \n";
   fprintf(stderr, help_message,
           program_invocation_short_name,
           program_invocation_name);
 }
 
+void conflicting_args(void)
+{
+  printf("Conflicting fuffa\n");
+  usage();
+  exit(EXIT_FAILURE);
+}
 
 int main(int argc, char** argv)
 {
@@ -79,15 +46,15 @@ int main(int argc, char** argv)
   size_t i;
 
   struct option long_options[] = {
-    {"help", required_argument, NULL, 'h'},
-    {"port", required_argument, NULL, 'p'},
+    {"help", no_argument, NULL, 'h'},
+    {"remote", required_argument, NULL, 'r'},
+    {"file", required_argument, NULL, 'f'},
     {0, 0, 0, 0}
   };
-  static const char* short_options = "h:p:";
+  static const char* short_options = "hr:f:";
 
   struct qa_conf conf = {
-    .host = NULL,
-    .port = NULL,
+    .src_type = NONE,
   };
 
   while ((opt=getopt_long(argc, argv,
@@ -98,8 +65,15 @@ int main(int argc, char** argv)
       usage();
       exit(EXIT_SUCCESS);
       break;
-    case 'p':
-      conf.port = optarg;
+    case 'f':
+      if (conf.src_type != NONE) conflicting_args();
+      conf.src_type = LOCAL;
+      conf.src = optarg;
+      break;
+    case 'r':
+      if (conf.src_type != NONE) conflicting_args();
+      conf.src_type = REMOTE;
+      conf.src = optarg;
       break;
     case '?':
     default:
@@ -107,14 +81,20 @@ int main(int argc, char** argv)
       exit(EXIT_FAILURE);
     }
 
-  if (optind < argc && !strcmp(argv[optind], "--")) optind++;
-  if (optind != argc-1) {
-    usage();
-    exit(EXIT_FAILURE);
-  }
+  if (conf.src_type == NONE)  {
+    conf.src_type = REMOTE;
 
-  host_port(argv[optind], &conf.host, &conf.port);
-  if (!conf.port) conf.port = QA_DEFAULT_PORT;
+    if (optind == argc)
+      conf.src = "-";
+    else if (optind == argc-1)
+      conf.src = argv[optind];
+    else if (optind == argc-2 && !strcmp(argv[optind], "--"))
+      conf.src = argv[optind+1];
+    else {
+        usage();
+        exit(EXIT_FAILURE);
+      }
+  }
 
   return qa_init(&conf);
 }
