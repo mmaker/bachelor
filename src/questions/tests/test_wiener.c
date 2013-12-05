@@ -162,7 +162,7 @@ void test_BN_sqrtmod(void)
 void test_wiener(void)
 {
   X509 *crt;
-  FILE *fp = fopen("questions/test/wiener_test.crt", "r");
+  FILE *fp = fopen("questions/tests/wiener_test.crt", "r");
 
   if (!fp) exit(EXIT_FAILURE);
   crt = PEM_read_X509(fp, NULL, 0, NULL);
@@ -170,17 +170,18 @@ void test_wiener(void)
     exit(EXIT_FAILURE);
   }
 
-  WienerQuestion.setup();
   assert(WienerQuestion.test(crt));
   assert(WienerQuestion.ask(crt));
-  WienerQuestion.teardown();
 }
 
 int main(int argc, char ** argv)
 {
+  WienerQuestion.setup();
+
   test_cf();
   test_BN_sqrtmod();
   test_wiener();
 
+  WienerQuestion.teardown();
   return 0;
 }
