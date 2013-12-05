@@ -23,16 +23,24 @@
  */
 
 #include <openssl/x509.h>
+#include <openssl/err.h>
 
 #include "questions.h"
 
+static BIGNUM *two;
+
 int pollard1_question_setup(void)
 {
+  /* create 2 */
+  two = BN_new();
+  BN_one(two);
+  BN_uadd(two, two, BN_value_one());
   return 0;
 }
 
 int pollard1_question_teardown(void)
 {
+  BN_free(two);
   return 0;
 }
 
@@ -42,6 +50,8 @@ int pollard1_question_test(X509 *cert)
   return 0;
 }
 
+
+int BN_sqrtmod(BIGNUM*, BIGNUM*, BIGNUM*, BN_CTX*);
 
 /**
  * \brief Pollard (p-1) factorization.
@@ -57,21 +67,54 @@ int pollard1_question_test(X509 *cert)
  */
 int pollard1_question_ask(X509 *cert)
 {
+  int ret = 1;
   RSA *rsa;
-  BIGNUM *a, *B;
+  BIGNUM *a, *B, *a1;
+  BIGNUM *gcd, *rem;
   BIGNUM *n;
+  BIGNUM *p, *q;
+  BN_CTX *ctx;
 
   rsa = X509_get_pubkey(cert)->pkey.rsa;
   n = rsa->n;
   a = BN_new();
   B = BN_new();
+  a1 = BN_new();
+  gcd = BN_new();
+  rem = BN_new();
+  ctx = BN_CTX_new();
 
-  BN_dec2bn(&a, "2");
+  /* take ⁸√N */
+  BN_sqrtmod(gcd, rem, n, NULL);
+  BN_sqrtmod(B, rem, gcd, NULL);
+  /* compute 2^(B!) */
+  for (BN_copy(a, two), BN_one(gcd);
+       !(BN_is_zero(B) || !BN_is_one(gcd) || BN_cmp(gcd, n)==0);
+       BN_usub(B, B, BN_value_one())) {
+
+    BN_mod_exp(a, a, B, n, ctx);
+    /* p ≟ gcd(a-1, N) */
+    BN_usub(a1, a, BN_value_one());
+    BN_gcd(gcd, a1, n, ctx);
+  }
+
+  /* Either p or q found :) */
+  ret = BN_is_zero(B);
+  if (!ret) {
+    p = BN_dup(gcd);
+    q = BN_new();
+    BN_div(q, NULL, n, gcd, ctx);
+    printf("p:%s, q=%s \n", BN_bn2dec(p), BN_bn2dec(q));
+  }
 
   BN_free(a);
   BN_free(B);
+  BN_free(a1);
+  BN_free(gcd);
+  BN_free(rem);
+  BN_CTX_free(ctx);
 
-  return 0;
+  return ret;
 }
 
 
