@@ -204,6 +204,7 @@ int wiener_question_ask(X509* cert)
   /* equation coefficients */
   BIGNUM *b2, *delta;
   BN_CTX *ctx;
+  int bits;
 
   rsa = X509_get_pubkey(cert)->pkey.rsa;
   phi = BN_new();
@@ -217,11 +218,12 @@ int wiener_question_ask(X509* cert)
   /*
    * Generate the continued fractions approximating e/N
    */
+  bits = BN_num_bits(n);
   cf = cf_init(NULL, e, n);
   ctx = cf->ctx;
   for (i=0, it = cf_next(cf);
        // XXX. how many keys shall I test?
-       i!=100 && it;
+       i!=bits && it;
        i++, it = cf_next(cf)) {
     t = it->h;
     d = it->k;

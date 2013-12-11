@@ -162,7 +162,7 @@ void test_BN_sqrtmod(void)
 void test_wiener(void)
 {
   X509 *crt;
-  FILE *fp = fopen("questions/tests/wiener_test.crt", "r");
+  FILE *fp = fopen("tests/wiener_test.crt", "r");
 
   if (!fp) exit(EXIT_FAILURE);
   crt = PEM_read_X509(fp, NULL, 0, NULL);
