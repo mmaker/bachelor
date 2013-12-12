@@ -120,22 +120,18 @@ bigfraction_t* cf_next(cf_t *f)
   BN_div(f->a, rem, f->x.h, f->x.k, f->ctx);
 
   /* computing hᵢ */
-  if (!BN_mul(f->fs[f->i].h , f->a, f->fs[(f->i-1+3) % 3].h, f->ctx)) goto oh_fuck;
-  if (!BN_add(f->fs[f->i].h, f->fs[f->i].h, f->fs[(f->i-2+3) % 3].h)) goto oh_fuck;
+  BN_mul(f->fs[f->i].h , f->a, f->fs[(f->i-1+3) % 3].h, f->ctx);
+  BN_uadd(f->fs[f->i].h, f->fs[f->i].h, f->fs[(f->i-2+3) % 3].h);
   /* computing kᵢ */
-  if (!BN_mul(f->fs[f->i].k , f->a, f->fs[(f->i-1+3) % 3].k, f->ctx)) goto oh_fuck;
-  if (!BN_add(f->fs[f->i].k, f->fs[f->i].k, f->fs[(f->i-2+3) % 3].k)) goto oh_fuck;
+  BN_mul(f->fs[f->i].k , f->a, f->fs[(f->i-1+3) % 3].k, f->ctx);
+  BN_uadd(f->fs[f->i].k, f->fs[f->i].k, f->fs[(f->i-2+3) % 3].k);
 
   f->i = (f->i + 1) % 3;
   /* update x. */
-  if (!BN_copy(f->x.h, f->x.k)) goto oh_fuck;
-  if (!BN_copy(f->x.k, rem))    goto oh_fuck;
+  BN_copy(f->x.h, f->x.k);
+  BN_copy(f->x.k, rem);
 
   return ith_fs;
-
- oh_fuck:
-  printf("of fuck!\n");
-  exit(EXIT_FAILURE);
 }
 
 
@@ -220,7 +216,7 @@ int wiener_question_ask(X509* cert)
   delta = BN_new();
 
   /*
-   * generate the continued fractions approximating e/N
+   * Generate the continued fractions approximating e/N
    */
   bits = BN_num_bits(n);
   cf = cf_init(NULL, e, n);
@@ -240,7 +236,7 @@ int wiener_question_ask(X509* cert)
     BN_div(phi, rem, tmp, t, cf->ctx);
     if (!BN_is_zero(rem)) continue;
     // XXX. check, is it possible to fall here, assuming N, e are valid?
-    if (BN_is_odd(phi) && BN_cmp(n, phi) > 0)   continue;
+    if (BN_is_odd(phi) && BN_cmp(n, phi) == 1)   continue;
     /*
      * Recovering p, q
      * Solving the equation

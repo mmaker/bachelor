@@ -1,35 +1,33 @@
 # -*- coding: utf-8 ; mode: org -*-
 
 #+TITLE:  Third report
-#+DATE:   2013-12-03
+#+DATE:   2013-12-04
 #+AUTHOR: Michele Orru`
 #+EMAIL:  maker@tumbolandia.net
 #+TODO:   DOING DONE TODO
 
 
 This third week has been spent finalizing Wiener's Attack on small private
-exponent, and starting Dixon's factorization.
+exponent, and starting Dixon's, Pollard's (p-1) factorization.
 It would be nice to receive feddback on the implmented parts.
 
 * DONE Finalize and test Wiener's attack.
-  The attack has been implemented and tested, but there are a few issues worth
-  mentioning:
-   1) The square root has been implemented by myself, using Bombelli's algorithm
-      for computing root and modulus - which is O(lg₂² n ).
-      The algorithm *must* be optimized and *extended* to support big
-      numbers. Also, it would be nice if Emanuele could do a second check to
-      assert there is no other way.
-   2) Tests are being done only against a fake certificate, so it would be nice to
-      have more data to test on, maybe the cryptolab has some certificate I shall
-      look at?
+  1) Complete the implementation of a square root algorithm for integers
+  2) Complete Wiener's attack
+  3) Unittest, and test over a fake certificate
 * DOING Starting Dixon's attack for factorizing the public modulus
+  Just spent some time looking at the mathematical basis behing the attack,
+  started thinking about the algorithm.
   Sources are now, the course lecture (lecture 3), and this [[http://cse.iitkgp.ac.in/~debdeep/courses_iitkgp/Crypto/slides/Factorization.pdf][slides]] found on the
-  internetz. There, at page 10 I see that -1 ∈ B, the factor basis. Though, on
+  internetz.
+
+  Note: On the slides, at page 10 I see that -1 ∈ B, the factor basis. Though, on
   lecture 3, I read "A set B finite and non-empty of prime positive
   integers". What is true, what is wrong?
-* DONE Starting book/
+* DOING Starting Pollard's (p-1) attack for factorizing the public modulus
+  I am currently doing some research here, sorting out the best choiceof
+  B. Though, it seems that [[https://en.wikipedia.org/wiki/Pollard's_p_%E2%88%92_1_algorithm#How_to_choose_B.3F][wikipedia]] 's section is wrong.
+* DOING Starting book/
   Following Emanuele's suggestion, I've created the book/ directory contains the
   thesis book, and right now I'm just taking note of some algs I've been using;
   so, nothing ready, but might be useful in the future.
-  Emanuele mentioned that there are some templates for Sala's students, can I
-  have them before next week?
