@@ -1,20 +1,17 @@
-%--------------------------------------------------------------------
-% Emmanuela Orsini
-%--------------------------------------------------------------------
+%% Using thesis custom template.
+\documentclass[12pt,a4paper,twoside]{thesis}
 
-\documentclass[12pt,a4paper,twoside]{Phd_1}
-
-% ---(Babel)--------------------------------------------------------------
-%-----------------------------------------------------------------------
+%% PACKAGES
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
-% ---(Colors)-------------------------------------------------------------
+\usepackage{hyperref}
+%% Colors packages.
 \usepackage[dvips]{color}
 % or alternatively [usenames,dvips] if using ordinary LaTeX rather than pdfLaTeX
-% ---(Images)-------------------------------------------------------------
+%% Images packages.
 \usepackage{graphicx}
 \usepackage{makeidx,shortvrb,latexsym}
 \usepackage{fancyhdr}
@@ -25,10 +22,10 @@
 %\usepackage{xypic}
 \input xy
 \xyoption{all}
-%--(Tables)-----------------------------------------------------------------
+%% Table packages.
 \usepackage{supertabular}
-%---------------------------------------------------------------------------
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% COMMANDS
 %\newcommand{\pe}{\psi}
 \def\d{\delta}
 \def\ds{\displaystyle}
@@ -59,7 +56,7 @@
 \newcommand{\sms}{\setminus}
 \newcommand{\Special}{s2ec}
 \newcommand{\spl}{s2ec}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%ROBA MIA%%%%%%%%%%%
+%% Optional custom shortcuts commands.
 \usepackage{braket}
 \newenvironment{sistema}
   {\left\lbrace\begin{array}{@{}l@{}}}
@@ -99,7 +96,8 @@
 \newcommand{\SQ}{\begin{flushright}
 $\square$
 \end{flushright}}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 \makeindex
 \let\origdoublepage\cleardoublepage
 \newcommand{\clearemptydoublepage}{%
@@ -107,7 +105,6 @@ $\square$
 {\pagestyle{empty}\origdoublepage}%
 }
 \let\cleardoublepage\clearemptydoublepage
-\usepackage{hyperref}
 % Note that colour boxes around links are NOT printed.
 % The text itself can be coloured, replacing the bounding box, but
 % when printing this may appear illegible;
@@ -121,35 +118,36 @@ $\square$
 % earlier in this document if that is not set to the right option (e.g.
 % dvips or pdflatex).
 \begin{document}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%da riempire
 %\phd  %se e' la tesi di dottorato, altrimenti non mettere nulla
-\university{Universit\`{a} degli Studi di Trento}
-\faculty{Facolt\`{a} di Scienze Matematiche Fisiche e Naturali}
-\Logo{unitnlogo.pdf}    %metti il logo della tua universita'
-\phdtitle{}     %titolo del dottorato
-\title{Probabilit\`a d'errore in decodifica con un nuovo bound}  %titolo della tesi
-\author{Matteo Piva}
-%\twosupervisors   %scommentare se si ha anche il correlatore
+
+\university{Universit\`a degli Studi di Trento}
+\faculty{Facolt\`a di Scienze Matematiche Fisiche e Naturali}
+\dept{Dipartimento di Scienze Informatiche}
+\Logo{logo_unitn.jpg}
+%% titolo del dottorato
+% \phdtitle{}
+%% titolo della tesi
+\title{Ladies and Gentlemen, we are floating in space}
+\subtitle{}
+\author{Beppe Scamozza}
 \supervisor{Prof. Massimiliano Sala}
-%
-\firstreader{Mariello Prapapappo}  %correlatore
-%
-\secondreader{Prof. Sandro Mattarei}    %capo della scuola di dottorato o controrelatore
-\accademico{ Anno accademico $2008/2009$}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%frontespizio%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\frontespizio     %questo e' il frontespizio esterno, cioe' senza firme
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Uncomment the following two lines if a co-relator is present.
+%\twosupervisors
+%\firstreader{Prof. Ettore Miron}
+
+% capo della scuola di dottorato o controrelatore
+\secondreader{Prof. Nara Stabbocchi}
+\accademico{Anno accademico $2008/2009$}
+
+\frontespizio     % questo e` il frontespizio esterno, cioe' senza firme
 \cleardoublepage
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\signaturepage     %questo e' il frontesizio interno con le firme
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\signaturepage    % questo e` il frontesizio interno con le firme
 \cleardoublepage
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% DEDICA
 %non e' ovviamente obbligatoria
 %\dedica{To my grandfather C.} \dedicapage
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \cleardoublepage \setcounter{page}{1} \pagenumbering{roman}
 \pagestyle{plain} \tableofcontents
 %\listoffigures
@@ -158,15 +156,15 @@ $\square$
 %\listofalgorithms
 %\addcontentsline{toc}{chapter}{Elenco degli algoritmi}
 %\addcontentsline{toc}{chapter}{Introduction}
-%%%%%%%%%%%%%%%%%%%%%%%%%Introduzione%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% INTRODUCTION
 %\include{ack}
 %\addcontentsline{toc}{chapter}{Acknowledgment}
 %\cleardoublepage
 %\include{Introduction}
 %\addcontentsline{toc}{chapter}{Introduction}
 \cleardoublepage
-%---------------------------------------------------------------------
-%%%%%%%%%%TESI parte centrale%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% THESIS BODY
 \pagestyle{fancy} \pagenumbering{arabic} \mainmatter
 %\part{}
 %\include{chap1}
@@ -184,6 +182,6 @@ $\square$
 %\part{Appendice }
 %\include{appendice}
 \backmatter
-\bibliography{RefsCGC}
+\bibliography{refs_ CGC}
 \addcontentsline{toc}{chapter}{Bibliografia}
 \end{document}
