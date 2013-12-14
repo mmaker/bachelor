@@ -26,6 +26,7 @@
 #include <openssl/err.h>
 
 #include "qa/questions/questions.h"
+#include "qa/questions/qarith.h"
 #include "qa/questions/qpollard.h"
 
 

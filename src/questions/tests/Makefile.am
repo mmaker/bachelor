@@ -1,9 +1,11 @@
 # unittesting my ass
-check_PROGRAMS = test_qstrings
-
 AM_CFLAGS = -I ../../include/
+AM_LDFLAGS = -lcrypto -lssl -L ../libquestions.a
 
-test_qstrings_SOURCES = test_qstrings.c ../qstrings.c
-test_qstrings_LDADD = -L ../libquestions.a
+check_PROGRAMS = test_qstrings test_qarith
 
-TESTS = test_qstrings
+test_qstrings_SOURCES = test_qstrings.c
+
+test_qarith_SOURCES = test_qarith.c
+
+TESTS = test_qstrings test_qarith

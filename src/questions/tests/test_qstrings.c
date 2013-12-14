@@ -3,7 +3,6 @@
 
 #include "qa/questions/qstrings.h"
 
-
 void test_is_vzero(void)
 {
   const char *v = "\x0\x0\x0\x1\x0\x1";
