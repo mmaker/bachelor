@@ -9,8 +9,8 @@
 #include <openssl/rsa.h>
 #include <openssl/bn.h>
 
-#include "questions.h"
-#include "qwiener.h"
+#include "qa/questions/questions.h"
+#include "qa/questions/qwiener.h"
 
 
 cf_t* cf_new(void)

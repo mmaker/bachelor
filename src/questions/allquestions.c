@@ -1,6 +1,6 @@
 #include <sys/queue.h>
 
-#include "questions.h"
+#include "qa/questions/questions.h"
 
 
 #define REGISTER_QUESTION(q)                      \

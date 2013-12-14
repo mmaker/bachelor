@@ -22,9 +22,9 @@
 
 #include <openssl/bn.h>
 
-#include "qarith.h"
-#include "qstrings.h"
-#include "questions.h"
+#include "qa/questions/qarith.h"
+#include "qa/questions/qstrings.h"
+#include "qa/questions/questions.h"
 
 #define EPOCHS             100
 #define REPOP_EPOCHS        50

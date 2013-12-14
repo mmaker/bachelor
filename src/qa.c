@@ -10,9 +10,9 @@
 #include <openssl/ssl.h>
 #include <openssl/x509.h>
 
-#include "qa.h"
-#include "questions.h"
-#include "qa_sock.h"
+#include "qa/qa.h"
+#include "qa/questions/questions.h"
+#include "qa/qa_sock.h"
 
 /** BIO wrapper around stdout */
 BIO* bio_out;

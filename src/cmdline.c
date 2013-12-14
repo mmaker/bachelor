@@ -14,7 +14,7 @@
 #include <string.h>
 #include <errno.h>
 
-#include "qa.h"
+#include "qa/qa.h"
 
 /**
  * \brief Prints the usage message, then exit.

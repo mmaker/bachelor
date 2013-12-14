@@ -13,7 +13,7 @@
 #include <openssl/x509.h>
 #include <openssl/ssl.h>
 
-#include "qa.h"
+#include "qa/qa.h"
 
 #define SOCKET_PROTOCOL 0
 #define INVALID_SOCKET  (-1)

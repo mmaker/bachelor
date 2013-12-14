@@ -25,7 +25,9 @@
 #include <openssl/x509.h>
 #include <openssl/err.h>
 
-#include "questions.h"
+#include "qa/questions/questions.h"
+#include "qa/questions/qpollard.h"
+
 
 static BIGNUM *two;
 
