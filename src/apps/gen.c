@@ -53,7 +53,7 @@ int main(int argc, char **argv)
   BN_mod(rsa->dmq1, rsa->d, q1, ctx);
   BN_mod(rsa->dmp1, rsa->d, p1, ctx);
   BN_mod_inverse(rsa->iqmp, rsa->q, rsa->p, ctx);
-  /* PEM_write_RSAPrivateKey(stdout, rsa, NULL, NULL, 0, NULL, NULL); */
+  PEM_write_RSAPrivateKey(stdout, rsa, NULL, NULL, 0, NULL, NULL);
 
   /* creating public key */
   EVP_PKEY *pk;
@@ -64,7 +64,7 @@ int main(int argc, char **argv)
   X509* crt;
   crt = X509_new();
   if (!X509_set_pubkey(crt, pk)) exit(EXIT_FAILURE);
-  PEM_write_X509(stdout, crt);
+  /* PEM_write_X509(stdout, crt); */
   X509_free(crt);
   EVP_PKEY_free(pk);
   BN_CTX_free(ctx);

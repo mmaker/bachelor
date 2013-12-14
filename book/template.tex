@@ -1,0 +1,187 @@
+%% Using thesis custom template.
+\documentclass[12pt,a4paper,twoside]{thesis}
+
+%% PACKAGES
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{hyperref}
+%% Colors packages.
+\usepackage[dvips]{color}
+% or alternatively [usenames,dvips] if using ordinary LaTeX rather than pdfLaTeX
+%% Images packages.
+\usepackage{graphicx}
+\usepackage{makeidx,shortvrb,latexsym}
+\usepackage{fancyhdr}
+%\usepackage[boxed]{algorithm}
+%\usepackage{algorithmic}
+\usepackage{amsthm}
+\usepackage{indentfirst}
+%\usepackage{xypic}
+\input xy
+\xyoption{all}
+%% Table packages.
+\usepackage{supertabular}
+
+%% COMMANDS
+%\newcommand{\pe}{\psi}
+\def\d{\delta}
+\def\ds{\displaystyle}
+\def\e{{\epsilon}}
+\def\eb{\bar{\eta}}
+\def\enorm#1{\|#1\|_2}
+\def\then{\;\Longrightarrow\;}
+\def\Kc{{\cal K}}
+\def\norm#1{\|#1\|}
+\def\wb{{\bar w}}
+\def\zb{{\bar z}}
+\def\Bbb#1{{\mathbb #1}}
+\newcommand{\GCD}{\mathrm{GCD}}
+\newcommand{\lowrk}{\mathrm{low\_rk}}
+\newcommand{\bestrk}{\mathrm {best\_rk}}
+\newcommand{\DFT}{\mathrm {DFT}}
+\newcommand{\BCH}{\mathrm {BCH}}
+\newcommand{\Schaub}{\mathrm {Schaub}}
+\newcommand{\SchaubPlus}{\mathrm {SchaubPlus}}
+\newcommand{\s}{\cal{S}}
+\newcommand{\h}{\hspace{0.4cm}}
+\def\Exists{\mbox{\ exists }}
+\def\And{\mbox{\ and  }}
+\newcommand{\cnk}{{\mathcal C}(n,k,q)}
+\newcommand{\supp}{\rm supp}
+\newcommand{\fattorial}[2]{ \left( #1 \atop #2 \right) }
+\newcommand{\hi}{\hspace{0.2cm}}
+\newcommand{\sms}{\setminus}
+\newcommand{\Special}{s2ec}
+\newcommand{\spl}{s2ec}
+%% Optional custom shortcuts commands.
+\usepackage{braket}
+\newenvironment{sistema}
+  {\left\lbrace\begin{array}{@{}l@{}}}
+  {\end{array}\right.}
+\newcommand{\dimo}{\noindent\textit{Dimostrazione.}\\}
+\newtheorem{teo}[thm]{Teorema}
+\newcommand{\pe}{\mathbb{P}_{\mathrm{E}}}
+\newcommand{\pme}{\mathbb{P}_{\mathrm{ME}}}
+\newcommand{\primary}{\blacktriangle}
+\newcommand{\secondary}{{\blacktriangle\!}^{\! \! +}}
+\newcommand{\MM}{\mathcal{M}}
+%\newtheorem{teo}[thm]{Teorema}
+\newtheorem{proposizione}[thm]{Proposizione}
+\newtheorem{corollario}[thm]{Corollario}
+\newtheorem{fatto}[thm]{Fatto}
+\newtheorem{definizione}[thm]{Definizione}
+%\newtheorem{lemma}[thm]{Lemma}
+\newtheorem{osservazione}[thm]{Osservazione}
+\newtheorem{esempio}[thm]{Esempio}
+\newcommand{\DP}{{\D\!}^{\! \! +}}
+\newcommand{\D}{\Delta}
+\newcommand{\Fq}{ \mathbb{F}_{q}}
+\newcommand{\Fp}{ \mathbb{F}_{p}}
+\newcommand{\Lq}{ \mathcal{L}_{q}}
+\newcommand{\R}{ \mathcal{R}}
+\newcommand{\Cq}{ \mathcal{C}_{q}}
+\newcommand{\SCa}{ S_{C,\alpha}}
+\newcommand{\Cqn}{ \mathcal{C}_{q,n}}
+\newcommand{\K}{ \mathbb{K}}
+\newcommand{\U}{ \mathcal{U}}
+\newcommand{\vi}{\mathrm{\textbf{v}}}
+\newcommand{\ww}{\mathrm{w}}
+\newcommand{\uu}{\mathrm{\textbf{u}}}
+\newcommand{\f}{\mathsf{f}}
+\newcommand{\V}{V_{\left(n,S\right)}^{\zeta}}
+\newcommand{\T}{T_{\left(n,S\right)}^{\zeta}}
+\newcommand{\SQ}{\begin{flushright}
+$\square$
+\end{flushright}}
+
+
+\makeindex
+\let\origdoublepage\cleardoublepage
+\newcommand{\clearemptydoublepage}{%
+\clearpage
+{\pagestyle{empty}\origdoublepage}%
+}
+\let\cleardoublepage\clearemptydoublepage
+% Note that colour boxes around links are NOT printed.
+% The text itself can be coloured, replacing the bounding box, but
+% when printing this may appear illegible;
+% link colors can be set to black for printing purposes, like so:
+%\hypersetup{colorlinks,%
+%	citecolor=black,%
+%	filecolor=black,%
+%	linkcolor=black,%
+%	urlcolor=black}
+% Also note that this will conflict with the color package called
+% earlier in this document if that is not set to the right option (e.g.
+% dvips or pdflatex).
+\begin{document}
+%\phd  %se e' la tesi di dottorato, altrimenti non mettere nulla
+
+\university{Universit\`a degli Studi di Trento}
+\faculty{Facolt\`a di Scienze Matematiche Fisiche e Naturali}
+\dept{Dipartimento di Scienze Informatiche}
+\Logo{logo_unitn.jpg}
+%% titolo del dottorato
+% \phdtitle{}
+%% titolo della tesi
+\title{Ladies and Gentlemen, we are floating in space}
+\subtitle{}
+\author{Beppe Scamozza}
+\supervisor{Prof. Massimiliano Sala}
+%% Uncomment the following two lines if a co-relator is present.
+%\twosupervisors
+%\firstreader{Prof. Ettore Miron}
+
+% capo della scuola di dottorato o controrelatore
+\secondreader{Prof. Nara Stabbocchi}
+\accademico{Anno accademico $2008/2009$}
+
+\frontespizio     % questo e` il frontespizio esterno, cioe' senza firme
+\cleardoublepage
+\signaturepage    % questo e` il frontesizio interno con le firme
+\cleardoublepage
+
+%% DEDICA
+%non e' ovviamente obbligatoria
+%\dedica{To my grandfather C.} \dedicapage
+
+\cleardoublepage \setcounter{page}{1} \pagenumbering{roman}
+\pagestyle{plain} \tableofcontents
+%\listoffigures
+%\addcontentsline{toc}{chapter}{Elenco delle figure}
+%\renewcommand{\listalgorithmname}{Elenco degli algoritmi}
+%\listofalgorithms
+%\addcontentsline{toc}{chapter}{Elenco degli algoritmi}
+%\addcontentsline{toc}{chapter}{Introduction}
+%% INTRODUCTION
+%\include{ack}
+%\addcontentsline{toc}{chapter}{Acknowledgment}
+%\cleardoublepage
+%\include{Introduction}
+%\addcontentsline{toc}{chapter}{Introduction}
+\cleardoublepage
+
+%% THESIS BODY
+\pagestyle{fancy} \pagenumbering{arabic} \mainmatter
+%\part{}
+%\include{chap1}
+%\include{chap2}
+%\part{}
+%\include{chap3}
+%\include{chap5}
+%\part{}
+%\include{chap5}
+%\include{chap6}
+%\part{}
+%\include{chap8}
+%\include{chap7}
+%
+%\part{Appendice }
+%\include{appendice}
+\backmatter
+\bibliography{refs_ CGC}
+\addcontentsline{toc}{chapter}{Bibliografia}
+\end{document}

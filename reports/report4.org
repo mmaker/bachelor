@@ -1,0 +1,19 @@
+# -*- coding: utf-8 ; mode: org -*-
+
+#+TITLE:  Fourth report
+#+DATE:   2013-12-11
+#+AUTHOR: Michele Orru`
+#+EMAIL:  maker@tumbolandia.net
+#+TODO:   DOING DONE TODO
+
+
+This fourth week has not got any consistent update. I just reached a working
+implementation of Pollard's (p-1) algorithm. I believe it can still be optimied,
+yet there are some sources given by Emanuele I have to read/study.
+
+* DONE Complete and test Pollard's (p-1) factorization.
+  See 773c479543acda096e83e625124284f for further informations.
+* DOING Studying an upper limit for the iterations in Wiener.
+  "Twenty Years of Attacks on the RSA Cryptosystem" claims that the algorithms
+  is linear, that's jsut about log N iterations; looking at the proof to
+  understand why.

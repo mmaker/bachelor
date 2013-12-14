@@ -120,64 +120,61 @@ bigfraction_t* cf_next(cf_t *f)
   BN_div(f->a, rem, f->x.h, f->x.k, f->ctx);
 
   /* computing hᵢ */
-  if (!BN_mul(f->fs[f->i].h , f->a, f->fs[(f->i-1+3) % 3].h, f->ctx)) goto oh_fuck;
-  if (!BN_add(f->fs[f->i].h, f->fs[f->i].h, f->fs[(f->i-2+3) % 3].h)) goto oh_fuck;
+  BN_mul(f->fs[f->i].h , f->a, f->fs[(f->i-1+3) % 3].h, f->ctx);
+  BN_uadd(f->fs[f->i].h, f->fs[f->i].h, f->fs[(f->i-2+3) % 3].h);
   /* computing kᵢ */
-  if (!BN_mul(f->fs[f->i].k , f->a, f->fs[(f->i-1+3) % 3].k, f->ctx)) goto oh_fuck;
-  if (!BN_add(f->fs[f->i].k, f->fs[f->i].k, f->fs[(f->i-2+3) % 3].k)) goto oh_fuck;
+  BN_mul(f->fs[f->i].k , f->a, f->fs[(f->i-1+3) % 3].k, f->ctx);
+  BN_uadd(f->fs[f->i].k, f->fs[f->i].k, f->fs[(f->i-2+3) % 3].k);
 
   f->i = (f->i + 1) % 3;
   /* update x. */
-  if (!BN_copy(f->x.h, f->x.k)) goto oh_fuck;
-  if (!BN_copy(f->x.k, rem))    goto oh_fuck;
+  BN_copy(f->x.h, f->x.k);
+  BN_copy(f->x.k, rem);
 
   return ith_fs;
-
- oh_fuck:
-  printf("of fuck!\n");
-  exit(EXIT_FAILURE);
 }
 
 
+/**
+ * \brief Square Root for bignums.
+ *
+ * An implementation of Dijkstra's Square Root Algorithm.
+ * A Discipline of Programming, page 61 - Fifth Exercise.
+ *
+ */
 int BN_sqrtmod(BIGNUM* dv, BIGNUM* rem, BIGNUM* a, BN_CTX* ctx)
 {
-  char *abn2dec, *bbn2dec;
-  int g[100];
-  long al, bl;
-  long x = 0, r = 0;
-  int i, j;
-  int d;
-  long y, yn;
+  BIGNUM *shift;
+  BIGNUM *adj;
 
-  abn2dec = BN_bn2dec(a);
-  sscanf(abn2dec, "%ld", &al);
+  shift = BN_new();
+  adj = BN_new();
+  BN_zero(dv);
+  BN_copy(rem, a);
 
-  r = 0;
-  x = 0;
-  for (i=0; al > 0; i++) {
-    g[i] = al%100;
-    al /= 100;
-  }
+  /* hacking into internal sequence to skip some cycles. */
+  /* for  (BN_one(shift);     original */
+  for (bn_wexpand(shift, a->top+1), shift->top=a->top, shift->d[shift->top-1] = 1;
+       BN_ucmp(shift, rem) != 1;
+       /* BN_rshift(shift, shift, 2); */
+       BN_lshift1(shift, shift), BN_lshift1(shift, shift));
 
-  for (j=i-1; j>=0; j--) {
-    r = r*100 + g[j];
-    y = 0;
-    for (d=1; d!=10; d++) {
-      yn = d*(20*x + d);
-      if (yn <= r) y = yn; else break;
+
+  while (!BN_is_one(shift)) {
+    /* BN_rshift(shift, shift, 2); */
+    BN_rshift1(shift, shift);
+    BN_rshift1(shift, shift);
+
+    BN_uadd(adj, dv, shift);
+    BN_rshift1(dv, dv);
+    if (BN_ucmp(rem, adj) != -1) {
+      BN_uadd(dv, dv, shift);
+      BN_usub(rem, rem, adj);
     }
-    r -= y;
-    x = 10*x + d -1;
   }
 
-  sprintf(abn2dec, "%ld", r);
-  BN_dec2bn(&rem, abn2dec);
-  sprintf(abn2dec, "%ld", x);
-  BN_dec2bn(&dv, abn2dec);
-
-
-  OPENSSL_free(abn2dec);
-
+  BN_free(shift);
+  BN_free(adj);
   return BN_is_zero(rem);
 }
 
@@ -196,43 +193,84 @@ int wiener_question_test(X509* cert) { return 1; }
 int wiener_question_ask(X509* cert)
 {
   RSA *rsa;
+  /* key data */
   BIGNUM *n, *e, *d, *phi;
-  BIGNUM *t, *tmp, *rem;
+  BIGNUM *p, *q;
+  /* continued fractions coefficient, and mod */
   cf_t* cf;
   bigfraction_t *it;
   size_t  i;
+  BIGNUM *t, *tmp, *rem;
+  /* equation coefficients */
+  BIGNUM *b2, *delta;
+  BN_CTX *ctx;
+  int bits;
 
+  rsa = X509_get_pubkey(cert)->pkey.rsa;
   phi = BN_new();
   tmp = BN_new();
   rem = BN_new();
-  rsa = X509_get_pubkey(cert)->pkey.rsa;
   n = rsa->n;
   e = rsa->e;
+  b2 = BN_new();
+  delta = BN_new();
 
-  cf = cf_init(NULL, n, e);
-
+  /*
+   * Generate the continued fractions approximating e/N
+   */
+  bits = BN_num_bits(n);
+  cf = cf_init(NULL, e, n);
+  ctx = cf->ctx;
   for (i=0, it = cf_next(cf);
-       i!=100 && it;
+       // XXX. how many keys shall I test?
+       i!=bits && it;
        i++, it = cf_next(cf)) {
     t = it->h;
     d = it->k;
+    /*
+     * Recovering φ(N) = (ed - 1) / t
+     * TEST1: obviously the couple {t, d} is correct → (ed-1) | t
+     */
     BN_mul(phi, e, d, cf->ctx);
-    BN_sub(tmp, phi, BN_value_one());
+    BN_usub(tmp, phi, BN_value_one());
     BN_div(phi, rem, tmp, t, cf->ctx);
-
-    /* test 1: there shall be no rem */
     if (!BN_is_zero(rem)) continue;
-
-    printf("Found? ");
-    BN_print_fp(stdout, e);
-    printf(" ");
-    BN_print_fp(stdout, d);
-    printf(" ");
-    BN_print_fp(stdout, phi);
+    // XXX. check, is it possible to fall here, assuming N, e are valid?
+    if (BN_is_odd(phi) && BN_cmp(n, phi) == 1)   continue;
+    /*
+     * Recovering p, q
+     * Solving the equation
+     *  x² + [N-φ(N)+1]x + N = 0
+     * which, after a few passages, boils down to:
+     *  x² + (p+q)x + (pq) = 0
+     *
+     * TEST2: φ(N) is correct → the two roots of x are integers
+     */
+    BN_usub(b2, n, phi);
+    BN_uadd(b2, b2, BN_value_one());
+    BN_rshift(b2, b2, 1);
+    if (BN_is_zero(b2)) continue;
+    /* delta */
+    BN_sqr(tmp, b2, ctx);
+    BN_usub(delta, tmp, n);
+    if (!BN_sqrtmod(tmp, rem, delta, ctx)) continue;
+    /* key found :) */
+    p = BN_new();
+    q = BN_new();
+    BN_usub(p, b2, tmp);
+    BN_uadd(q, b2, tmp);
+    //printf("Primes: %s %s", BN_bn2dec(p), BN_bn2dec(q));
+    break;
   }
 
   cf_free(cf);
-  return 0;
+  BN_free(rem);
+  BN_free(tmp);
+  BN_free(b2);
+  BN_free(delta);
+  BN_free(phi);
+
+  return i;
 }
 
 

@@ -1,0 +1,18 @@
+# -*- coding: utf-8 ; mode: org -*-
+
+#+TITLE:  Fifth report
+#+DATE:   2013-12-17
+#+AUTHOR: Michele Orru`
+#+EMAIL:  maker@tumbolandia.net
+
+* DOING Cleanup the thesis .template
+  + Laurea deve essere scirtta
+  + [[http://tesi.clusit.it/regolamento.php][Premio tesi]] - Non riesco a parteciparci vero?
+* DOING Reviewing MPI library for running c code on a cluster.
+* DOING Implementing Dixon's attack
+  + Finished implementation. Starting testing, but there are a few things that
+    shall be discussed about, the tuning of some constants.
+    * EPOCHS
+    * e_bits
+    * REPOP_EPOCHS
+  + Discuss the algorithm for populating the R_pool

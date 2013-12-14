@@ -69,10 +69,10 @@ int qa_init(const struct qa_conf* conf)
 
   register_all_questions();
   for (q=questions.lh_first; q; q = q->qs.le_next) {
-    q->setup();
-    q->test(crt);
+    if (q->setup)    q->setup();
+    if (q->test)     q->test(crt);
     q->ask(crt);
-    q->teardown();
+    if (q->teardown) q->teardown();
   }
 
   X509_free(crt);
