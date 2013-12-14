@@ -141,6 +141,7 @@ bigfraction_t* cf_next(cf_t *f)
  * An implementation of Dijkstra's Square Root Algorithm.
  * A Discipline of Programming, page 61 - Fifth Exercise.
  *
+ * \return true if rem is equal to zero, false otherwise.
  */
 int BN_sqrtmod(BIGNUM* dv, BIGNUM* rem, BIGNUM* a, BN_CTX* ctx)
 {
