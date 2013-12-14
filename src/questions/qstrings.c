@@ -4,7 +4,7 @@
  * \brief Extend stdlib support with some common functions used in questions.
  *
  */
-#include "qstrings.h"
+#include "qa/questions/qstrings.h"
 
 
 /**

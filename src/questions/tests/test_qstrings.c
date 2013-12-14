@@ -1,7 +1,7 @@
 #include <stddef.h>
 #include <assert.h>
 
-#include "qstrings.h"
+#include "qa/questions/qstrings.h"
 
 
 void test_is_vzero(void)
