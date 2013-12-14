@@ -3,7 +3,7 @@
 
 #include <openssl/x509.h>
 
-#include "qa.h"
+#include "qa/qa.h"
 
 
 void test_get_local_cert(void)

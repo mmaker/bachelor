@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.65])
-AC_INIT([question_authority], [0.1], [maker@tumbolandia.n])
+AC_INIT([question_authority], [0.1], [maker@tumbolandia.net])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([src/qa.c])
 AC_CONFIG_HEADERS([config.h])

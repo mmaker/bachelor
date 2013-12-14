@@ -185,7 +185,7 @@ int dixon_question_ask(X509* cert) {
   RSA *rsa;
   /* key data */
   BIGNUM
-    *n, *e,
+    *n,
     *p, *q;
   /* x, y */
   BIGNUM
@@ -202,7 +202,6 @@ int dixon_question_ask(X509* cert) {
 
   rsa = X509_get_pubkey(cert)->pkey.rsa;
   n = rsa->n;
-  e = rsa->e;
   U_bucket = malloc(sizeof(ssize_t) * U_SIZE);
   even_powers = malloc(sizeof(char) * B_size);
   ctx = BN_CTX_new();

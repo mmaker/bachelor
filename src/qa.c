@@ -14,12 +14,6 @@
 #include "qa/questions/questions.h"
 #include "qa/qa_sock.h"
 
-/** BIO wrapper around stdout */
-BIO* bio_out;
-/** BIO wrapper around srderr */
-BIO* bio_err;
-
-
 void qa_abort(const char *reason)
 {
   //ERR_print_errors_fp(stderr);
