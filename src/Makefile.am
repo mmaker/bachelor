@@ -1,4 +1,4 @@
-SUBDIRS = questions/ apps/
+SUBDIRS = questions/ apps/ tests/
 
 CC = clang
 

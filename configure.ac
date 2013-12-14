@@ -25,4 +25,8 @@ AC_FUNC_ERROR_AT_LINE
 AC_FUNC_MALLOC
 #AC_CHECK_FUNCS([dup2 setlocale strdup])
 
-AC_OUTPUT([Makefile src/Makefile src/questions/Makefile src/apps/Makefile src/questions/tests/Makefile ])
+AC_OUTPUT([Makefile
+           src/Makefile src/questions/Makefile
+           src/apps/Makefile
+           src/tests/Makefile src/questions/tests/Makefile
+])

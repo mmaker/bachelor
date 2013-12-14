@@ -11,9 +11,6 @@ struct qa_conf {
 };
 
 
-extern BIO* bio_out;
-extern BIO* bio_err;
-
 int qa_init(const struct qa_conf* args);
 
 X509* get_local_cert(const char *src);

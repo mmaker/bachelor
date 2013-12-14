@@ -7,8 +7,8 @@
 #include <openssl/ssl.h>
 #include <openssl/x509.h>
 
-#include "qa.h"
-#include "qa_sock.h"
+#include "qa/qa.h"
+#include "qa/qa_sock.h"
 
 FILE* ferr;
 

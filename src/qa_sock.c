@@ -14,9 +14,16 @@
 #include <openssl/ssl.h>
 
 #include "qa/qa.h"
+#include "qa/qa_sock.h"
 
 #define SOCKET_PROTOCOL 0
 #define INVALID_SOCKET  (-1)
+
+/** BIO wrapper around stdout */
+BIO* bio_out;
+/** BIO wrapper around srderr */
+BIO* bio_err;
+
 
 /**
  * \brief Converts a uri into a tuple {host, service}.

@@ -1,5 +1,12 @@
 /**
  * \file wiener.c
+ * \brief An implementation of Wiener's Attack using bignums.
+ *
+ * Wiener's atttack states that:
+ * given N = pq the public modulus, the couple e, d . ed ≡ 1 (mod φ(N))
+ * respectively the private and public exponent,
+ * given p < q < 2p and d < ⅓ ⁴√N,
+ * one can efficently recover d knowing only <N, e>.
  *
  */
 #include <math.h>
