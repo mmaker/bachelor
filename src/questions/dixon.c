@@ -23,6 +23,7 @@
 #include <openssl/bn.h>
 
 #include "qarith.h"
+#include "qstrings.h"
 #include "questions.h"
 
 #define EPOCHS             100
@@ -179,14 +180,6 @@ int dixon_question_test(X509* cert) {
   return 1;
 }
 
-
-static int is_vzero(void *v, size_t len)
-{
-  char unsigned *s = (char unsigned *) v;
-  while (len--)
-    if (*(s++)) return 0;
-  return 1;
-}
 
 int dixon_question_ask(X509* cert) {
   RSA *rsa;
