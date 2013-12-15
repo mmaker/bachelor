@@ -9,4 +9,4 @@ test_qstrings_LDADD = ../libquestions.a
 test_qarith_SOURCES = test_qarith.c
 test_qarith_LDADD = ../libquestions.a
 
-TESTS = test_qarith test_qstrings
+TESTS = $(check_PROGRAMS)

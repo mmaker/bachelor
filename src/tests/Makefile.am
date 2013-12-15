@@ -10,4 +10,4 @@ test_qa_sock_LDADD = ../qa_sock.o
 test_qa_SOURCES = test_qa
 test_qa_LDADD = ../qa_sock.o ../cmdline.o ../qa.o ../questions/allquestions.o ../questions/libquestions.a
 
-TESTS = test_qa_sock test_qa
+TESTS = $(check_PROGRAMS)
