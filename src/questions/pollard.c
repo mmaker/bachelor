@@ -48,14 +48,6 @@ int pollard1_question_teardown(void)
 }
 
 
-int pollard1_question_test(X509 *cert)
-{
-  return 0;
-}
-
-
-int BN_sqrtmod(BIGNUM*, BIGNUM*, BIGNUM*, BN_CTX*);
-
 /**
  * \brief Pollard (p-1) factorization.
  *
@@ -68,17 +60,15 @@ int BN_sqrtmod(BIGNUM*, BIGNUM*, BIGNUM*, BN_CTX*);
  * about 3^(−3) = 1/27 that a B value of n^(1/6) will yield a factorisation.»
  *
  */
-int pollard1_question_ask(X509 *cert)
+int pollard1_question_ask_rsa(RSA *rsa)
 {
   int ret = 1;
-  RSA *rsa;
   BIGNUM *a, *B, *a1;
   BIGNUM *gcd, *rem;
   BIGNUM *n;
   BIGNUM *p, *q;
   BN_CTX *ctx;
 
-  rsa = X509_get_pubkey(cert)->pkey.rsa;
   n = rsa->n;
   a = BN_new();
   B = BN_new();
@@ -125,6 +115,7 @@ struct qa_question PollardQuestion = {
   .name = "Pollard's (p-1) factorization",
   .setup = pollard1_question_setup,
   .teardown = pollard1_question_teardown,
-  .test = pollard1_question_test,
-  .ask = pollard1_question_ask,
+  .test = NULL,
+  .ask_rsa = pollard1_question_ask_rsa,
+  .ask_crt = NULL
 };

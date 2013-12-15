@@ -11,8 +11,8 @@
 #include <openssl/x509.h>
 #include <openssl/err.h>
 
-#include "questions.h"
-#include "qwiener.h"
+#include "qa/questions/questions.h"
+#include "qa/questions/qwiener.h"
 
 /**
  * \brief Testing the continued fractions generator.
@@ -116,7 +116,8 @@ void test_cf(void)
 void test_wiener(void)
 {
   X509 *crt;
-  FILE *fp = fopen("tests/wiener_test.crt", "r");
+  RSA *rsa;
+  FILE *fp = fopen("wiener_test.crt", "r");
 
   if (!fp) exit(EXIT_FAILURE);
   crt = PEM_read_X509(fp, NULL, 0, NULL);
@@ -124,17 +125,18 @@ void test_wiener(void)
     exit(EXIT_FAILURE);
   }
 
-  assert(WienerQuestion.test(crt));
-  assert(WienerQuestion.ask(crt));
+  rsa = X509_get_pubkey(crt)->pkey.rsa;
+  /* assert(WienerQuestion.test(crt)); */
+  assert(WienerQuestion.ask_rsa(rsa));
 }
 
 int main(int argc, char ** argv)
 {
-  WienerQuestion.setup();
+  if (WienerQuestion.setup) WienerQuestion.setup();
 
   test_cf();
   test_wiener();
 
-  WienerQuestion.teardown();
+  if (WienerQuestion.teardown) WienerQuestion.teardown();
   return 0;
 }

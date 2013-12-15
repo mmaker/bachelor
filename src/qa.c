@@ -41,6 +41,7 @@ X509* get_local_cert(const char *src)
 int qa_init(const struct qa_conf* conf)
 {
   X509 *crt;
+  RSA *rsa;
   struct qa_question *q;
 
   /* bind stdout/stderr to a BIO shit to be used externally */
@@ -61,11 +62,14 @@ int qa_init(const struct qa_conf* conf)
   if (!crt)
     error(EXIT_FAILURE, errno, "oops");
 
+  rsa = X509_get_pubkey(crt)->pkey.rsa;
+
   register_all_questions();
   for (q=questions.lh_first; q; q = q->qs.le_next) {
     if (q->setup)    q->setup();
     if (q->test)     q->test(crt);
-    q->ask(crt);
+    if (q->ask_rsa)  q->ask_rsa(rsa);
+    if (q->ask_crt)  q->ask_crt(crt);
     if (q->teardown) q->teardown();
   }
 

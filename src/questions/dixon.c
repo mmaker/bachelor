@@ -176,13 +176,8 @@ int dixon_question_teardown(void) {
   return 0;
 }
 
-int dixon_question_test(X509* cert) {
-  return 1;
-}
 
-
-int dixon_question_ask(X509* cert) {
-  RSA *rsa;
+int dixon_question_ask_rsa(RSA *rsa) {
   /* key data */
   BIGNUM
     *n,
@@ -200,7 +195,6 @@ int dixon_question_ask(X509* cert) {
   char *even_powers;
   size_t i, j, k;
 
-  rsa = X509_get_pubkey(cert)->pkey.rsa;
   n = rsa->n;
   U_bucket = malloc(sizeof(ssize_t) * U_SIZE);
   even_powers = malloc(sizeof(char) * B_size);
@@ -278,6 +272,7 @@ qa_question_t DixonQuestion = {
   .name = "Dixon",
   .setup = dixon_question_setup,
   .teardown = dixon_question_teardown,
-  .test = dixon_question_test,
-  .ask = dixon_question_ask
+  .test =  NULL,
+  .ask_rsa = dixon_question_ask_rsa,
+  .ask_crt = NULL
 };

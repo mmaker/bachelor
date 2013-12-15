@@ -146,17 +146,8 @@ bigfraction_t* cf_next(cf_t *f)
 /*
  *  Weiner Attack Implementation
  */
-
-int wiener_question_setup(void) { return 0; }
-
-int wiener_question_teardown(void) { return 0; }
-
-int wiener_question_test(X509* cert) { return 1; }
-
-
-int wiener_question_ask(X509* cert)
+int wiener_question_ask_rsa(RSA *rsa)
 {
-  RSA *rsa;
   /* key data */
   BIGNUM *n, *e, *d, *phi;
   BIGNUM *p, *q;
@@ -170,7 +161,6 @@ int wiener_question_ask(X509* cert)
   BN_CTX *ctx;
   int bits;
 
-  rsa = X509_get_pubkey(cert)->pkey.rsa;
   phi = BN_new();
   tmp = BN_new();
   rem = BN_new();
@@ -241,8 +231,9 @@ int wiener_question_ask(X509* cert)
 
 qa_question_t WienerQuestion = {
   .name = "Wiener",
-  .setup = wiener_question_setup,
-  .teardown = wiener_question_teardown,
-  .test = wiener_question_test,
-  .ask = wiener_question_ask
+  .setup = NULL,
+  .teardown = NULL,
+  .test = NULL,
+  .ask_rsa = wiener_question_ask_rsa,
+  .ask_crt = NULL,
 };
