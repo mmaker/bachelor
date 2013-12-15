@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# N = 11 * 13
+# e = 103
+# d = 7
+./gen pub -N 143 -e 103 | grep -q PUBLIC

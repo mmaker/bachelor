@@ -84,11 +84,11 @@ int main(int argc, char **argv)
   int opt;
   RSA *rsa = RSA_new();
 
-  rsa->n = rsa->e = rsa->q = rsa->q = NULL;
+  rsa->n = rsa->e = rsa->p = rsa->q = NULL;
 
   if (argc < 3) usage(EXIT_FAILURE);
 
-  while ((opt = getopt(argc-1, argv+1, "e:N:n:p:q:")) != -1)  {
+  while ((opt = getopt(argc-1, argv+1, "d:e:N:n:p:q:")) != -1)  {
     switch (opt) {
     case 'N':
     case 'n':

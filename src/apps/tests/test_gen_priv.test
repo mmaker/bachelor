@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# N = 11 * 13
+# e = 103
+# d = 7
+./gen priv -p 11 -q 13 -e 103 -d 7 | openssl rsa -noout -modulus | grep -q '8F'
