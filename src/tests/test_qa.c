@@ -16,7 +16,7 @@ void test_get_local_cert(void)
   strcpy(path, "/lifting/me/higher/keeps/me/lifting.crt");
   assert(!get_local_cert(path));
 
-  strcpy(path, "/home/maker/dev/uni/thesis/src/dummy.crt");
+  strcpy(path, "dummy.crt");
   crt = get_local_cert(path);
   assert(crt);
   pkey = X509_get_pubkey(crt);
