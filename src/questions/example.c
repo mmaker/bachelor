@@ -40,7 +40,8 @@ int example_question_ask_rsa(RSA *rsa)
 
 
 qa_question_t ExampleQuestion = {
-  .name = "Example Question",
+  .name = "example",
+  .pretty_name = "Example Question",
   .setup = example_question_setup,
   .teardown = example_question_teardown,
   .test = example_question_test,

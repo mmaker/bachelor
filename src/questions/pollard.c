@@ -112,7 +112,8 @@ int pollard1_question_ask_rsa(RSA *rsa)
 
 
 struct qa_question PollardQuestion = {
-  .name = "Pollard's (p-1) factorization",
+  .name = "pollard1",
+  .pretty_name = "Pollard's (p-1) factorization",
   .setup = pollard1_question_setup,
   .teardown = pollard1_question_teardown,
   .test = NULL,

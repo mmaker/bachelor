@@ -269,7 +269,8 @@ int dixon_question_ask_rsa(RSA *rsa) {
 }
 
 qa_question_t DixonQuestion = {
-  .name = "Dixon",
+  .name = "dixon",
+  .pretty_name = "Dixon's Factorization",
   .setup = dixon_question_setup,
   .teardown = dixon_question_teardown,
   .test =  NULL,

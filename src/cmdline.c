@@ -26,6 +26,7 @@ void usage(void)
 {
   static const char* help_message = "%s usage: %s"
     " [-r HOST:port | -f FILE]"
+    " [-a ATTACK]"
     " \n";
   fprintf(stderr, help_message,
           program_invocation_short_name,
@@ -34,7 +35,7 @@ void usage(void)
 
 void conflicting_args(void)
 {
-  printf("Conflicting fuffa\n");
+  fprintf(stderr, "Conflicting arguments.\n");
   usage();
   exit(EXIT_FAILURE);
 }
@@ -51,10 +52,11 @@ int main(int argc, char** argv)
     {"file", required_argument, NULL, 'f'},
     {0, 0, 0, 0}
   };
-  static const char* short_options = "hr:f:";
+  static const char* short_options = "hr:f:a:";
 
   struct qa_conf conf = {
     .src_type = NONE,
+    .attacks = NULL
   };
 
   while ((opt=getopt_long(argc, argv,
@@ -74,6 +76,9 @@ int main(int argc, char** argv)
       if (conf.src_type != NONE) conflicting_args();
       conf.src_type = REMOTE;
       conf.src = optarg;
+      break;
+    case 'a':
+      conf.attacks = optarg;
       break;
     case '?':
     default:

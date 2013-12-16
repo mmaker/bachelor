@@ -230,7 +230,8 @@ int wiener_question_ask_rsa(RSA *rsa)
 
 
 qa_question_t WienerQuestion = {
-  .name = "Wiener",
+  .name = "wiener",
+  .pretty_name = "Wiener's Attack",
   .setup = NULL,
   .teardown = NULL,
   .test = NULL,

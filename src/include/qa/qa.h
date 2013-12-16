@@ -8,10 +8,13 @@ struct qa_conf {
     NONE, LOCAL, REMOTE
   } src_type;
   char *src;
+  char *attacks;
 };
 
 
 int qa_init(const struct qa_conf* args);
+
+void qa_dispose(X509 *crt);
 
 X509* get_local_cert(const char *src);
 

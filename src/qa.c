@@ -41,8 +41,6 @@ X509* get_local_cert(const char *src)
 int qa_init(const struct qa_conf* conf)
 {
   X509 *crt;
-  RSA *rsa;
-  struct qa_question *q;
 
   /* bind stdout/stderr to a BIO shit to be used externally */
   bio_out = BIO_new_fp(stdout, BIO_NOCLOSE);
@@ -62,10 +60,28 @@ int qa_init(const struct qa_conf* conf)
   if (!crt)
     error(EXIT_FAILURE, errno, "oops");
 
+
+  if (!conf->attacks) select_all_questions();
+  else select_question(conf->attacks);
+
+  if (!questions.lh_first) error(EXIT_FAILURE, 0, "No valid question selected.");
+
+  qa_dispose(crt);
+
+  X509_free(crt);
+  return 0;
+}
+
+void qa_dispose(X509 *crt)
+{
+  RSA *rsa;
+  qa_question_t *q;
+
   rsa = X509_get_pubkey(crt)->pkey.rsa;
 
-  register_all_questions();
+  printf("[+] Certificate acquired\n");
   for (q=questions.lh_first; q; q = q->qs.le_next) {
+    printf( "[-] Running: %s\n", q->pretty_name);
     if (q->setup)    q->setup();
     if (q->test)     q->test(crt);
     if (q->ask_rsa)  q->ask_rsa(rsa);
@@ -73,7 +89,4 @@ int qa_init(const struct qa_conf* conf)
     if (q->teardown) q->teardown();
   }
 
-  X509_free(crt);
-
-  return 0;
 }
