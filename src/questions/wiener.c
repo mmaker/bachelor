@@ -146,9 +146,10 @@ bigfraction_t* cf_next(cf_t *f)
 /*
  *  Weiner Attack Implementation
  */
-int wiener_question_ask_rsa(RSA *rsa)
+RSA* wiener_question_ask_rsa(const RSA *rsa)
 {
   /* key data */
+  RSA *ret = NULL;
   BIGNUM *n, *e, *d, *phi;
   BIGNUM *p, *q;
   /* continued fractions coefficient, and mod */
@@ -209,11 +210,13 @@ int wiener_question_ask_rsa(RSA *rsa)
     BN_usub(delta, tmp, n);
     if (!BN_sqrtmod(tmp, rem, delta, ctx)) continue;
     /* key found :) */
-    p = BN_new();
-    q = BN_new();
+    ret = RSA_new();
+    ret->n = rsa->n;
+    ret->e = rsa->e;
+    ret->p = p = BN_new();
+    ret->q = q = BN_new();
     BN_usub(p, b2, tmp);
     BN_uadd(q, b2, tmp);
-    //printf("Primes: %s %s", BN_bn2dec(p), BN_bn2dec(q));
     break;
   }
 
@@ -224,7 +227,7 @@ int wiener_question_ask_rsa(RSA *rsa)
   BN_free(delta);
   BN_free(phi);
 
-  return i;
+  return ret;
 }
 
 

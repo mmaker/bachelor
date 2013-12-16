@@ -165,7 +165,7 @@ int dixon_question_setup(void)
   BN_zero(zero);
 
   extend_B_pool(BPOOL_STARTING_BITS);
-  return 0;
+  return 1;
 }
 
 int dixon_question_teardown(void) {
@@ -177,8 +177,9 @@ int dixon_question_teardown(void) {
 }
 
 
-int dixon_question_ask_rsa(RSA *rsa) {
+RSA* dixon_question_ask_rsa(const RSA *rsa) {
   /* key data */
+  RSA *ret = NULL;
   BIGNUM
     *n,
     *p, *q;
@@ -247,8 +248,11 @@ int dixon_question_ask_rsa(RSA *rsa) {
     if (!BN_cmp(x, y)) continue;
 
     /* p, q found :) */
-    p = BN_new();
-    q = BN_new();
+    ret = RSA_new();
+    ret->e = rsa->e;
+    ret->n = rsa->n;
+    ret->p = p = BN_new();
+    ret->q = q = BN_new();
 
     BN_uadd(tmp, x, y);
     BN_gcd(p, tmp, n, ctx);
@@ -265,7 +269,7 @@ int dixon_question_ask_rsa(RSA *rsa) {
   free(U_bucket);
   free(even_powers);
 
-  return 0;
+  return ret;
 }
 
 qa_question_t DixonQuestion = {

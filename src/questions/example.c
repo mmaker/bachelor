@@ -1,29 +1,59 @@
+/**
+ * \file example.c
+ * \brief Template for future Questions.
+ *
+ * This file has the purpose of showing and documenting how a
+ * \ref{qa_question_t} is supposed to be used.
+ *
+ */
 #include <openssl/bio.h>
 #include <openssl/rsa.h>
 #include <openssl/x509.h>
 
-
 #include "qa/questions/questions.h"
+
 
 static BIO* out;
 
-int example_question_setup(void) {
+/**
+ * \brief Example Setup.
+ *
+ * This functions returns false if `out` could not be opened.
+ */
+static int
+example_question_setup(void) {
   out = BIO_new_fp(stdout, BIO_NOCLOSE);
-  return 0;
+
+  return (out != NULL);
 }
 
-int example_question_teardown(void)
+/**
+ * \brief Example Teardown.
+ *
+ * This function returns an error if `out` could not be closed.
+ */
+static int
+example_question_teardown(void)
 {
+  return BIO_free(out);
+}
 
+/**
+ * \brief Example Test.
+ *
+ * This function always returns zero, as its attack is undecidible.
+ */
+static int
+example_question_test(X509* cert) {
   return 0;
 }
 
-/* XXX. apparently openssl does not allow const X509* in get_pkey() func */
-int example_question_test(X509* cert) {
-  return 1;
-}
 
-int example_question_ask_crt(X509* cert)
+/**
+ * \brief Example Attack to X509 certificate
+ */
+static int
+example_question_ask_crt(X509* cert)
 {
   EVP_PKEY* pkey;
 
@@ -32,9 +62,13 @@ int example_question_ask_crt(X509* cert)
   return 1;
 }
 
-int example_question_ask_rsa(RSA *rsa)
+/**
+ * \brief Example Attack on a RSA key.
+ */
+RSA*
+example_question_ask_rsa(const RSA *rsa)
 {
-  return 0;
+  return NULL;
 }
 
 

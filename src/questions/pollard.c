@@ -38,13 +38,13 @@ int pollard1_question_setup(void)
   two = BN_new();
   BN_one(two);
   BN_uadd(two, two, BN_value_one());
-  return 0;
+  return 1;
 }
 
 int pollard1_question_teardown(void)
 {
   BN_free(two);
-  return 0;
+  return 1;
 }
 
 
@@ -60,9 +60,9 @@ int pollard1_question_teardown(void)
  * about 3^(−3) = 1/27 that a B value of n^(1/6) will yield a factorisation.»
  *
  */
-int pollard1_question_ask_rsa(RSA *rsa)
+RSA* pollard1_question_ask_rsa(const RSA *rsa)
 {
-  int ret = 1;
+  RSA *ret = NULL;
   BIGNUM *a, *B, *a1;
   BIGNUM *gcd, *rem;
   BIGNUM *n;
@@ -92,12 +92,12 @@ int pollard1_question_ask_rsa(RSA *rsa)
   }
 
   /* Either p or q found :) */
-  ret = BN_is_zero(B);
-  if (!ret) {
-    p = BN_dup(gcd);
-    q = BN_new();
+  if (!BN_is_zero(B)) {
+    ret = RSA_new();
+    ret->n = rsa->e;
+    ret->p = p = BN_dup(gcd);
+    ret->q = q = BN_new();
     BN_div(q, NULL, n, gcd, ctx);
-    printf("p:%s, q=%s \n", BN_bn2dec(p), BN_bn2dec(q));
   }
 
   BN_free(a);
