@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <unistd.h>
+#include <bsd/sys/queue.h>
 
 #include <openssl/err.h>
 #include <openssl/pem.h>
@@ -80,7 +81,7 @@ void qa_dispose(X509 *crt)
   rsa = X509_get_pubkey(crt)->pkey.rsa;
 
   printf("[+] Certificate acquired\n");
-  for (q=questions.lh_first; q; q = q->qs.le_next) {
+  LIST_FOREACH(q, &questions, qs) {
     printf( "[-] Running: %s\n", q->pretty_name);
     if (q->setup)    q->setup();
     if (q->test)     q->test(crt);
