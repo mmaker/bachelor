@@ -146,7 +146,8 @@ bigfraction_t* cf_next(cf_t *f)
 /*
  *  Weiner Attack Implementation
  */
-RSA* wiener_question_ask_rsa(const RSA *rsa)
+static RSA*
+wiener_question_ask_rsa(const RSA *rsa)
 {
   /* key data */
   RSA *ret = NULL;

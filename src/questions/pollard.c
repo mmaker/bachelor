@@ -32,7 +32,8 @@
 
 static BIGNUM *two;
 
-int pollard1_question_setup(void)
+static int
+pollard1_question_setup(void)
 {
   /* create 2 */
   two = BN_new();
@@ -41,7 +42,8 @@ int pollard1_question_setup(void)
   return 1;
 }
 
-int pollard1_question_teardown(void)
+static int
+pollard1_question_teardown(void)
 {
   BN_free(two);
   return 1;
@@ -60,7 +62,8 @@ int pollard1_question_teardown(void)
  * about 3^(−3) = 1/27 that a B value of n^(1/6) will yield a factorisation.»
  *
  */
-RSA* pollard1_question_ask_rsa(const RSA *rsa)
+static RSA*
+pollard1_question_ask_rsa(const RSA *rsa)
 {
   RSA *ret = NULL;
   BIGNUM *a, *B, *a1;
@@ -111,7 +114,7 @@ RSA* pollard1_question_ask_rsa(const RSA *rsa)
 }
 
 
-struct qa_question PollardQuestion = {
+qa_question_t PollardQuestion = {
   .name = "pollard1",
   .pretty_name = "Pollard's (p-1) factorization",
   .setup = pollard1_question_setup,

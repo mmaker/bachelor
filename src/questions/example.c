@@ -65,7 +65,7 @@ example_question_ask_crt(X509* cert)
 /**
  * \brief Example Attack on a RSA key.
  */
-RSA*
+static RSA*
 example_question_ask_rsa(const RSA *rsa)
 {
   return NULL;
