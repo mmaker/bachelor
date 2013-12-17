@@ -1,6 +1,5 @@
 SUBDIRS = tests/
 
-AM_CFLAGS = -I ../include/ -Wall
 AM_LDFLAGS = -lssl -lcrypto
 
 lib_LIBRARIES = libquestions.a

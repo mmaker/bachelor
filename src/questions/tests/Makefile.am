@@ -1,5 +1,4 @@
 # unittesting my ass
-AM_CFLAGS = -I ../../include/ -ggdb -Wall
 AM_LDFLAGS = -lcrypto -lssl
 LDADD = ../libquestions.a
 

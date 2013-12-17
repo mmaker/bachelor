@@ -1,5 +1,4 @@
 bin_PROGRAMS = gen
-AM_CFLAGS = --std=c99 -Wall
 
 gen_SOURCES = gen.c
 gen_LDFLAGS = -lcrypto -lssl

@@ -8,7 +8,8 @@ AC_CONFIG_SRCDIR([src/qa.c])
 AC_CONFIG_HEADERS([config.h])
 
 # Checks for programs.
-AC_PROG_CC
+AC_PROG_CC([clang gcc cc])
+AC_PROG_CC_C99
 AC_PROG_RANLIB
 
 # Checks for libraries.
@@ -24,6 +25,14 @@ AC_TYPE_SIZE_T
 AC_FUNC_ERROR_AT_LINE
 AC_FUNC_MALLOC
 #AC_CHECK_FUNCS([dup2 setlocale strdup])
+
+# Add compiler flags
+CFLAGS="$CFLAGS --std=c99 -I$(pwd)/src/include -Wall"
+
+# Adding package options
+AC_ARG_ENABLE(debug,
+   AS_HELP_STRING([--enable-debug], [enable debugging, default: no]),
+   CFLAGS+=" -DDEBUG -ggdb")
 
 AC_OUTPUT([Makefile
            src/Makefile src/questions/Makefile
