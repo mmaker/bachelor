@@ -6,9 +6,14 @@
 #+EMAIL:  maker@tumbolandia.net
 
 * DOING Cleanup the thesis .template
-  + Laurea deve essere scirtta
+  + Some small improvements to the thesis documentclass. For what is worth, that
+    could be adopted also for future thesis.
+  + Copying template.tex and starting the creation of the master file for my
+    thesis.
   + [[http://tesi.clusit.it/regolamento.php][Premio tesi]] - Non riesco a parteciparci vero?
 * DOING Reviewing MPI library for running c code on a cluster.
+  + creating some small, random programs designed to work in parallel
+  + running those programs in cluster.science.unitn.it
 * DOING Implementing Dixon's attack
   + Finished implementation. Starting testing, but there are a few things that
     shall be discussed about, the tuning of some constants.
@@ -16,3 +21,7 @@
     * e_bits
     * REPOP_EPOCHS
   + Discuss the algorithm for populating the R_pool
+* DOING Hacking with autoconf/automake
+  + Providing a test suite that can be easily run with `make check`
+  + Uniforming compiler options, and giving `--enable-debug` option to the
+    ./configure script
