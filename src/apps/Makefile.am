@@ -1,7 +1,7 @@
 bin_PROGRAMS = gen
 
 gen_SOURCES = gen.c
-gen_LDFLAGS = -lcrypto -lssl
+gen_LDADD = -lcrypto -lssl
 
 
 TESTS = tests/test_gen_pub.test \

@@ -21,7 +21,7 @@ usage(int ret)
     "%s pub [-n MODULUS | -p PRIME -q PRIME] -e PUBLIC_EXPONENT\n"
     "%s priv -p PRIME -q PRIME -e PUBLIC_EXPONENT -d PRIVATE_EXPONENT\n";
   fprintf(stderr, help_message, program_invocation_short_name,
-          program_invocation_name);
+          program_invocation_name, program_invocation_name);
 
   exit(ret);
 }

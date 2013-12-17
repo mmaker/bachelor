@@ -16,7 +16,10 @@ AC_PROG_RANLIB
 
 # Checks for header files.
 AC_CHECK_HEADERS([limits.h stdint.h stdlib.h string.h unistd.h])
-AC_CHECK_HEADERS([openssl/ssl.h])
+AC_CHECK_HEADER(bsd/sys/queue.h, [:],
+                [AC_MSG_ERROR([Could not find or include bsd queues. Please install libbsd-dev.])])
+AC_CHECK_HEADERS([openssl/ssl.h openssl/bn.h openssl/x509.h openssl/rsa.h], [:],
+                 AC_MSG_ERROR([Could not find or include openssl headers. Please install libssl-dev.]))
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_TYPE_SIZE_T
@@ -26,7 +29,7 @@ AC_FUNC_ERROR_AT_LINE
 AC_FUNC_MALLOC
 #AC_CHECK_FUNCS([dup2 setlocale strdup])
 
-# Add compiler flags
+# Add compiler/linker flags
 CFLAGS="$CFLAGS --std=c99 -I$(pwd)/src/include -Wall"
 
 # Adding package options
@@ -38,4 +41,4 @@ AC_OUTPUT([Makefile
            src/Makefile src/questions/Makefile
            src/apps/Makefile
            src/tests/Makefile src/questions/tests/Makefile
-])
+           ])

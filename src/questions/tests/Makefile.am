@@ -1,6 +1,5 @@
 # unittesting my ass
-AM_LDFLAGS = -lcrypto -lssl
-LDADD = ../libquestions.a
+LDADD=../libquestions.a -lssl -lcrypto
 
 check_PROGRAMS = test_qarith test_qstrings test_wiener test_pollard
 TESTS = $(check_PROGRAMS)
