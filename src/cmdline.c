@@ -44,7 +44,6 @@ int main(int argc, char** argv)
 {
   char opt;
   int option_index;
-  size_t i;
 
   struct option long_options[] = {
     {"help", no_argument, NULL, 'h'},

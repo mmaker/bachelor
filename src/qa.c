@@ -41,7 +41,7 @@ X509* get_local_cert(const char *src)
  */
 int qa_init(const struct qa_conf* conf)
 {
-  X509 *crt;
+  X509 *crt = NULL;
 
   /* bind stdout/stderr to a BIO shit to be used externally */
   bio_out = BIO_new_fp(stdout, BIO_NOCLOSE);

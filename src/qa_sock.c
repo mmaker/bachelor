@@ -154,9 +154,8 @@ static int verify_callback(int ok, X509_STORE_CTX* ctx)
  */
 struct qa_connection* qa_connection_new(char* address)
 {
-  struct qa_connection* c;
+  struct qa_connection* c = NULL;
   char *host, *port;
-  int err;
 
   /* parse input address */
   if (!host_port(address, &host, &port)) goto error;
