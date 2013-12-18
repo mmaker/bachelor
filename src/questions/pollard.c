@@ -97,9 +97,10 @@ pollard1_question_ask_rsa(const RSA *rsa)
   /* Either p or q found :) */
   if (!BN_is_zero(B)) {
     ret = RSA_new();
-    ret->n = rsa->e;
-    ret->p = p = BN_dup(gcd);
+    ret->n = rsa->n;
+    ret->e = rsa->e;
     ret->q = q = BN_new();
+    ret->p = p = BN_dup(gcd);
     BN_div(q, NULL, n, gcd, ctx);
   }
 

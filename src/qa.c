@@ -1,3 +1,11 @@
+/**
+ * \file qa.c
+ * \brief QA controller and engine.
+ *
+ * After retrieving a valid configuration from the frontend, this file takes
+ * care of running the actual mainloop.
+ */
+
 #include <assert.h>
 #include <error.h>
 #include <stdio.h>
@@ -15,13 +23,26 @@
 #include "qa/questions/questions.h"
 #include "qa/qa_sock.h"
 
-void qa_abort(const char *reason)
+/**
+ * \Handle unexpected error.
+ *
+ * Function handling fatal errors: exit immediately, reporting eventual errors
+ * coming from openssl/bio or the standard errno.
+ */
+void
+qa_abort(const char *reason)
 {
   //ERR_print_errors_fp(stderr);
   exit(EXIT_FAILURE);
 }
 
-X509* get_local_cert(const char *src)
+/**
+ * \brief Loads a valid ssl certificate from file.
+ *
+ * \return NULL in case of error, a X509* structure otherwise.
+ */
+X509*
+get_local_cert(const char *src)
 {
   X509 *crt;
   FILE *fp;
@@ -35,11 +56,44 @@ X509* get_local_cert(const char *src)
 }
 
 /**
+ * \brief Print out a valid RSA Private Key.
+ *
+ */
+static void
+print_rsa_private(RSA *rsa)
+{
+  size_t i;
+  char *dec, *hex;
+  const struct {
+    const char *desc;
+    BIGNUM *n;
+  } items[5] = {
+    {"Public Modulus", rsa->n},
+    {"Prime Factor p", rsa->p},
+    {"Prime Factor q", rsa->q},
+    {"Public Exponent", rsa->e},
+    {"Private Exponent", rsa->d},
+  };
+
+
+  assert(rsa); /* && rsa->p && rsa->q && rsa->e); */
+  for (i=0; i!=5; i++) {
+    if (!items[i].n) continue;
+    dec = BN_bn2dec(items[i].n);
+    hex = BN_bn2hex(items[i].n);
+    fprintf(stdout, "\t%-22s : %-15s (0x%s)\n", items[i].desc, dec, hex);
+    OPENSSL_free(dec);
+    OPENSSL_free(hex);
+  }
+}
+
+/**
  * \brief Given an initial configuration, stuctures the program flow.
  *
  * \param[in] args   Initial configuration given from a frontend.
  */
-int qa_init(const struct qa_conf* conf)
+int
+qa_init(const struct qa_conf* conf)
 {
   X509 *crt = NULL;
 
@@ -73,7 +127,8 @@ int qa_init(const struct qa_conf* conf)
   return 0;
 }
 
-void qa_dispose(X509 *crt)
+void
+qa_dispose(X509 *crt)
 {
   RSA *pub = X509_get_pubkey(crt)->pkey.rsa;
   RSA *priv;
@@ -93,7 +148,7 @@ void qa_dispose(X509 *crt)
     }
 
     /*
-     * Run test. If the test is undecidible or either okk, go on. Otherwise,
+     * Run test. If the test is undecidible or either ok, go on. Otherwise,
      * print an error message and go to the next question.
      */
     if (q->test && q->test(crt) < 0) {
@@ -108,7 +163,7 @@ void qa_dispose(X509 *crt)
     if (q->ask_rsa &&
         (priv = q->ask_rsa(pub))) {
       fprintf(stderr, "[\\] Key Broken using %s.\n", q->pretty_name);
-
+      print_rsa_private(priv);
     }
 
     /*

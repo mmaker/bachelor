@@ -30,7 +30,6 @@ wiener_question_ask_rsa(const RSA *rsa)
   /* key data */
   RSA *ret = NULL;
   BIGNUM *n, *e, *d, *phi;
-  BIGNUM *p, *q;
   /* continued fractions coefficient, and mod */
   cf_t* cf;
   bigfraction_t *it;
@@ -92,10 +91,10 @@ wiener_question_ask_rsa(const RSA *rsa)
     ret = RSA_new();
     ret->n = rsa->n;
     ret->e = rsa->e;
-    ret->p = p = BN_new();
-    ret->q = q = BN_new();
-    BN_usub(p, b2, tmp);
-    BN_uadd(q, b2, tmp);
+    ret->p = BN_new();
+    ret->q = BN_new();
+    BN_usub(ret->p, b2, tmp);
+    BN_uadd(ret->q, b2, tmp);
     break;
   }
 
