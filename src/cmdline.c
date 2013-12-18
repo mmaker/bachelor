@@ -25,7 +25,7 @@
 void usage(void)
 {
   static const char* help_message = "%s usage: %s"
-    " [-r HOST:port | -f FILE]"
+    " [-r HOST:port | -f X509 | -R RSA]"
     " [-a ATTACK]"
     " \n";
   fprintf(stderr, help_message,
@@ -49,13 +49,14 @@ int main(int argc, char** argv)
     {"help", no_argument, NULL, 'h'},
     {"remote", required_argument, NULL, 'r'},
     {"file", required_argument, NULL, 'f'},
+    {"rsa", required_argument, NULL, 'R'},
     {0, 0, 0, 0}
   };
-  static const char* short_options = "hr:f:a:";
+  static const char* short_options = "hr:f:a:R:";
 
   struct qa_conf conf = {
     .src_type = NONE,
-    .attacks = NULL
+    .attacks = NULL,
   };
 
   while ((opt=getopt_long(argc, argv,
@@ -68,12 +69,17 @@ int main(int argc, char** argv)
       break;
     case 'f':
       if (conf.src_type != NONE) conflicting_args();
-      conf.src_type = LOCAL;
+      conf.src_type = LOCAL_X509;
       conf.src = optarg;
       break;
     case 'r':
       if (conf.src_type != NONE) conflicting_args();
       conf.src_type = REMOTE;
+      conf.src = optarg;
+      break;
+    case 'R':
+      if (conf.src_type != NONE) conflicting_args();
+      conf.src_type = LOCAL_RSA;
       conf.src = optarg;
       break;
     case 'a':
@@ -86,7 +92,7 @@ int main(int argc, char** argv)
     }
 
   if (conf.src_type == NONE)  {
-    conf.src_type = REMOTE;
+    conf.src_type = LOCAL_RSA;
 
     if (optind == argc)
       conf.src = "-";

@@ -5,7 +5,7 @@
 
 struct qa_conf {
   enum sources {
-    NONE, LOCAL, REMOTE
+    NONE, LOCAL_X509, LOCAL_RSA, REMOTE
   } src_type;
   char *src;
   char *attacks;
@@ -14,7 +14,7 @@ struct qa_conf {
 
 int qa_init(const struct qa_conf* args);
 
-void qa_dispose(X509 *crt);
+void qa_dispose(X509 *crt, RSA *rsa);
 
 X509* get_local_cert(const char *src);
 

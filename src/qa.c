@@ -56,6 +56,25 @@ get_local_cert(const char *src)
 }
 
 /**
+ * \brief Loads a valid rsa public key from file.
+ *
+ * /return NULL in case of error, a X509* structure otherwise.
+ */
+RSA*
+get_local_rsa(const char *src)
+{
+  RSA *rsa = NULL;
+  FILE *fp;
+
+  if (!strcmp(src, "-")) fp = stdin;
+  else if (!(fp = fopen(src, "r")))
+    return NULL;
+
+  rsa = PEM_read_RSAPublicKey(fp, &rsa, NULL, NULL);
+  return rsa;
+}
+
+/**
  * \brief Print out a valid RSA Private Key.
  *
  */
@@ -96,6 +115,7 @@ int
 qa_init(const struct qa_conf* conf)
 {
   X509 *crt = NULL;
+  RSA *rsa = NULL;
 
   /* bind stdout/stderr to a BIO shit to be used externally */
   bio_out = BIO_new_fp(stdout, BIO_NOCLOSE);
@@ -104,16 +124,17 @@ qa_init(const struct qa_conf* conf)
   /* Initialize SSL Library by registering algorithms. */
   SSL_library_init();
 
-
   if (conf->src_type == REMOTE)
     crt = get_remote_cert(conf->src);
-  else if (conf->src_type == LOCAL)
+  else if (conf->src_type == LOCAL_X509)
     crt = get_local_cert(conf->src);
+  else if (conf->src_type == LOCAL_RSA)
+    rsa = get_local_rsa(conf->src);
   else
     error(EXIT_FAILURE, 0, "iternal error: unable to determine source type.");
 
-  if (!crt)
-    error(EXIT_FAILURE, errno, "oops");
+  if (!crt && !rsa)
+    error(EXIT_FAILURE, errno, "Unable to open source.");
 
 
   if (!conf->attacks) select_all_questions();
@@ -121,18 +142,21 @@ qa_init(const struct qa_conf* conf)
 
   if (!questions.lh_first) error(EXIT_FAILURE, 0, "No valid question selected.");
 
-  qa_dispose(crt);
+  qa_dispose(crt, rsa);
 
   X509_free(crt);
   return 0;
 }
 
 void
-qa_dispose(X509 *crt)
+qa_dispose(X509 *crt, RSA *rsa)
 {
-  RSA *pub = X509_get_pubkey(crt)->pkey.rsa;
+  RSA *pub;
   RSA *priv;
   qa_question_t *q;
+
+  if (!rsa && crt)  pub = X509_get_pubkey(crt)->pkey.rsa;
+  else pub = rsa;
 
   printf("[+] Certificate acquired\n");
   LIST_FOREACH(q, &questions, qs) {
@@ -169,7 +193,7 @@ qa_dispose(X509 *crt)
     /*
      * Attempt to attack the X509 certificate.
      */
-    if (q->ask_crt)  q->ask_crt(crt);
+    if (crt && q->ask_crt)  q->ask_crt(crt);
 
     /*
      * Shut down the given question. If it fails, print an error messae and go
