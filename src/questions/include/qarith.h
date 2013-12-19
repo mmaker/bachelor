@@ -1,6 +1,10 @@
 #ifndef _QA_ARITH_H_
 #define _QA_ARITH_H
 
+
+/* shortcut macros. */
+#define BN_uiadd1(a) BN_uadd(a, a, BN_value_one())
+
 /**
  * Fractions made of bignums.
  */

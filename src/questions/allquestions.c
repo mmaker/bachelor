@@ -1,3 +1,12 @@
+/**
+ * \file allquestions.c
+ *
+ * \brief Quetions controller.
+ *
+ * Implements procedures for addign and removing questions from the global \ref
+ * questions variable.
+ */
+
 #include <assert.h>
 #include <string.h>
 #include <bsd/sys/queue.h>
@@ -21,7 +30,7 @@ void select_question(const char *sq)
 }
 
 /**
- * /brief Puts registered questions into \ref questions.
+ * \brief Puts registered questions into \ref questions.
  *
  * Disposes all registered questions into a global linked list, so that future
  * procedures can iterate over all possible tests.

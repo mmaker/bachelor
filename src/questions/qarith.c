@@ -1,3 +1,8 @@
+/**
+ * \file qarith.c
+ * \brief Random Algebraic utilities with BIGNUMs.
+ *
+ */
 #include <openssl/bn.h>
 
 #include "qa/questions/qarith.h"
