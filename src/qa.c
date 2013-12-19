@@ -127,6 +127,10 @@ qa_init(const struct qa_conf* conf)
   /* Initialize SSL Library by registering algorithms. */
   SSL_library_init();
 
+  if (!conf->attacks) select_all_questions();
+  else select_question(conf->attacks);
+  if (!questions.lh_first) error(EXIT_FAILURE, 0, "No valid question selected.");
+
   if (conf->src_type == REMOTE)
     crt = get_remote_cert(conf->src);
   else if (conf->src_type == LOCAL_X509)
@@ -135,18 +139,10 @@ qa_init(const struct qa_conf* conf)
     rsa = get_local_rsa(conf->src);
   else
     error(EXIT_FAILURE, 0, "iternal error: unable to determine source type.");
-
   if (!crt && !rsa)
     error(EXIT_FAILURE, errno, "Unable to open source.");
 
-
-  if (!conf->attacks) select_all_questions();
-  else select_question(conf->attacks);
-
-  if (!questions.lh_first) error(EXIT_FAILURE, 0, "No valid question selected.");
-
   exitcode = qa_dispose(crt, rsa);
-
   X509_free(crt);
   return exitcode;
 }
