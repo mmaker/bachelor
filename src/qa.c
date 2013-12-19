@@ -23,6 +23,8 @@
 #include "qa/questions/questions.h"
 #include "qa/qa_sock.h"
 
+static int qa_dispose(X509 *crt, RSA *rsa);
+
 /**
  * \Handle unexpected error.
  *
@@ -114,6 +116,7 @@ print_rsa_private(RSA *rsa)
 int
 qa_init(const struct qa_conf* conf)
 {
+  int exitcode;
   X509 *crt = NULL;
   RSA *rsa = NULL;
 
@@ -142,13 +145,13 @@ qa_init(const struct qa_conf* conf)
 
   if (!questions.lh_first) error(EXIT_FAILURE, 0, "No valid question selected.");
 
-  qa_dispose(crt, rsa);
+  exitcode = qa_dispose(crt, rsa);
 
   X509_free(crt);
-  return 0;
+  return exitcode;
 }
 
-void
+static int
 qa_dispose(X509 *crt, RSA *rsa)
 {
   RSA *pub;
@@ -188,6 +191,7 @@ qa_dispose(X509 *crt, RSA *rsa)
         (priv = q->ask_rsa(pub))) {
       fprintf(stderr, "[\\] Key Broken using %s.\n", q->pretty_name);
       print_rsa_private(priv);
+      return EXIT_SUCCESS;
     }
 
     /*
@@ -208,5 +212,5 @@ qa_dispose(X509 *crt, RSA *rsa)
   /*
    *  Key seems resistent: exit with status -1
    */
-  exit(-1);
+  return -1;
 }

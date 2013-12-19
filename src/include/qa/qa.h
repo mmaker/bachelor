@@ -14,8 +14,6 @@ struct qa_conf {
 
 int qa_init(const struct qa_conf* args);
 
-void qa_dispose(X509 *crt, RSA *rsa);
-
 X509* get_local_cert(const char *src);
 
 #endif   /* _QA_H_ */
