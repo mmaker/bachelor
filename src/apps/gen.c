@@ -39,12 +39,16 @@ pubkey_generation(RSA* rsa)
     exit(EXIT_FAILURE);
     }
 
-  if (!rsa->n)
+  if (!rsa->n) {
+    rsa->n = BN_new();
     BN_mul(rsa->n, rsa->p, rsa->q, ctx);
+  }
 
   PEM_write_RSAPublicKey(stdout, rsa);
 
   BN_CTX_free(ctx);
+  RSA_free(rsa);
+
   return EXIT_SUCCESS;
 }
 
