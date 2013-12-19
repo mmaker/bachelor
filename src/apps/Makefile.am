@@ -1,10 +1,8 @@
 bin_PROGRAMS = gen
 
-AM_CFLAGS = --std=c99
-
 gen_SOURCES = gen.c
-gen_LDFLAGS = -lcrypto -lssl
+gen_LDADD = -lcrypto -lssl
 
 
-gen.o:
-	$(CC) $(CFLAGS) $(LIBS) gen.c -c -o gen.o
+TESTS = tests/test_gen_pub.test \
+	tests/test_gen_priv.test

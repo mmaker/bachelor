@@ -25,33 +25,30 @@
 #include <openssl/x509.h>
 #include <openssl/err.h>
 
-#include "questions.h"
+#include "qa/questions/questions.h"
+#include "qa/questions/qarith.h"
+#include "qa/questions/qpollard.h"
+
 
 static BIGNUM *two;
 
-int pollard1_question_setup(void)
+static int
+pollard1_question_setup(void)
 {
   /* create 2 */
   two = BN_new();
   BN_one(two);
   BN_uadd(two, two, BN_value_one());
-  return 0;
+  return 1;
 }
 
-int pollard1_question_teardown(void)
+static int
+pollard1_question_teardown(void)
 {
   BN_free(two);
-  return 0;
+  return 1;
 }
 
-
-int pollard1_question_test(X509 *cert)
-{
-  return 0;
-}
-
-
-int BN_sqrtmod(BIGNUM*, BIGNUM*, BIGNUM*, BN_CTX*);
 
 /**
  * \brief Pollard (p-1) factorization.
@@ -65,17 +62,16 @@ int BN_sqrtmod(BIGNUM*, BIGNUM*, BIGNUM*, BN_CTX*);
  * about 3^(−3) = 1/27 that a B value of n^(1/6) will yield a factorisation.»
  *
  */
-int pollard1_question_ask(X509 *cert)
+static RSA*
+pollard1_question_ask_rsa(const RSA *rsa)
 {
-  int ret = 1;
-  RSA *rsa;
+  RSA *ret = NULL;
   BIGNUM *a, *B, *a1;
   BIGNUM *gcd, *rem;
   BIGNUM *n;
   BIGNUM *p, *q;
   BN_CTX *ctx;
 
-  rsa = X509_get_pubkey(cert)->pkey.rsa;
   n = rsa->n;
   a = BN_new();
   B = BN_new();
@@ -99,12 +95,13 @@ int pollard1_question_ask(X509 *cert)
   }
 
   /* Either p or q found :) */
-  ret = BN_is_zero(B);
-  if (!ret) {
-    p = BN_dup(gcd);
-    q = BN_new();
+  if (!BN_is_zero(B)) {
+    ret = RSA_new();
+    ret->n = rsa->n;
+    ret->e = rsa->e;
+    ret->q = q = BN_new();
+    ret->p = p = BN_dup(gcd);
     BN_div(q, NULL, n, gcd, ctx);
-    printf("p:%s, q=%s \n", BN_bn2dec(p), BN_bn2dec(q));
   }
 
   BN_free(a);
@@ -118,10 +115,12 @@ int pollard1_question_ask(X509 *cert)
 }
 
 
-struct qa_question PollardQuestion = {
-  .name = "Pollard's (p-1) factorization",
+qa_question_t PollardQuestion = {
+  .name = "pollard1",
+  .pretty_name = "Pollard's (p-1) factorization",
   .setup = pollard1_question_setup,
   .teardown = pollard1_question_teardown,
-  .test = pollard1_question_test,
-  .ask = pollard1_question_ask,
+  .test = NULL,
+  .ask_rsa = pollard1_question_ask_rsa,
+  .ask_crt = NULL
 };

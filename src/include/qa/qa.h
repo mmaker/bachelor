@@ -5,14 +5,12 @@
 
 struct qa_conf {
   enum sources {
-    NONE, LOCAL, REMOTE
+    NONE, LOCAL_X509, LOCAL_RSA, REMOTE
   } src_type;
   char *src;
+  char *attacks;
 };
 
-
-extern BIO* bio_out;
-extern BIO* bio_err;
 
 int qa_init(const struct qa_conf* args);
 

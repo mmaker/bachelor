@@ -13,10 +13,17 @@
 #include <openssl/x509.h>
 #include <openssl/ssl.h>
 
-#include "qa.h"
+#include "qa/qa.h"
+#include "qa/qa_sock.h"
 
 #define SOCKET_PROTOCOL 0
 #define INVALID_SOCKET  (-1)
+
+/** BIO wrapper around stdout */
+BIO* bio_out;
+/** BIO wrapper around srderr */
+BIO* bio_err;
+
 
 /**
  * \brief Converts a uri into a tuple {host, service}.
@@ -147,9 +154,8 @@ static int verify_callback(int ok, X509_STORE_CTX* ctx)
  */
 struct qa_connection* qa_connection_new(char* address)
 {
-  struct qa_connection* c;
+  struct qa_connection* c = NULL;
   char *host, *port;
-  int err;
 
   /* parse input address */
   if (!host_port(address, &host, &port)) goto error;
