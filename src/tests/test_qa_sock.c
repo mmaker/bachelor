@@ -45,8 +45,7 @@ void test_host_port(void)
   /* uris containing just a hostname shall be recognized */
   strcpy(uri, "queer");
   host_port(uri, &host, &port);
-  assert(!strcmp(host, "queer") &&
-         !port);
+  assert(!strcmp(host, "queer"));
 }
 
 void test_get_remote_cert(void)

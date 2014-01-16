@@ -1,8 +1,27 @@
 #!/bin/sh
 
-../qa -a non_existing_test < /dev/null
-if [ $? -ne 1 ]
-then
-    echo "Invalid questions shall raise an error."
-    exit 1
-fi
+## TESTING -a parameter
+../qa -a non_existing_test < /dev/zero
+[[ $? == 1 ]] || exit 1
+
+../qa -a example < /dev/zero
+[[ $? == 1 ]] || exit 1
+
+../qa -a example -f dummy.crt
+[[ $? != 1 ]] || exit 1
+
+../qa  < /dev/zero
+[[ $? == 1 ]] || exit 1
+
+## tests requiring network.
+interface="wlan0"
+[[ $(cat "/sys/class/net/$interface/carrier") == 1 ]] ||  exit 0
+
+../qa -a example -r https://www.esse3.unitn.it
+[[ $? != 1 ]] || exit 1
+
+../qa -a example -r www.esse3.unitn.it
+[[ $? != 1 ]] || exit 1
+
+../qa -a example -r www.esse3.unitn.it:443
+[[ $? != 1 ]] || exit 1

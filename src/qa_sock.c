@@ -159,6 +159,7 @@ struct qa_connection* qa_connection_new(char* address)
 
   /* parse input address */
   if (!host_port(address, &host, &port)) goto error;
+  if (!port) port = "https";
 
   c = malloc(sizeof(struct qa_connection));
   if (!c) goto error;
