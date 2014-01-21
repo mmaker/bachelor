@@ -1,0 +1,4 @@
+#!/bin/sh
+
+## TESTING file 3
+../qa -a wiener -R cryptowars2011_3.pem > /dev/null
