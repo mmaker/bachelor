@@ -35,7 +35,7 @@ CFLAGS="$CFLAGS --std=c99 -I$(pwd)/src/include -Wall"
 # Adding package options
 AC_ARG_ENABLE(debug,
    AS_HELP_STRING([--enable-debug], [enable debugging, default: no]),
-   CFLAGS+=" -DDEBUG -ggdb")
+   CFLAGS+=" -DDEBUG -DBN_DEBUG -O0 -ggdb")
 
 AC_OUTPUT([Makefile
            src/Makefile src/questions/Makefile
