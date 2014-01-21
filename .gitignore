@@ -1,8 +1,10 @@
+
 # emacs-generated files.
 *~
 \#*\#
 
 # autoconf/automake/autotools shit.
+stamp-h1
 compile
 depcomp
 aclocal.m4
@@ -13,6 +15,16 @@ Makefile
 config*
 .deps
 /missing
+*.Po
+
+# tests shit
+*.trs
+*.log
+test-driver
+
+# unittests
+test_*
+!test_*.c
 
 # binaries, libraries, and objects
 *.[oa]
@@ -25,3 +37,5 @@ book/*.pdf
 book/*.out
 book/*.log
 book/*.aux
+book/*.idx
+book/*.toc
