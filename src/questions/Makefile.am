@@ -6,6 +6,7 @@ EXAMPLE_QUESTION =   example.c
 WIENER_QUESTION =     wiener.c         include/qwiener.h
 POLLARD_QUESTION =   pollard.c         include/qpollard.h
 DIXON_QUESTION =       dixon.c
+FERMAT_QUESTION =     fermat.c
 
 QUESTIONS = $(WIENER_QUESTION) $(POLLARD_QUESTION) $(DIXON_QUESTION) \
 	    $(FERMAT_QUESTION) $(EXAMPLE_QUESTION)

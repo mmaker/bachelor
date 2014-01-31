@@ -42,4 +42,5 @@ void select_all_questions(void)
   REGISTER_QUESTION(ExampleQuestion);
   REGISTER_QUESTION(WienerQuestion);
   REGISTER_QUESTION(PollardQuestion);
+  REGISTER_QUESTION(FermatQuestion);
 }
