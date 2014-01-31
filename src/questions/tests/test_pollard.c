@@ -13,9 +13,9 @@ void test_pollard(void)
   RSA *rsa;
   FILE *fp = fopen("pollard.pem", "r");
 
-  if (!fp) exit(EXIT_FAILURE);
+  assert(fp);
   crt = PEM_read_X509(fp, NULL, 0, NULL);
-  if (!crt) exit(EXIT_FAILURE);
+  assert(crt);
 
   rsa = X509_get_pubkey(crt)->pkey.rsa;
   PollardQuestion.ask_rsa(rsa);
