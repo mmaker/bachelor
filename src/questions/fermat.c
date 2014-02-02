@@ -41,22 +41,21 @@ fermat_question_ask(const RSA *rsa)
   BN_sqrtmod(tmp, rem, n, ctx);
   /* Δ = |p - q| = |a + b - a + b| = |2b| > √N  2⁻¹⁰⁰ */
   BN_rshift(dssdelta, tmp, 101);
-  /* a² = (⌊√N⌋ + 1)² =  N + 1 + 2⌊√N⌋ */
   BN_copy(a, tmp);
-  BN_uiadd1(a);
-  /* b² = a² - N */
-  BN_sub(b2, a2, n);
+  BN_sqr(a2, a, ctx);
 
   do {
-    /* b² += 2a + 1 */
+    /* a² += 2a + 1 */
     BN_lshift(tmp, a, 1);
     BN_uiadd1(tmp);
-    BN_uadd(b2, b2, tmp);
+    BN_uadd(a2, a2, tmp);
     /* a += 1 */
     BN_uiadd1(a);
+    /* b² = a² - N */
+    BN_usub(b2, a2, n);
     /* b */
     BN_sqrtmod(b, rem, b2, ctx);
-  } while (!BN_is_zero(rem) && BN_ucmp(b, dssdelta) == 1);
+  } while (!BN_is_zero(rem) && BN_ucmp(b, dssdelta) < 1);
 
   if (BN_is_zero(rem)) {
     /* p, q found :) */
