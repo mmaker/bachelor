@@ -1,27 +1,29 @@
-%% Using thesis custom template.
-\documentclass[9pt,a4paper,twoside]{thesis}
+\documentclass[11pt,a4paper,twoside]{thesis}
 
 %% PACKAGES
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
 \usepackage{amsmath}
+\usepackage{amsthm}
 \usepackage{amsfonts}
 \usepackage{amssymb}
-\usepackage{hyperref}
-%% Colors packages.
-\usepackage[dvips]{color}
-% or alternatively [usenames,dvips] if using ordinary LaTeX rather than pdfLaTeX
-%% Images packages.
-\usepackage{graphicx}
-\usepackage{makeidx,shortvrb,latexsym}
-\usepackage{fancyhdr}
-%\usepackage[boxed]{algorithm}
-%\usepackage{algorithmic}
 \usepackage{amsthm}
+\usepackage{cite}
+\usepackage[dvips]{color}
+\usepackage{epigraph}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
 \usepackage{indentfirst}
+\usepackage{mathtools}
+\usepackage{minted}
+\usepackage{makeidx,shortvrb,latexsym}
+\usepackage{supertabular}
+%\usepackage{algorithmic}
 %\usepackage{xypic}
 %% setting epigraphs
-\usepackage{epigraph}
+
 \renewcommand{\epigraphsize}{\small}
 \setlength{\epigraphwidth}{0.8\textwidth}
 \let\origepigraph\epigraph
@@ -29,10 +31,17 @@
 
 \input xy
 \xyoption{all}
-%% Table packages.
-\usepackage{supertabular}
+
 
 %% COMMANDS
+\DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+\DeclarePairedDelimiter{\angular}{\langle}{\rangle}
+
+\newcommand{\naturalN}{\mathbb{N}}
+\newcommand{\bigO}[1]{\ensuremath{\operatorname{O}\left(#1\right)}}
+\newcommand{\openssl}{\textsc{OpenSSL}\ }
+
 %\newcommand{\pe}{\psi}
 \def\d{\delta}
 \def\ds{\displaystyle}
@@ -190,10 +199,14 @@ $\square$
   \centering
   \includegraphics[width=80pt]{kopimi.png}
 \end{figure}
-%\part{}
-%\include{chap1}
-%\include{chap2}
-%\part{}
+\include{preface}
+\part{Prequisites}
+\include{ssl_prequisites}
+\include{math_prequisites}
+\part{Factorization Methods}
+\include{fermat}
+\include{wiener}
+
 %\include{chap3}
 %\include{chap5}
 %\part{}
@@ -206,6 +219,8 @@ $\square$
 %\part{Appendice }
 %\include{appendice}
 \backmatter
-\bibliography{refs_CGC}
-\addcontentsline{toc}{chapter}{Bibliografia}
+\bibliography{library.bib}
+\bibliographystyle{plain}
+\clearpage
+\addcontentsline{toc}{chapter}{Bibliography}
 \end{document}

@@ -1,0 +1,99 @@
+\chapter{Mathematical prequisites \label{chap:preq}}
+
+\section{Euclid's Greatest Common Divisor}
+
+Being the gratest common divisor a foundamental algebraic operation in the ssl
+protocol, \openssl implemented it with the following signature:
+
+\begin{minted}[fontsize=\small]{c}
+  int BN_gcd(BIGNUM *r, BIGNUM *a, BIGNUM *b, BN_CTX *ctx);
+\end{minted}
+
+The computation proceeds under the well-known Euclidean algorithm, specifically
+the binary variant developed by Josef Stein in 1961 \cite{AOCPv2}. This variant
+exploits some interesting properties of $gcd(u, v)$:
+
+\begin{itemize}
+  \setlength{\itemsep}{1pt}
+  \setlength{\parskip}{0pt}
+  \setlength{\parsep}{0pt}
+\item if $u,\ v$ are even, then $gcd(u, v) = 2gcd(u/2, v/2)$
+\item if $u$ is even and $v$ is odd, then $gcd(u, v) = gcd(u/2, v)$
+\item  $gcd(u, v) = gcd(u-v, v)$, as in the standard Euclid's algorithm
+\item the sum of two odd numbers is always even
+\end{itemize}
+
+% Donald Knuth, TAOCP, "a binary method", p. 388 VOL 2
+Both \cite{AOCPv2} and \cite{MITalg} analyze the running time for the algorithm,
+even if \cite{clrs}'s demonstration is fairly simpler and proceeds %elegantly
+by induction.
+Anyway, both show that algorithm ~\ref{alg:gcd} belongs to the class
+\bigO{\log b}.
+
+\begin{algorithm}
+  \caption{\openssl's GCD \label{alg:gcd}}
+  \begin{algorithmic}[1]
+    \State $k \gets 0$
+    \While{$v \neq 0$}
+      \If{$u$ is odd}
+        \If{$v$ is odd}
+          \State $a \gets (a-b) \ll 1$
+        \Else
+          \State $b = b \ll 1$
+        \EndIf
+        \If{$a < b$} $a, b \gets b, a$ \EndIf
+
+      \Else
+        \If{$v$ is odd}
+          \State $a = a \ll 1$
+          \If{$a < b$} $a, b = b, a$ \EndIf
+        \Else
+          \State $k = k+1$
+          \State $a, b = a \ll 1, b \ll 1$
+        \EndIf
+      \EndIf
+    \EndWhile
+    \State \Return $a \ll k$
+
+  \end{algorithmic}
+\end{algorithm}
+
+
+\section{RSA Cipher}
+
+XXX.
+define RSA, provide the simple keypair generation algorithm.
+
+From now on, except otherwise specified, the variable $N=pq$ will refer to the
+public modulis of a generis RSA keypair, with $p, q\ .\ p > q$ being the two primes
+factorizing it. Again, $e, d$ will respectively refer to the public exponent and
+the private exponent.
+
+
+\section{Algorithmic Complexity Notation}
+The notation used to describe asymptotic complexity follows the $O$-notation,
+abused under the conventions and limits of MIT's Introduction to Algorithms.
+
+Let \bigO{g} be the asymptotic upper bound of g:
+$$
+O(g(n)) = \{ f(n) : \exists n_0, c \in \naturalN \mid 0 \leq f(n) \leq cg(n)
+             \ \forall n > n_0 \}
+$$
+
+With the writing $f(n) = O(g(n))$ we will actually interpret
+$f(n) \in O(g(n))$.
+
+\section{Square Root \label{sec:preq:sqrt}}
+
+Computing the square root has been another foundamental requirement of the
+project, though not satisfied by \openssl. Apprently,
+% \openssl is a great pile of crap, as phk states
+\openssl does not provide
+XXX.
+define square root in the algebraic notation
+discuss method of computation for square root
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "question_authority"
+%%% End:

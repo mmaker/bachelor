@@ -1,7 +1,7 @@
 /**
  * \file Fermat's factorization
  *
- * According to the Digital Signature Standard,  |p - q| = Δ < √N 2⁻¹⁰⁰
+ * According to the Digital Signature Standard,  |p - q| = Δ > √N 2⁻¹⁰⁰
  * Otherwise, it is possible to factorize N using Fermat's Factorization.
  * Specifically, we try to solve
  *  a² - N = b²
