@@ -1265,7 +1265,6 @@
 %\def\chart{\mathop{\rm char}\nolimits}
 %\newcommand{\Gr}{Gr\"ob\-ner}
 
-
 \newcommand\contentsname{Contents}
 \newcommand\listfigurename{List of Figures}
 \newcommand\listtablename{List of Tables}
