@@ -6,6 +6,8 @@ really among the most efficient, it holds still a practical interest whenever
 the two primes are sufficiently close.
 Indeed, \cite{DSS2009} \S B.3.6 explicitly reccomends that $|p-q| \geq \sqrt{N}2^{-100}$,
 in order to address this kind of threat, for any key of bitlength $1024,\ 2048,\ 3072$.\\
+%% it would be nice here to explain that this magic 2^100 is just about wonting
+%% the most significant digits to be different.
 The basic idea is to attempt to write $N$ as a difference of squares,
 \begin{align}
 \label{eq:fermat_problem}
@@ -15,21 +17,39 @@ x^2 - N = y^2
 So, we start by $x = \ceil{\sqrt{N}}$ and check that $x^2-N$ is a perfect
 square. If it isn't, we iterativelly increment $x$ and check again, until we
 find a pair $\angular{x, y}$ satisfying equation \ref{eq:fermat_problem}.
-Once found, we claim that $N = pq = (x+y)(x-y)$; it is indeed true that:
+Once found, we claim that $N = pq = (x+y)(x-y)$; it is indeed true that, if we
+decompose $x^2 - y^2$ as difference of squares, then it is immediately clear
+that $x+y \mid N \ \land \  x-y \mid N$, and that both are non-trivial
+divisors.
+
+\paragraph{Complexity} \cite{riesel} contains a detailed proof for the
+complexity of this algorirthm, which is
+$\bigO{\frac{(1-k)^2}{2k} \sqrt{N}} \;\;,  0 < k < 1$. We summarize it down
+below here to better clarify the limits of this algorithm.
+
+
+
 \begin{proof}
-  \label{proof:fermat}
+  Since, once we reach the final step $x_f$ it holds $N = pq = x_f^2 - y_f^2$,
+  the number of steps required to reach the result is:
   \begin{align*}
-    x^2 - N = y^2 \\
-    x^2 - y^2 = N \\
-    (x+y)(x-y) = N \\
-    x+y \mid N \ \land \  x-y \mid N
+    x_f - \sqrt{N} &= \frac{p + q}{2} - \sqrt{N} \\
+                   &= \frac{p + \frac{N}{p}}{2} - \sqrt{N} \\
+                   &= \frac{(\sqrt{N} - p)^2}{2p}
   \end{align*}
+  If we finally suppose that $p = k\sqrt{N}, \; 0 < k < 1$, then the number of cycles
+  becomes
+  $\frac{(1-k)^2}{2k} \sqrt{N}$.
 \end{proof}
 
-As it is straightforward to see, the order of magnitude of this algorithm is
-$\bigO{\sqrt{N}}$.
+\begin{remark}
+  Note that, for the algorithm to be effective, the two primes
+  \emph{really close} to $\sqrt{N}$. As much as the lowest prime gets near to
+  one, the ratio $\frac{(1-k)^2}{2k}$ becomes larger, until the actual magnitude
+  of this factorization method approaches \bigO{N}.
+\end{remark}
 
-\section{An Implementative Perspective}
+\section{An Implementation Perspective}
 
 At each iteration, the $i-$th state is hold by the pair $\angular{x, x^2}$.\\
 The later step, described by $\angular{x+1, (x+1)^2}$ can be computed efficently
@@ -50,7 +70,7 @@ aforementioned.
     \Repeat
     \State $x \gets x+1$
     \State $x^2 \gets x^2 + x \ll 1 + 1$
-    \State $y, rest \gets sqrt(x^2 - N)$
+    \State $y, rest \gets \dsqrt{x^2 - N}$
     \Until{ $rest \neq 0 \land y < \frac{\sqrt{N}}{2^{101}}$ }
 
     \If{ $rest = 0$ }
@@ -67,7 +87,7 @@ aforementioned.
 \section{Thoughts about parallelization}
 
 During each single iteration, the computational complexity is dominated by the
-quare root's $sqrt()$ function, which belongs to the class
+quare root's $\dsqrt$ function, which belongs to the class
 \bigO{lg^2 N}, as we saw in section ~\ref{sec:preq:sqrt}.
 
 Even if at first sight might seem plausible to split

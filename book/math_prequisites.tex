@@ -1,8 +1,16 @@
 \chapter{Mathematical prequisites \label{chap:preq}}
 
+This chapter formalizes the notation used in the rest of the thesis, and
+moreover attempts to discuss and study the elementary functions on which the
+project has been grounded. For example, the $\ll$ and $\gg$ are respectively
+used with the meaning of left and right binary shift, as usual in the computer
+science field; meanwhile, the $\dsqrt$ function will be defined in section
+\ref{sec:preq:sqrt}, with the acceptation of discrete square root.
+
+
 \section{Euclid's Greatest Common Divisor}
 
-Being the gratest common divisor a foundamental algebraic operation in the ssl
+Being the greatest common divisor a foundamental algebraic operation in the ssl
 protocol, \openssl implemented it with the following signature:
 
 \begin{minted}[fontsize=\small]{c}
@@ -25,7 +33,7 @@ exploits some interesting properties of $gcd(u, v)$:
 
 % Donald Knuth, TAOCP, "a binary method", p. 388 VOL 2
 Both \cite{AOCPv2} and \cite{MITalg} analyze the running time for the algorithm,
-even if \cite{clrs}'s demonstration is fairly simpler and proceeds %elegantly
+even if \cite{MITalg}'s demonstration is fairly simpler and proceeds %elegantly
 by induction.
 Anyway, both show that algorithm ~\ref{alg:gcd} belongs to the class
 \bigO{\log b}.
@@ -34,22 +42,22 @@ Anyway, both show that algorithm ~\ref{alg:gcd} belongs to the class
   \caption{\openssl's GCD \label{alg:gcd}}
   \begin{algorithmic}[1]
     \State $k \gets 0$
-    \While{$v \neq 0$}
-      \If{$u$ is odd}
-        \If{$v$ is odd}
-          \State $a \gets (a-b) \ll 1$
+    \While{$b \neq 0$}
+      \If{$a$ is odd}
+        \If{$b$ is odd}
+          \State $a \gets (a-b) \gg 1$
         \Else
-          \State $b = b \ll 1$
+          \State $b = b \gg 1$
         \EndIf
         \If{$a < b$} $a, b \gets b, a$ \EndIf
 
       \Else
-        \If{$v$ is odd}
-          \State $a = a \ll 1$
+        \If{$b$ is odd}
+          \State $a = a \gg 1$
           \If{$a < b$} $a, b = b, a$ \EndIf
         \Else
           \State $k = k+1$
-          \State $a, b = a \ll 1, b \ll 1$
+          \State $a, b = a \gg 1, b \gg 1$
         \EndIf
       \EndIf
     \EndWhile
@@ -58,6 +66,8 @@ Anyway, both show that algorithm ~\ref{alg:gcd} belongs to the class
   \end{algorithmic}
 \end{algorithm}
 
+Unfortunately, there is yet no known parallel solution that significantly improves
+Euclid's \textsc{gcd}.
 
 \section{RSA Cipher}
 
@@ -74,10 +84,10 @@ the private exponent.
 The notation used to describe asymptotic complexity follows the $O$-notation,
 abused under the conventions and limits of MIT's Introduction to Algorithms.
 
-Let \bigO{g} be the asymptotic upper bound of g:
+Let \bigO{g} be the asymptotic upper bound of g:`
 $$
 O(g(n)) = \{ f(n) : \exists n_0, c \in \naturalN \mid 0 \leq f(n) \leq cg(n)
-             \ \forall n > n_0 \}
+\ \forall n > n_0 \}
 $$
 
 With the writing $f(n) = O(g(n))$ we will actually interpret
@@ -86,13 +96,109 @@ $f(n) \in O(g(n))$.
 \section{Square Root \label{sec:preq:sqrt}}
 
 Computing the square root has been another foundamental requirement of the
-project, though not satisfied by \openssl. Apprently,
+project, though not satisfied by \openssl. Apparently,
 % \openssl is a great pile of crap, as phk states
-\openssl does not provide
-XXX.
-define square root in the algebraic notation
-discuss method of computation for square root
+\openssl does only provide the discrete quare root implementation using the
+Tonelli/Shanks algorithm, which specifically solves $x$ in $x^2 = a \pmod{p}$,
+with $p \in \naturalPrime$.
 
+\begin{minted}{c}
+  BIGNUM* BN_mod_sqrt(BIGNUM* x, const BIGNUM* a, const BIGNUM* p,
+                      const BN_CTX* ctx);
+\end{minted}
+
+Instead, we are interested in finding the square root in $\naturalN$, hence we
+did come out with our specific implementation, first using Bombelli's algorithm
+described in ~\ref{par:preq:sqrt:bombelli},
+and later with Dijkstra one discussed in ~\ref{par:preq:sqrt:dijkstra}.
+
+Unless otherwise specified, in the later pages we will use $\sqrt{n}$ with the
+usual meaning ``the half power of $n$'', while with $x, r = \dsqrt{n}$ we will
+intend the pair $\angular{x, r} \in \naturalN^2 \mid x^2 + r = n$.
+
+\paragraph{Bombelli's Algorithm \label{par:preq:sqrt:bombelli}} here here here.
+
+\paragraph{Dijkstra's Algorithm \label{par:preq:sqrt:dijkstra}} can be found in
+\cite{Dijkstra:adop}, \S 8, p.61. There, Dijkstra presents an elightning
+process for the computation of the square root, making only use of binary shift
+and algebraic additions.
+Specifically, the problem attempts to find, given a natual $n$, the $a$ that
+establishes:
+\begin{align}
+  \label{eq:preq:dijkstra_problem}
+  a^2 \leq n \: \land \: (a+1)^2 > n
+\end{align}
+
+Take now the pair $\angular{a=0, b=n+1}$, and think about the problem as dicotomic
+search: we want to diminuish the dinstance between the upper bound $b$ and the
+lower bound $a$ while holding the guard \ref{eq:preq:dijkstra_problem}:
+
+\begin{align*}
+  a^2 \leq n \: \land \: b > n
+\end{align*}
+
+The speed of convergence is determined by the choice of dinstance $d$, which is optimal when
+$d = (b-a) \idiv 2$.
+
+\begin{algorithm}
+  \caption{Square Root: an intuitive, na\"ive implementation}
+  \label{alg:sqrt:dijkstra_naif}
+  \begin{algorithmic}[1]
+    \State $a, b \gets 0, n+1$
+    \While{$a+1 \neq b$}
+      \State $d = (b-a) \idiv 2$
+      \If{$(a+d)^2 \leq n$}
+         $a \gets a+d$
+      \ElsIf{$(b-d)^2 > n$}
+         $b \gets b-d$
+      \EndIf
+    \EndWhile
+    \State \Return a
+  \end{algorithmic}
+\end{algorithm}
+
+% heh, there's not much to explain here, that's almost the same in Dijkstra's
+% book, excluding the inspirative familiar portrait that led to the insight of
+% this change of varaibles.
+Now optimization proceeds by abstration: the variables $a, b$ are sobstituded
+introducing:
+$c = b-a$,
+$p = ac$,
+$q = c^2$,
+$r = n-a^2$
+and finally $h$ as local optimization. For any further details and
+explainations, the reference is still \cite{Dijkstra:adop}.
+
+\begin{algorithm}
+  \caption{Square Root: final version}
+  \label{alg:sqrt:dijkstra}
+  \begin{algorithmic}
+    \State $p, q, r \gets 0, 1, n$
+    \While{$q \leq n$} $q \gets q \gg 2$ \EndWhile
+    \While{$q \neq 1$}
+      \State $q \gets q \ll 2$
+      \State $h \gets p+q$
+      \State $p \gets q \ll 1$
+      \State $h \gets 2p + q$
+      \If{$r \geq h$} $p, r \gets p+q, r-h$ \EndIf
+    \EndWhile
+    \State \Return p
+  \end{algorithmic}
+\end{algorithm}
+
+A fair approxidmation of the magnitude of the Dijkstra algorithm can be studied
+by looking at the pseudocode in ~\ref{alg:sqrt:dijkstra_naif}.Exactely as with
+the dicotomic search case, we split the interval $[a, b]$ in half on each step,
+and choose wether to take the leftmost or the rightmost part. This results in
+$log(n+1)$ steps. During each iteration, instead, as we have seen in
+~\ref{alg:sqrt:dijkstra} we just apply summations and binary shifts, which are
+upper bounded by \bigO{\log{n}/2}. Thus, the order of magnitude belongs to
+\bigO{\log^2{n}}.
+
+\paragraph{}
+Even if both algorithms presented have \emph{asymptotically} the same
+complexity, we believe that adopting Dijkstra's one has lead to a pragmatic,
+substantial performance improvement.
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "question_authority"
