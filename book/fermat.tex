@@ -2,10 +2,12 @@
 
 Excluding the trial division, Fermat's method is the oldest known systematic
 method for factorizing integers. Even if its algorithmic complexity is not
-really among the most efficient, it holds still a practical interest whenever
+among the most efficient, it holds still a practical interest whenever
 the two primes are sufficiently close.
-Indeed, \cite{DSS2009} \S B.3.6 explicitly reccomends that $|p-q| \geq \sqrt{N}2^{-100}$,
-in order to address this kind of threat, for any key of bitlength $1024,\ 2048,\ 3072$.\\
+Indeed, \cite{DSS2009} \S B.3.6 explicitly recommends that
+$|p-q| \geq \sqrt{N}2^{-100}$
+for any key of bitlength $1024,\ 2048,\ 3072$ in order to address this kind of
+threat.\\
 %% it would be nice here to explain that this magic 2^100 is just about wonting
 %% the most significant digits to be different.
 The basic idea is to attempt to write $N$ as a difference of squares,
@@ -41,22 +43,22 @@ below here to better clarify the limits of this algorithm.
 \end{proof}
 
 \begin{remark}
-  Note that, for the algorithm to be effective, the two primes
-  \emph{really close} to $\sqrt{N}$. As much as the lowest prime gets near to
-  one, the ratio $\frac{(1-k)^2}{2k}$ becomes larger, until the actual magnitude
+  Note that, for the algorithm to be effective, the two primes must be
+  ``really close'' to $\sqrt{N}$. As much as the lowest prime gets near to
+  $1$, the ratio $\frac{(1-k)^2}{2k}$ becomes larger, until the actual magnitude
   of this factorization method approaches \bigO{N}.
 \end{remark}
 
 \section{An Implementation Perspective}
 
 At each iteration, the $i-$th state is hold by the pair $\angular{x, x^2}$.\\
-The later step, described by $\angular{x+1, (x+1)^2}$ can be computed efficently
+The later step, described by $\angular{x+1, (x+1)^2}$ can be computed efficiently
 considering the square of a binomial: $\angular{x+1, (x^2) + (x \ll 1) + 1}$.
 The upperbound, instead, is reached when
 $ \Delta = p - q  = x + y - x + y = 2y > 2^{-100}\sqrt{N}$.
 
 Algorithm ~\ref{alg:fermat} presents a simple implementation of this
-factorization method, taking into account the small aptimizations
+factorization method, taking into account the small optimizations
 aforementioned.
 
 \paragraph{How to chose the upper limit?}  after having explained our interpretation

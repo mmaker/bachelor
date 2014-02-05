@@ -21,9 +21,8 @@
 \usepackage{minted}
 \usepackage{makeidx,shortvrb,latexsym}
 \usepackage{supertabular}
-%\usepackage{xypic}
-%% setting epigraphs
 
+%% setting epigraphs
 \renewcommand{\epigraphsize}{\small}
 \setlength{\epigraphwidth}{0.8\textwidth}
 \let\origepigraph\epigraph
@@ -49,35 +48,6 @@
 \newcommand{\eulerphi}[1]{\varphi(#1)}
 \newcommand{\abs}[1]{\left|#1\right|}
 \newcommand{\rfrac}[2]{{}^{#1}\!/_{#2}}
-
-%% Optional custom shortcuts commands.
-\usepackage{braket}
-\newcommand{\pe}{\mathbb{P}_{\mathrm{E}}}
-\newcommand{\pme}{\mathbb{P}_{\mathrm{ME}}}
-\newcommand{\primary}{\blacktriangle}
-\newcommand{\secondary}{{\blacktriangle\!}^{\! \! +}}
-\newcommand{\MM}{\mathcal{M}}
-\newcommand{\DP}{{\D\!}^{\! \! +}}
-\newcommand{\D}{\Delta}
-\newcommand{\Fq}{ \mathbb{F}_{q}}
-\newcommand{\Fp}{ \mathbb{F}_{p}}
-\newcommand{\Lq}{ \mathcal{L}_{q}}
-\newcommand{\R}{ \mathcal{R}}
-\newcommand{\Cq}{ \mathcal{C}_{q}}
-\newcommand{\SCa}{ S_{C,\alpha}}
-\newcommand{\Cqn}{ \mathcal{C}_{q,n}}
-\newcommand{\K}{ \mathbb{K}}
-\newcommand{\U}{ \mathcal{U}}
-\newcommand{\vi}{\mathrm{\textbf{v}}}
-\newcommand{\ww}{\mathrm{w}}
-\newcommand{\uu}{\mathrm{\textbf{u}}}
-\newcommand{\f}{\mathsf{f}}
-\newcommand{\V}{V_{\left(n,S\right)}^{\zeta}}
-\newcommand{\T}{T_{\left(n,S\right)}^{\zeta}}
-\newcommand{\SQ}{\begin{flushright}
-$\square$
-\end{flushright}}
-
 
 \makeindex
 \let\origdoublepage\cleardoublepage
@@ -162,6 +132,8 @@ $\square$
   \centering
   \includegraphics[width=80pt]{kopimi.png}
 \end{figure}
+
+
 \include{preface}
 
 \part{Prequisites}
@@ -182,4 +154,5 @@ $\square$
 \bibliography{library}
 \clearpage
 \addcontentsline{toc}{chapter}{Bibliography}
+
 \end{document}

@@ -1,17 +1,16 @@
 \chapter{Preface}
 
-Even if the basic RSA keypair generation algorithm is fairly
-straightforward, it turns out that any software willing to provide such a
-feature does have to test the pair candidate against a substantious number of
-tests before claiming its security.
+Even if the basic RSA key generation algorithm is fairly straightforward, it
+turns out that any software willing to provide such a feature does have to test
+the candidate key against a substantious number of threats before claiming its
+security.
 
-The purpose of this project is to examine the TLS protocol, study in deep the
-\openssl library, and survey some of the attacks to which a bad key generation
-is exposed. On the footprint of ~\cite{20years}, we which already analyzed most
-of these, we are going to describe the mathematical basis of each attack, and
-then proceed further reasoning about a clever, possibly optimal, solution in
-procedural programming; finally, we are trying to think about a distributed
-version of it.
+The purpose of this project is to examine the TLS protocol, to study in depth
+the \openssl library, and to survey some of the attacks to which a bad key
+generation is exposed. On the footprint of ~\cite{20years}, where most of these
+attacks have already been analyzed, we are going to describe the mathematical
+basis of each attack, reason about a possible solution in procedural
+programming, and finally, give some hints about a distributed version of it.
 
 Besides the pseudocode already available in this document, the project led to the
 development of a real, open, C implementation consultable at

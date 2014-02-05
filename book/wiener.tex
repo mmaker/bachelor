@@ -6,15 +6,16 @@ possible to find the private key in \emph{polynomial time} using continued fract
 expansions whenever a good estimate of the fraction $\frac{e}{N}$ is known.
 More specifically, given $d < \frac{1}{3} ^{4}\sqrt{N}$ one can efficiently
 recover $d$ only knowing $\angular{N, e}$.
-\section{A small digression into continued fractions}
+
+\section{A small digression into continued fractions \label{sec:wiener:cf}}
 
 \section{The actual attack}
 
 
 As we saw in ~\ref{sec:preq:rsa}, by contruction the two exponents are such that
 $ed \equiv 1 \pmod{\varphi(N)}$. This implies that there exists a
-$k \in \naturalN \mid ed = k\varphi(N) + 1$. But, this can be formalized to be
-the same problem ...: %% decribed in the preceeding section XXX.
+$k \in \naturalN \mid ed = k\varphi(N) + 1$. This can be formalized to be
+the same problem we saw in ~\ref{sec:wiener:cf}:
 \begin{align*}
   ed = k\varphi(N) + 1 \\
   \abs{\frac{ed - k\eulerphi{N}}{d\eulerphi{N}}} = \frac{1}{d\eulerphi{N}} \\

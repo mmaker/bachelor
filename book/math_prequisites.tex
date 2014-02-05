@@ -1,22 +1,36 @@
 \chapter{Mathematical prequisites \label{chap:preq}}
 
-This chapter formalizes the notation used in the rest of the thesis, and
-moreover attempts to discuss and study the elementary functions on which the
-project has been grounded. For example, the $\ll$ and $\gg$ are respectively
-used with the meaning of left and right binary shift, as usual in the computer
-science field; meanwhile, the $\dsqrt$ function will be defined in section
-\ref{sec:preq:sqrt}, with the acceptation of discrete square root.
-
-
-%% XXX. where to put these?
+In this chapter we formalize the notation used in the rest of the thesis, and
+furthermore attempt to discuss and study the elementary functions on which the
+project has been grounded.
+\\
+The $\ll$ and $\gg$ are respectively used with the meaning of left and right
+bitwise shift, as usual in computer science.
+\\
+The $\dsqrt$ function will be defined in section \ref{sec:preq:sqrt}, with the
+acceptation of discrete square root.
+\\
 The logarithmic $\log$ function is assumed to be in base two, i.e. $\log_2$.
-
+\\
 The $\idiv$ symbol is the integer division over $\naturalN$, i.e.
 $a \idiv b = \floor{\frac{a}{b}}$.
 
+\section{Algorithmic Complexity Notation}
+The notation used to describe asymptotic complexity follows the $O$-notation,
+abused under the conventions and limits of MIT's Introduction to Algorithms.
+
+Let \bigO{g} be the asymptotic upper bound of g:
+$$
+\bigO{g(n)} = \{ f(n) : \exists n_0, c \in \naturalN \mid 0 \leq f(n) \leq cg(n)
+\ \forall n > n_0 \}
+$$
+
+With $f(n) = \bigO{g(n)}$ we actually mean
+$f(n) \in \bigO{g(n)}$.
+
 \section{Euclid's Greatest Common Divisor}
 
-Being the greatest common divisor a foundamental algebraic operation in the ssl
+Being the greatest common divisor a foundamental algebraic operation in the TLS
 protocol, \openssl implemented it with the following signature:
 
 \begin{minted}[fontsize=\small]{c}
@@ -25,20 +39,20 @@ protocol, \openssl implemented it with the following signature:
 
 The computation proceeds under the well-known Euclidean algorithm, specifically
 the binary variant developed by Josef Stein in 1961 \cite{AOCPv2}. This variant
-exploits some interesting properties of $gcd(a, b)$
+exploits some interesting properties of $gcd(a, b)$:
 \begin{itemize}
   \setlength{\itemsep}{1pt}
   \setlength{\parskip}{0pt}
   \setlength{\parsep}{0pt}
-  \item if $a,\ b$ are even, then $gcd(a, b) = 2gcd(a/2, b/2)$
-  \item if $a$ is even and $b$ is odd, then $gcd(a, b) = gcd(a/2, b)$
-  \item  $gcd(a, b) = gcd(a-b, b)$, as in the standard Euclid's algorithm
-  \item the sum of two odd numbers is always even
+  \item if $a,\ b$ are even, then $gcd(a, b) = 2gcd(a/2, b/2)$;
+  \item if $a$ is even and $b$ is odd, then $gcd(a, b) = gcd(a/2, b)$;
+  \item  $gcd(a, b) = gcd(a-b, b)$, as in the standard Euclid algorithm;
+  \item the sum of two odd numbers is always even.
 \end{itemize}
 
 % Donald Knuth, TAOCP, "a binary method", p. 388 VOL 2
-Both \cite{AOCPv2} and \cite{MITalg} analyze the running time for the algorithm,
-even if \cite{MITalg}'s demonstration is fairly simpler and proceeds %elegantly
+Both \cite{AOCPv2} and \cite{MITalg} analyze the running time of the
+algorithm; \cite{MITalg}'s proof is fairly simpler and proceeds %elegantly
 by induction.
 Anyway, both show that algorithm ~\ref{alg:gcd} belongs to the class
 \bigO{\log b}.
@@ -74,84 +88,39 @@ Anyway, both show that algorithm ~\ref{alg:gcd} belongs to the class
 Unfortunately, there is yet no known parallel solution that significantly improves
 Euclid's \textsc{gcd}.
 
-\section{RSA Cipher \label{sec:preq:rsa}}
-
-The RSA cryptosystem, invented by Ron Rivesst, Adi Shamir, and Len Adleman
-~\cite{rsa}, was first published in August 1977's issue of
-\emph{Scientific American}. In its basic version, this \emph{asymmetric} cipher
-works as follows:
-\begin{itemize}
-  \item choose a pair $\angular{p, q}$ of \emph{random} \emph{prime} numbers;
-    let $N$ be the product of the two, $N=pq$, and call it ``Public Modulus''
-  \item choose a pair $\angular{e, d}$ of \emph{random} numbers, both in
-    $\integerZ^*_{\varphi(N)}$, such that one is the multiplicative inverse of the
-    other, $ed \equiv 1 \pmod{\varphi(N)}$ and $\varphi(N)$ is Euler's totient
-    function;
-\end{itemize}
-Now, call $\angular{N, e}$ \emph{public key}, and $\angular{N, d}$
-\emph{private key}, and let the encryption function $E(m)$ be the $e$-th power of
-the message $m$:
-\begin{align}
-  \label{eq:rsa:encrypt}
-  E(m) = m^e \pmod{N}
-\end{align}
-while the decryption function $D(c)$ is the $d$-th power of the ciphertext $c$:
-\begin{align}
-  \label{eq:rsa:decrypt}
-  D(c) = c^d \equiv E(m)^d \equiv m^{ed} \equiv m \pmod{N}
-\end{align}
-that, due to Fermat's little theorem, is the inverse of $E$.
-
-\paragraph{}
-%% less unless <https://www.youtube.com/watch?v=XnbnuY7Kxhc>
-From now on, unless otherwise specified, the variable $N=pq$ will always refer
-to the public modulus of a generis RSA keypair, with $p, q\ .\ p > q$ being the
-two primes factorizing it. Again, $e, d$ will respectively refer to the public
-exponent and the private exponent.
-
-
-\section{Algorithmic Complexity Notation}
-The notation used to describe asymptotic complexity follows the $O$-notation,
-abused under the conventions and limits of MIT's Introduction to Algorithms.
-
-Let \bigO{g} be the asymptotic upper bound of g:`
-$$
-O(g(n)) = \{ f(n) : \exists n_0, c \in \naturalN \mid 0 \leq f(n) \leq cg(n)
-\ \forall n > n_0 \}
-$$
-
-With the writing $f(n) = O(g(n))$ we will actually interpret
-$f(n) \in O(g(n))$.
 
 \section{Square Root \label{sec:preq:sqrt}}
 
-Computing the square root has been another foundamental requirement of the
-project, though not satisfied by \openssl. Apparently,
+Computing the square root is another important building block of the project,
+though not available in \openssl\!.
+Apparently,
 % \openssl is a great pile of crap, as phk states
-\openssl does only provide the discrete quare root implementation using the
-Tonelli/Shanks algorithm, which specifically solves $x$ in $x^2 = a \pmod{p}$,
-with $p \in \naturalPrime$.
+\openssl does only provide the discrete square root implementation using the
+Tonelli/Shanks algorithm, which specifically solves in $x$ the equation
+$x^2 = a \pmod{p}$, with $p \in \naturalPrime$:
 
 \begin{minted}{c}
   BIGNUM* BN_mod_sqrt(BIGNUM* x, const BIGNUM* a, const BIGNUM* p,
                       const BN_CTX* ctx);
 \end{minted}
 
-Instead, we are interested in finding the square root in $\naturalN$, hence we
-did come out with our specific implementation, first using Bombelli's algorithm
-described in ~\ref{par:preq:sqrt:bombelli},
-and later with Dijkstra one discussed in ~\ref{par:preq:sqrt:dijkstra}.
+Instead, we are interested in finding the the pair
+$\angular{x, r} \in \naturalN^2 \mid x^2 + r = n$, that is, the integer part of
+the square root of a natural number and its rest.
+Hence, we did come out with our specific implementation, first using Bombelli's
+algorithm, and later with the one of Dijkstra. Both are going to be discussed
+below.
 
-Unless otherwise specified, in the later pages we will use $\sqrt{n}$ with the
-usual meaning ``the half power of $n$'', while with $x, r = \dsqrt{n}$ we will
-intend the pair $\angular{x, r} \in \naturalN^2 \mid x^2 + r = n$.
+Unless otherwise specified, in the later pages we use $\sqrt{n}$ with the
+usual meaning ``the half power of $n$'', while with $x, r = \dsqrt{n}$ we mean
+the pair just defined.
 
 \paragraph{Bombelli's Algorithm \label{par:preq:sqrt:bombelli}} dates back to
 the XVI century, and approaches the problem of finding the square root by using
 continued fractions. Unfortunately, we weren't able to fully assert the
 correctness of the algorithm, since the original document
-~\cite{bombelli:algebra} is definitely unreadable and presents a difficult,
-inconvenient notation. Though, for completeness' sake, we report in table
+~\cite{bombelli:algebra} presents a difficult, inconvenient notation. Though,
+for completeness' sake, we report in table
 ~\ref{alg:sqrt:bombelli} the pseudocode adopted and tested for its correctness.
 
 \begin{algorithm}[H]
@@ -179,6 +148,9 @@ inconvenient notation. Though, for completeness' sake, we report in table
       \State $r \gets r - y$
       \State $x \gets 10x + d - 1$
     \EndFor
+
+    \State \Return $x, r$
+
     \EndProcedure
   \end{algorithmic}
 \end{algorithm}
@@ -190,23 +162,24 @@ multiplications. This means that the complexity of this solutions belongs to
 \cite{Dijkstra:adop}, \S 8, p.61. There, Dijkstra presents an elightning
 process for the computation of the square root, making only use of binary shift
 and algebraic additions.
-Specifically, the problem attempts to find, given a natual $n$, the $a$ that
-establishes:
+Specifically, the problem attempts to find, given a natual $n$, the integer $a$
+that establishes:
 \begin{align}
   \label{eq:preq:dijkstra_problem}
   a^2 \leq n \: \land \: (a+1)^2 > n
 \end{align}
 
-Take now the pair $\angular{a=0, b=n+1}$, and think about the problem as dicotomic
-search: we want to diminuish the dinstance between the upper bound $b$ and the
-lower bound $a$ while holding the guard \ref{eq:preq:dijkstra_problem}:
+Take now the pair $\angular{a=0, b=n+1}$, and consider the inverval
+$[a, b[$. We would like to reduce the distance between the upper bound $b$ and
+the lower bound $a$, while holding the guard \ref{eq:preq:dijkstra_problem}:
 
 \begin{align*}
   a^2 \leq n \: \land \: b > n
 \end{align*}
 
 %% XXX. I am not so sure about this, pure fantasy.
-The speed of convergence is determined by the choice of dinstance $d$, which is optimal when
+The speed of convergence is determined by the choice of the distance $d$, which
+analougously to the dicotomic search problem, is optimal when
 $d = (b-a) \idiv 2$.
 
 \begin{algorithm}[H]
@@ -229,14 +202,13 @@ $d = (b-a) \idiv 2$.
 % heh, there's not much to explain here, that's almost the same in Dijkstra's
 % book, excluding the inspirative familiar portrait that led to the insight of
 % this change of varaibles.
-Now optimization proceeds by abstration: the variables $a, b$ are sobstituded
-introducing:
+Now optimization proceeds with the following change of variables:
 $c = b-a$,
 $p = ac$,
 $q = c^2$,
-$r = n-a^2$
-and finally $h$ as local optimization. For any further details and
-explainations, the reference is still \cite{Dijkstra:adop}.
+$r = n-a^2$;
+For any further details and explainations, the reference is still
+\cite{Dijkstra:adop}.
 
 \begin{algorithm}[H]
   \caption{Square Root: final version}
@@ -255,10 +227,10 @@ explainations, the reference is still \cite{Dijkstra:adop}.
   \end{algorithmic}
 \end{algorithm}
 
-A fair approxidmation of the magnitude of the Dijkstra algorithm can be studied
-by looking at the pseudocode in ~\ref{alg:sqrt:dijkstra_naif}. Exactely as with
+A fair approximation of the magnitude of the Dijkstra algorithm can be studied
+by looking at the pseudocode in ~\ref{alg:sqrt:dijkstra_naif}. Exactly as in
 the dicotomic search case, we split the interval $[a, b]$ in half on each step,
-and choose wether to take the leftmost or the rightmost part. This results in
+and choose whether to take the leftmost or the rightmost part. This results in
 $log(n+1)$ steps. During each iteration, instead, as we have seen in
 ~\ref{alg:sqrt:dijkstra} we just apply summations and binary shifts, which are
 upper bounded by \bigO{\log{n}/2}. Thus, the order of magnitude belongs to
@@ -266,8 +238,46 @@ upper bounded by \bigO{\log{n}/2}. Thus, the order of magnitude belongs to
 
 \paragraph{}
 Even if both algorithms presented have \emph{asymptotically} the same
-complexity, we believe that adopting Dijkstra's one has lead to a pragmatic,
-substantial performance improvement.
+complexity, we believe that adopting the one of Dijkstra has lead to a
+pragmatic, substantial performance improvement.
+
+
+\section{RSA Cipher \label{sec:preq:rsa}}
+
+The RSA cryptosystem, invented by Ron Rivest, Adi Shamir, and Len Adleman
+~\cite{rsa}, was first published in August 1977's issue of
+\emph{Scientific American}. In its basic version, this \emph{asymmetric} cipher
+works as follows:
+\begin{itemize}
+  \item choose a pair $\angular{p, q}$ of \emph{random} \emph{prime} numbers;
+    let $N$ be the product of the two, $N=pq$, and call it \emph{public modulus};
+  \item choose a pair $\angular{e, d}$ of \emph{random} numbers, both in
+    $\integerZ^*_{\varphi(N)}$, such that one is the multiplicative inverse of the
+    other, $ed \equiv 1 \pmod{\varphi(N)}$ and $\varphi(N)$ is Euler's totient
+    function;
+\end{itemize}
+Now, call $\angular{N, e}$ \emph{public key}, and $\angular{N, d}$
+\emph{private key}, and let the encryption function $E(m)$ be the $e$-th power of
+the message $m$:
+\begin{align}
+  \label{eq:rsa:encrypt}
+  E(m) = m^e \pmod{N}
+\end{align}
+while the decryption function $D(c)$ is the $d$-th power of the ciphertext $c$:
+\begin{align}
+  \label{eq:rsa:decrypt}
+  D(c) = c^d \equiv E(m)^d \equiv m^{ed} \equiv m \pmod{N}
+\end{align}
+that, due to Fermat's little theorem, is the inverse of $E$.
+
+\paragraph{}
+%% less unless <https://www.youtube.com/watch?v=XnbnuY7Kxhc>
+From now on, unless otherwise specified, the variable $N=pq$ will always refer
+to the public modulus of a generic RSA keypair, with
+$p, q$ being the two primes factorizing it, such that $p > q$.
+ Again, $e, d$ will respectively refer to the public
+exponent and the private exponent.
+
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "question_authority"
