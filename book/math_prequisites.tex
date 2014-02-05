@@ -8,6 +8,12 @@ science field; meanwhile, the $\dsqrt$ function will be defined in section
 \ref{sec:preq:sqrt}, with the acceptation of discrete square root.
 
 
+%% XXX. where to put these?
+The logarithmic $\log$ function is assumed to be in base two, i.e. $\log_2$.
+
+The $\idiv$ symbol is the integer division over $\naturalN$, i.e.
+$a \idiv b = \floor{\frac{a}{b}}$.
+
 \section{Euclid's Greatest Common Divisor}
 
 Being the greatest common divisor a foundamental algebraic operation in the ssl
@@ -19,16 +25,15 @@ protocol, \openssl implemented it with the following signature:
 
 The computation proceeds under the well-known Euclidean algorithm, specifically
 the binary variant developed by Josef Stein in 1961 \cite{AOCPv2}. This variant
-exploits some interesting properties of $gcd(u, v)$:
-
+exploits some interesting properties of $gcd(u, v)$
 \begin{itemize}
   \setlength{\itemsep}{1pt}
   \setlength{\parskip}{0pt}
   \setlength{\parsep}{0pt}
-\item if $u,\ v$ are even, then $gcd(u, v) = 2gcd(u/2, v/2)$
-\item if $u$ is even and $v$ is odd, then $gcd(u, v) = gcd(u/2, v)$
-\item  $gcd(u, v) = gcd(u-v, v)$, as in the standard Euclid's algorithm
-\item the sum of two odd numbers is always even
+  \item if $u,\ v$ are even, then $gcd(u, v) = 2gcd(u/2, v/2)$
+  \item if $u$ is even and $v$ is odd, then $gcd(u, v) = gcd(u/2, v)$
+  \item  $gcd(u, v) = gcd(u-v, v)$, as in the standard Euclid's algorithm
+  \item the sum of two odd numbers is always even
 \end{itemize}
 
 % Donald Knuth, TAOCP, "a binary method", p. 388 VOL 2
@@ -38,7 +43,7 @@ by induction.
 Anyway, both show that algorithm ~\ref{alg:gcd} belongs to the class
 \bigO{\log b}.
 
-\begin{algorithm}
+\begin{algorithm}[H]
   \caption{\openssl's GCD \label{alg:gcd}}
   \begin{algorithmic}[1]
     \State $k \gets 0$
@@ -47,7 +52,7 @@ Anyway, both show that algorithm ~\ref{alg:gcd} belongs to the class
         \If{$b$ is odd}
           \State $a \gets (a-b) \gg 1$
         \Else
-          \State $b = b \gg 1$
+          \State $b \gets b \gg 1$
         \EndIf
         \If{$a < b$} $a, b \gets b, a$ \EndIf
 
@@ -56,8 +61,8 @@ Anyway, both show that algorithm ~\ref{alg:gcd} belongs to the class
           \State $a = a \gg 1$
           \If{$a < b$} $a, b = b, a$ \EndIf
         \Else
-          \State $k = k+1$
-          \State $a, b = a \gg 1, b \gg 1$
+          \State $k \gets k+1$
+          \State $a, b \gets a \gg 1, b \gg 1$
         \EndIf
       \EndIf
     \EndWhile
@@ -69,15 +74,40 @@ Anyway, both show that algorithm ~\ref{alg:gcd} belongs to the class
 Unfortunately, there is yet no known parallel solution that significantly improves
 Euclid's \textsc{gcd}.
 
-\section{RSA Cipher}
+\section{RSA Cipher \label{sec:preq:rsa}}
 
-XXX.
-define RSA, provide the simple keypair generation algorithm.
+The RSA cryptosystem, invented by Ron Rivesst, Adi Shamir, and Len Adleman
+~\cite{rsa}, was first published in August 1977's issue of
+\emph{Scientific American}. In its basic version, this \emph{asymmetric} cipher
+works as follows:
+\begin{itemize}
+  \item choose a pair $\angular{p, q}$ of \emph{random} \emph{prime} numbers;
+    let $N$ be the product of the two, $N=pq$, and call it ``Public Modulus''
+  \item choose a pair $\angular{e, d}$ of \emph{random} numbers, both in
+    $\integerZ^*_{\varphi(N)}$, such that one is the multiplicative inverse of the
+    other, $ed \equiv 1 \pmod{\varphi(N)}$ and $\varphi(N)$ is Euler's totient
+    function;
+\end{itemize}
+Now, call $\angular{N, e}$ \emph{public key}, and $\angular{N, d}$
+\emph{private key}, and let the encryption function $E(m)$ be the $e$-th power of
+the message $m$:
+\begin{align}
+  \label{eq:rsa:encrypt}
+  E(m) = m^e \pmod{N}
+\end{align}
+while the decryption function $D(c)$ is the $d$-th power of the ciphertext $c$:
+\begin{align}
+  \label{eq:rsa:decrypt}
+  D(c) = c^d \equiv E(m)^d \equiv m^{ed} \equiv m \pmod{N}
+\end{align}
+that, due to Fermat's little theorem, is the inverse of $E$.
 
-From now on, except otherwise specified, the variable $N=pq$ will refer to the
-public modulis of a generis RSA keypair, with $p, q\ .\ p > q$ being the two primes
-factorizing it. Again, $e, d$ will respectively refer to the public exponent and
-the private exponent.
+\paragraph{}
+%% less unless <https://www.youtube.com/watch?v=XnbnuY7Kxhc>
+From now on, unless otherwise specified, the variable $N=pq$ will always refer
+to the public modulus of a generis RSA keypair, with $p, q\ .\ p > q$ being the
+two primes factorizing it. Again, $e, d$ will respectively refer to the public
+exponent and the private exponent.
 
 
 \section{Algorithmic Complexity Notation}
@@ -116,8 +146,46 @@ Unless otherwise specified, in the later pages we will use $\sqrt{n}$ with the
 usual meaning ``the half power of $n$'', while with $x, r = \dsqrt{n}$ we will
 intend the pair $\angular{x, r} \in \naturalN^2 \mid x^2 + r = n$.
 
-\paragraph{Bombelli's Algorithm \label{par:preq:sqrt:bombelli}} here here here.
+\paragraph{Bombelli's Algorithm \label{par:preq:sqrt:bombelli}} dates back to
+the XVI century, and approaches the problem of finding the square root by using
+continued fractions. Unfortunately, we weren't able to fully assert the
+correctness of the algorithm, since the original document
+~\cite{bombelli:algebra} is definitely unreadable and presents a difficult,
+inconvenient notation. Though, for completeness' sake, we report in table
+~\ref{alg:sqrt:bombelli} the pseudocode adopted and tested for its correctness.
 
+\begin{algorithm}[H]
+  \caption{Square Root: Bombelli's algorithm}
+  \label{alg:sqrt:bombelli}
+  \begin{algorithmic}[1]
+    \Procedure{sqrt}{$n$}
+
+    \State $i, g \gets 0, \{\}$
+    \While{$n > 0$}
+      \State $g_i \gets n \pmod{100}$
+      \State $n \gets n // 100$
+      \State $i++$
+    \EndWhile
+
+    \State $x, r \gets 0, 0$
+    \For{$j \in \;  [i-1..0]$}
+      \State $r = 100r + g_i$
+      \For{$d \in \; [0, 9]$}
+        \State $y' \gets d(20x + d)$
+        \If{$y' > r$}  \textbf{break}
+        \Else  \ \ $y \gets y'$
+        \EndIf
+      \EndFor
+      \State $r \gets r - y$
+      \State $x \gets 10x + d - 1$
+    \EndFor
+    \EndProcedure
+  \end{algorithmic}
+\end{algorithm}
+
+For each digit of the result, we perform a subtraction, and a limited number of
+multiplications. This means that the complexity of this solutions belongs to
+\bigO{\log n \log n} = \bigO{\log^2 n}
 \paragraph{Dijkstra's Algorithm \label{par:preq:sqrt:dijkstra}} can be found in
 \cite{Dijkstra:adop}, \S 8, p.61. There, Dijkstra presents an elightning
 process for the computation of the square root, making only use of binary shift
@@ -137,16 +205,17 @@ lower bound $a$ while holding the guard \ref{eq:preq:dijkstra_problem}:
   a^2 \leq n \: \land \: b > n
 \end{align*}
 
+%% XXX. I am not so sure about this, pure fantasy.
 The speed of convergence is determined by the choice of dinstance $d$, which is optimal when
 $d = (b-a) \idiv 2$.
 
-\begin{algorithm}
+\begin{algorithm}[H]
   \caption{Square Root: an intuitive, na\"ive implementation}
   \label{alg:sqrt:dijkstra_naif}
   \begin{algorithmic}[1]
     \State $a, b \gets 0, n+1$
     \While{$a+1 \neq b$}
-      \State $d = (b-a) \idiv 2$
+      \State $d \gets (b-a) \idiv 2$
       \If{$(a+d)^2 \leq n$}
          $a \gets a+d$
       \ElsIf{$(b-d)^2 > n$}
@@ -169,7 +238,7 @@ $r = n-a^2$
 and finally $h$ as local optimization. For any further details and
 explainations, the reference is still \cite{Dijkstra:adop}.
 
-\begin{algorithm}
+\begin{algorithm}[H]
   \caption{Square Root: final version}
   \label{alg:sqrt:dijkstra}
   \begin{algorithmic}

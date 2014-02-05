@@ -27,8 +27,6 @@ complexity of this algorirthm, which is
 $\bigO{\frac{(1-k)^2}{2k} \sqrt{N}} \;\;,  0 < k < 1$. We summarize it down
 below here to better clarify the limits of this algorithm.
 
-
-
 \begin{proof}
   Since, once we reach the final step $x_f$ it holds $N = pq = x_f^2 - y_f^2$,
   the number of steps required to reach the result is:
@@ -60,6 +58,10 @@ $ \Delta = p - q  = x + y - x + y = 2y > 2^{-100}\sqrt{N}$.
 Algorithm ~\ref{alg:fermat} presents a simple implementation of this
 factorization method, taking into account the small aptimizations
 aforementioned.
+
+\paragraph{How to chose the upper limit?}  after having explained our interpretation
+of NISTS' upperbound limit - the most significat bits story, we ;should report
+some practical tets.
 
 \begin{algorithm}
   \caption{Fermat Factorization \label{alg:fermat}}
