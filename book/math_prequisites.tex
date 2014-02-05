@@ -25,14 +25,14 @@ protocol, \openssl implemented it with the following signature:
 
 The computation proceeds under the well-known Euclidean algorithm, specifically
 the binary variant developed by Josef Stein in 1961 \cite{AOCPv2}. This variant
-exploits some interesting properties of $gcd(u, v)$
+exploits some interesting properties of $gcd(a, b)$
 \begin{itemize}
   \setlength{\itemsep}{1pt}
   \setlength{\parskip}{0pt}
   \setlength{\parsep}{0pt}
-  \item if $u,\ v$ are even, then $gcd(u, v) = 2gcd(u/2, v/2)$
-  \item if $u$ is even and $v$ is odd, then $gcd(u, v) = gcd(u/2, v)$
-  \item  $gcd(u, v) = gcd(u-v, v)$, as in the standard Euclid's algorithm
+  \item if $a,\ b$ are even, then $gcd(a, b) = 2gcd(a/2, b/2)$
+  \item if $a$ is even and $b$ is odd, then $gcd(a, b) = gcd(a/2, b)$
+  \item  $gcd(a, b) = gcd(a-b, b)$, as in the standard Euclid's algorithm
   \item the sum of two odd numbers is always even
 \end{itemize}
 
@@ -256,7 +256,7 @@ explainations, the reference is still \cite{Dijkstra:adop}.
 \end{algorithm}
 
 A fair approxidmation of the magnitude of the Dijkstra algorithm can be studied
-by looking at the pseudocode in ~\ref{alg:sqrt:dijkstra_naif}.Exactely as with
+by looking at the pseudocode in ~\ref{alg:sqrt:dijkstra_naif}. Exactely as with
 the dicotomic search case, we split the interval $[a, b]$ in half on each step,
 and choose wether to take the leftmost or the rightmost part. This results in
 $log(n+1)$ steps. During each iteration, instead, as we have seen in
