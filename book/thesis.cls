@@ -160,8 +160,8 @@
 \def\copyrightyear#1{\gdef\@copyrightyear{#1}} % \author, \title in report
 \def\degree#1{\gdef\@degree{#1}}
 \def\degreeinitial#1{\gdef\@degreeinitial{#1}}
-\def\msc{\degree{Master of Science}\degreeinitial{M.Sc.}}
-\msc % default degree
+\def\mastersc{\degree{Master of Science}\degreeinitial{M.Sc.}}
+\mastersc % default degree
 \def\phd{\degree{Doctor of Philosophy}\degreeinitial{Ph.D.}\ph@dtrue}
 \def\ma{\degree{Master of Arts}\degreeinitial{M.A.}}
 \def\@title{}
