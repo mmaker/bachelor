@@ -10,17 +10,17 @@
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{amsthm}
-\usepackage{cite}
+\usepackage{cancel}
 \usepackage[dvips]{color}
 \usepackage{epigraph}
 \usepackage{fancyhdr}
 \usepackage{graphicx}
+\usepackage{hyperref}
 \usepackage{indentfirst}
 \usepackage{mathtools}
 \usepackage{minted}
 \usepackage{makeidx,shortvrb,latexsym}
 \usepackage{supertabular}
-%\usepackage{algorithmic}
 %\usepackage{xypic}
 %% setting epigraphs
 
@@ -40,32 +40,23 @@
 
 \newcommand{\naturalN}{\mathbb{N}}
 \newcommand{\naturalPrime}{\mathbb{P}}
+\newcommand{\integerZ}{\mathbb{Z}}
 \newcommand{\bigO}[1]{\ensuremath{\operatorname{O}\left(#1\right)}}
 \newcommand{\openssl}{\textsc{OpenSSL}\ }
 \newcommand{\dsqrt}[1]{\ensuremath{sqrt(#1)}}
 \newcommand{\idiv}{\ensuremath{//}}
 \newcommand{\strong}[1]{\textbf{#1}}
+\newcommand{\eulerphi}[1]{\varphi(#1)}
+\newcommand{\abs}[1]{\left|#1\right|}
+\newcommand{\rfrac}[2]{{}^{#1}\!/_{#2}}
 
 %% Optional custom shortcuts commands.
 \usepackage{braket}
-\newenvironment{sistema}
-  {\left\lbrace\begin{array}{@{}l@{}}}
-  {\end{array}\right.}
-\newcommand{\dimo}{\noindent\textit{Dimostrazione.}\\}
-\newtheorem{teo}[thm]{Teorema}
 \newcommand{\pe}{\mathbb{P}_{\mathrm{E}}}
 \newcommand{\pme}{\mathbb{P}_{\mathrm{ME}}}
 \newcommand{\primary}{\blacktriangle}
 \newcommand{\secondary}{{\blacktriangle\!}^{\! \! +}}
 \newcommand{\MM}{\mathcal{M}}
-%\newtheorem{teo}[thm]{Teorema}
-\newtheorem{proposizione}[thm]{Proposizione}
-\newtheorem{corollario}[thm]{Corollario}
-\newtheorem{fatto}[thm]{Fatto}
-\newtheorem{definizione}[thm]{Definizione}
-%\newtheorem{lemma}[thm]{Lemma}
-\newtheorem{osservazione}[thm]{Osservazione}
-\newtheorem{esempio}[thm]{Esempio}
 \newcommand{\DP}{{\D\!}^{\! \! +}}
 \newcommand{\D}{\Delta}
 \newcommand{\Fq}{ \mathbb{F}_{q}}
@@ -173,27 +164,23 @@ $\square$
   \includegraphics[width=80pt]{kopimi.png}
 \end{figure}
 \include{preface}
+
 \part{Prequisites}
 \include{ssl_prequisites}
 \include{math_prequisites}
+
 \part{Factorization Methods}
 \include{fermat}
 \include{wiener}
+\include{pollard-1}
+\include{pollard+1}
+\include{pollardrho}
 
-%\include{chap3}
-%\include{chap5}
-%\part{}
-%\include{chap5}
-%\include{chap6}
-%\part{}
-%\include{chap8}
-%\include{chap7}
-%
-%\part{Appendice }
-%\include{appendice}
+\include{conclusions}
+
 \backmatter
-\bibliography{library.bib}
-\bibliographystyle{plain}
+%%\bibliographystyle{ieeetr}
+\bibliography{library}
 \clearpage
 \addcontentsline{toc}{chapter}{Bibliography}
 \end{document}

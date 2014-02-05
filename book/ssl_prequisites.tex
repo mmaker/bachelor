@@ -1,6 +1,52 @@
-\chapter{The Secure Socket Layer \label{chap:ssl}}
+\chapter{The Secure Layer \label{chap:ssl}}
 
+Transport Layer Security, formerly known as SSL (Secure Socket Layer), aims
+to bring some security features over a communication channel, specifically
+providing \strong{integrity} and \strong{confidentiality} of the message, \strong{authenticity} of the server and
+optionally the client.
+%% fuck osi layers: there is no code explicitly structuring the internet in 7
+%% layers.
+The most allocate TLS in the 6 or 7th OSI Layer, ``Application'', and is nowdays widely adopted
+all over the world, being the de-facto standard for end-to-end  encryption.
+
+\paragraph{Certifications Authority} are at the root of the security of the
+protocol. See section ~\ref{sec:ssl:x509}
+
+\paragraph{The protocol} is actually composed of many sub-protocols:
+
+\begin{itemize}
+\item handshake protocol
+\item record protocol
+\item alert protocol
+\item changespec protocol ?
+\end{itemize}
+We will proceed by describing in deep only the first two of these, due to their
+relevant role inside the conection and furthermore, because they are the only
+two we actually made use of during our investigations.
+
+
+\section{The \texttt{handshake} protocol}
+Different options:
+\begin{itemize}
+\item no session
+\item session
+\item client authenticaton
+\end{itemize}
+
+
+\section{The \texttt{record} protocol}
+
+Until 2005, failure to authenticate, decrypt will result in I/O error and a
+close of the connection
+
+\section{What's inside a certificate \label{sec:ssl:x509}}
+
+\section{Remarks among SSL/TLS versions}
 
 cos'e
 differenze tra le varie versioni
 la certification autority
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "question_authority.tex"
+%%% End:
