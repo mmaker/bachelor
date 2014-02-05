@@ -1,0 +1,25 @@
+# -*- coding: utf-8 ; mode: org -*-
+
+#+TITLE:  Sixth report
+#+DATE:   2014-02-05
+#+AUTHOR: Michele Orru`
+#+EMAIL:  maker@tumbolandia.net
+
+Finalizing and testing a serial version of fermat's factorization, but most of
+the time were spent on the writing of the final document. Summarizing down here
+the current status of each attack candidate:
+
+* DIXON
+  Must be completely rewritten, the initial implementation was far too naive,
+  and I don't have many sources, neither simple enough, nor complete to use at
+  the moment.
+* FERMAT
+  Working and tested serial version
+* WIENER
+  WOrking and tested serial verision
+* POLLARD p-1
+  Was completed, but turns out also this one shall be almostly rewritten.
+* POLLAPRD p+1
+  To be studied and written
+* POLLARD ρ
+  To be studied and written
