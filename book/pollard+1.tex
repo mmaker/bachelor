@@ -1,6 +1,19 @@
-\chapter{Pollard's $p+1$ factorization method}
+\chapter{Williams' $p+1$ factorization method \label{chap:william+1}}
 
-pollard!
+Analogously to Pollard's $p-1$ factorization described in chapter
+~\ref{chap:pollard-1}, this method will allow the determination of the divisor
+$p$ of a number $N$, if $p$ is such that $p+1$ has only small prime divisors.
+This method was presented in ~\cite{Williams:p+1} together with the results of
+the application of this method to a large number of composite numbers.
+
+\begin{remark}
+  In the end of ~\cite{Williams:p+1}, there is a small performance comparison
+  with Pollard's $p-1$:
+  ``The real problem with the $p+1$ test is the fact that it is quite slow. For
+  our program, we found that it was about nine times slower.''
+  Nevertheless, there is no further information about the way the two
+  factorization have been benchmarked.
+\end{remark}
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "question_authority"
