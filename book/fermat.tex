@@ -90,13 +90,15 @@ some practical tets.
 
 \section{Thoughts about parallelization}
 
-During each single iteration, the computational complexity is dominated by the
-quare root's $\dsqrt$ function, which belongs to the class
-\bigO{lg^2 N}, as we saw in section ~\ref{sec:preq:sqrt}.
-
-Even if at first sight might seem plausible to split
-
-As we saw in Chapter ~\ref{chap:preq}, th
+At first glance we might be willing to split the entire interval
+$\{ \ceil{\sqrt{N}}, \ldots, N-1 \}$ in equal parts, one assigned to per each
+node. Hovever, this would not be any more efficient than the trial division
+algorithm, and nevertheless it is woth noting that during each single iteration,
+the computational complexity is dominated by the quare root $\dsqrt$ function,
+which belongs to the class \bigO{\log^2 N}, as we saw in section
+~\ref{sec:preq:sqrt}. Computing separatedly $x^2$ would add an overhead of the
+same order of magnitude \bigO{\log^2 N}, and thus result in a complete waste of
+resources.
 %%% Local Variables:
 %%% TeX-master: "question_authority.tex"
 %%% End:
