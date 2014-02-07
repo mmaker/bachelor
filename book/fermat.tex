@@ -17,7 +17,7 @@ x^2 - N = y^2
 \end{align}
 
 So, we start by $x = \ceil{\sqrt{N}}$ and check that $x^2-N$ is a perfect
-square. If it isn't, we iterativelly increment $x$ and check again, until we
+square. If it isn't, we iteratively increment $x$ and check again, until we
 find a pair $\angular{x, y}$ satisfying equation \ref{eq:fermat_problem}.
 Once found, we claim that $N = pq = (x+y)(x-y)$; it is indeed true that, if we
 decompose $x^2 - y^2$ as difference of squares, then it is immediately clear
@@ -25,7 +25,7 @@ that $x+y \mid N \ \land \  x-y \mid N$, and that both are non-trivial
 divisors.
 
 \paragraph{Complexity} \cite{riesel} contains a detailed proof for the
-complexity of this algorirthm, which is
+complexity of this algorithm, which is
 $\bigO{\frac{(1-k)^2}{2k} \sqrt{N}} \;\;,  0 < k < 1$. We summarize it down
 below here to better clarify the limits of this algorithm.
 
@@ -54,18 +54,14 @@ below here to better clarify the limits of this algorithm.
 At each iteration, the $i-$th state is hold by the pair $\angular{x, x^2}$.\\
 The later step, described by $\angular{x+1, (x+1)^2}$ can be computed efficiently
 considering the square of a binomial: $\angular{x+1, (x^2) + (x \ll 1) + 1}$.
-The upperbound, instead, is reached when
+The upper-bound, instead, is reached when
 $ \Delta = p - q  = x + y - x + y = 2y > 2^{-100}\sqrt{N}$.
 
 Algorithm ~\ref{alg:fermat} presents a simple implementation of this
 factorization method, taking into account the small optimizations
 aforementioned.
 
-\paragraph{How to chose the upper limit?}  after having explained our interpretation
-of NISTS' upperbound limit - the most significat bits story, we ;should report
-some practical tets.
-
-\begin{algorithm}
+\begin{algorithm}[H]
   \caption{Fermat Factorization \label{alg:fermat}}
   \begin{algorithmic}[1]
     \State $x \gets \floor{\sqrt{N}}$
@@ -87,14 +83,70 @@ some practical tets.
     \end{algorithmic}
 \end{algorithm}
 
+\paragraph{How to chose the upper limit?}  Our choice of keeping straight with
+the limits of the standard is a mere choice of commodity: we are interested in
+finding public keys  not respecting it. Though, it it worth noting that what this
+limit \emph{states} is that at least one of the most significant $100$ bits
+should be different between the two primes:
 
-\section{Thoughts about parallelization}
+\begin{bytefield}[
+  endianness=big,
+  bitwidth=1.5em,
+%  bitformatting=\fakerange,
+  ]{16}
+  \\
+%  \bitheader{}
+  \\[1px]
+  \begin{rightwordgroup}{$2^{\log{\frac{N}{2}}-100}$}
+    \bitbox{1}{0} & \bitbox{1}{0} & \bitbox{1}{0} & \bitbox{1}{0} &
+    \bitbox{1}{0} & \bitbox{1}{0} & \bitbox{1}{0} & \bitbox{1}{0} &
+    \bitbox{3}{\tiny $\cdots$} &
+    \bitbox{1}{0} & \bitbox{1}{0} & \bitbox{1}{0} & \bitbox{1}{0} &
+    \bitbox{1}{0} & \bitbox{1}{1} & \bitbox{1}{0} & \bitbox{1}{0} &
+    \bitbox{5}{\tiny $\cdots$}    & \bitbox{1}{0} & \bitbox{1}{0} &
+  \end{rightwordgroup}
+  \\[1ex]
+  \wordbox[]{1}{} &&
+  \\[1ex]
+  \begin{rightwordgroup}{$p$}
+    \bitbox{1}{0} & \bitbox{1}{1} & \bitbox{1}{0} & \bitbox{1}{0} &
+    \bitbox{1}{0} & \bitbox{1}{0} & \bitbox{1}{1} & \bitbox{1}{1} &
+    \bitbox{3}{\tiny $\cdots$} &
+    \bitbox{1}{0} & \bitbox{1}{1} & \bitbox{1}{0} & \bitbox{1}{0} &
+    \bitbox{1}{0} &
+    \colorbitbox{lightgray}{1}{1} & \colorbitbox{lightgray}{1}{0} &
+    \colorbitbox{lightgray}{1}{0} &
+    \colorbitbox{lightgray}{6}{\tiny{$\cdots$ least signif. bits $\cdots$}} &
+    \colorbitbox{lightgray}{1}{0} &
+  \end{rightwordgroup}
+  \\[1ex]
+  \begin{rightwordgroup}{$q$}
+    \bitbox{1}{0} & \bitbox{1}{1} & \bitbox{1}{0} & \bitbox{1}{0} &
+    \bitbox{1}{0} & \bitbox{1}{0} & \bitbox{1}{0} & \bitbox{1}{1} &
+    \bitbox{3}{\tiny $\cdots$} &
+    \bitbox{1}{0} & \bitbox{1}{1} & \bitbox{1}{0} & \bitbox{1}{0} &
+    \bitbox{1}{0} &
+    \colorbitbox{lightgray}{1}{0} & \colorbitbox{lightgray}{1}{0} &
+    \colorbitbox{lightgray}{1}{0} &
+    \colorbitbox{lightgray}{6}{\tiny{$\cdots$ least signif. bits $\cdots$}} &
+    \colorbitbox{lightgray}{1}{0} &
+  \end{rightwordgroup}
+\end{bytefield}
+\vspace{20pt}
+
+For example, in the case of a RSA key $1024$, the binary difference between $p$
+and $q$ has to be greater than $2^{412}$, which means that, excluding corner-cases
+where the remainder is involved, there must be at least one difference in the
+top 100 most significant bits for the key to be considered safe.
+
+
+\section{Thoughts about a parallel solution}
 
 At first glance we might be willing to split the entire interval
 $\{ \ceil{\sqrt{N}}, \ldots, N-1 \}$ in equal parts, one assigned to per each
-node. Hovever, this would not be any more efficient than the trial division
-algorithm, and nevertheless it is woth noting that during each single iteration,
-the computational complexity is dominated by the quare root $\dsqrt$ function,
+node. However, this would not be any more efficient than the trial division
+algorithm, and nevertheless it is worth noting that during each single iteration,
+the computational complexity is dominated by the square root $\dsqrt$ function,
 which belongs to the class \bigO{\log^2 N}, as we saw in section
 ~\ref{sec:preq:sqrt}. Computing separatedly $x^2$ would add an overhead of the
 same order of magnitude \bigO{\log^2 N}, and thus result in a complete waste of

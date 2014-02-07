@@ -10,8 +10,10 @@
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{amsthm}
+\usepackage{bytefield}
 \usepackage{cancel}
 \usepackage[dvips]{color}
+\usepackage{enumerate}
 \usepackage{epigraph}
 \usepackage{fancyhdr}
 \usepackage{graphicx}
@@ -30,6 +32,11 @@
 
 \input xy
 \xyoption{all}
+
+%% bytefield shit
+\newcommand{\colorbitbox}[3]{%
+\rlap{\bitbox{#2}{\color{#1}\rule{\width}{\height}}}%
+\bitbox{#2}{#3}}
 
 
 %% COMMANDS
