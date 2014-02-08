@@ -1,6 +1,21 @@
-\chapter{Dixon}
+\chapter{Dixon \label{chap:dixon}}
 
-dixon!
+~\cite{dixon} describes a class of ``probabilistic algorithms'' for finding a
+factor of any composite number, at a computational cost asymptotically  best
+than all other ones previously described:
+\bigO{\beta(\log N \log \log N)^{\rfrac{1}{2}}}
+for some constant $\beta > 0$.
+
+\paragraph{Kraitchick} was the first one popularizing the idea the instead of
+looking for integers $\angular{x, y}$ such that $x^2 -y^2 = N$ -recall Fermat's
+problem, formulated in equation ~\ref{eq:fermat_problem}, it is sufficient to
+look for \emph{multiples} of $N$:
+\begin{align}
+  x^2 - y^2 \equiv 0 \pmod{N}
+\end{align}
+and, once found, claim that $\gcd(N, x \pm y)$ are non-trial divisors of $N$
+just as we did in \ref{sec:fermat:implementation}.
+On the top of this,
 
 %%% Local Variables:
 %%% mode: latex
