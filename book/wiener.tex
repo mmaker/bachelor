@@ -64,7 +64,7 @@ Then it is possible to recover $f$, having $f'$, if $\delta$ is small
 enough, where small enough means:
 \begin{align}
   \label{eq:wiener:cf_approx}
-  \delta = 1 - \frac{f'}{f} < \frac{1}{\rfrac{3}{2}{h_1}{d_1}}
+  \delta = 1 - \frac{f'}{f} < \frac{1}{\rfrac{3}{2}{h_1}{k_1}}
 \end{align}
 \\
 The ``continued fraction algorithm'' allowing us to recover $f$ is the
@@ -76,7 +76,7 @@ following:
   \item generate the next $a_i$ of the continued fraction expansion of $f'$;
   \item use ~\ref{eq:wiener:cf} to generate the next fraction $\rfrac{h_i}{k_i}$
     equal to $\angular{a_0, a_1, \ldots, a_{i-1}, a_i}$ %% non e` proprio cosi`
-  \item chech whether $\rfrac{h_i}{k_i}$ is equal to $f$
+  \item check whether $\rfrac{h_i}{k_i}$ is equal to $f$
 \end{enumerate}
 
 \section{The actual attack}

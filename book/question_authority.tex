@@ -52,12 +52,14 @@
 \newcommand{\integerZ}{\mathbb{Z}}
 \newcommand{\bigO}[1]{\ensuremath{\operatorname{O}\left(#1\right)}}
 \newcommand{\openssl}{\textsc{OpenSSL}\ }
-\newcommand{\dsqrt}[1]{\ensuremath{sqrt(#1)}}
+%% here adopting Wikipedia's notation <https://en.wikipedia.org/wiki/Isqrt>
+\newcommand{\dsqrt}[1]{\ensuremath{isqrt(#1)}}
 \newcommand{\idiv}{\ensuremath{//}}
 \newcommand{\strong}[1]{\textbf{#1}}
 \newcommand{\eulerphi}[1]{\varphi(#1)}
 \newcommand{\abs}[1]{\left|#1\right|}
 \newcommand{\rfrac}[2]{{}^{#1}\!/_{#2}}
+\newcommand{\getsRandom}{\xleftarrow{r}}
 
 \makeindex
 \let\origdoublepage\cleardoublepage
