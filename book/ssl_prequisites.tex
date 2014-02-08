@@ -6,22 +6,74 @@ providing \strong{integrity} and \strong{confidentiality} of the message, \stron
 optionally the client.
 %% fuck osi layers: there is no code explicitly structuring the internet in 7
 %% layers.
-The most allocate TLS in the 6 or 7th OSI Layer, ``Application'', and is nowdays widely adopted
-all over the world, being the de-facto standard for end-to-end  encryption.
+It is nowadays widely adopted all over the world, being the de-facto standard for
+end-to-end  encryption.
 
-\paragraph{Certifications Authority} are at the root of the security of the
-protocol. See section ~\ref{sec:ssl:x509}
+\paragraph{Certification Authorities} are authorities to whom it is granted the
+power to \emph{authenticate} the peer. Pragmatically, they are public keys
+pre-installed on your computer that decide who and who not to trust employing
+of a digital signature. A more detailed analysis of the inside of a certificate
+will be given in section ~\ref{sec:ssl:x509}.
+In order to overcome the proliferation of keys to disribute, and satisfy the
+use-case of a mindless user willing to accomplish a secure transaction on the
+internet, the concept of a hierarchical model issuing digital certificates
+proliferated with the following trust model:
+\\
+\\
+%% E` BELLISSIMO QUESTO COSO
+\begin{center}
+  \begin{tikzpicture}[
+    scale=.8,
+    ->,>=stealth',
+    ,level/.style={sibling distance = 10cm/#1,
+      level distance = 2.5cm}]
+    \node  {Root CA}
+    child{ node {\small{Intermediate CA}}
+      child{ node  {Issuer CA}
+        child{ node {} edge from parent node[above left]
+          {\tiny{loltrust}}}
+        child{ node {}}
+      }
+      child{ node  {CA}
+        child{ node  {Sub-CA}}
+        child{ node  {}}
+      }
+    }
+    child{ node {\small{Intermediate CA}}
+      child{ node  {CA}
+        child{ node  {hacked computer}}
+        child{ node  {CA}}
+      }
+      child{ node {GVMT CA}
+        child{ node  {}}
+        child{ node  {}}
+      }
+    }
+    ;
+  \end{tikzpicture}
+\end{center}
 
-\paragraph{The protocol} is actually composed of many sub-protocols:
 
+\paragraph{The protocol} is actually a collection of many sub-protocols:
 \begin{itemize}
-\item handshake protocol
-\item record protocol
-\item alert protocol
-\item changespec protocol ?
+  \setlength{\itemsep}{1pt}
+  \setlength{\parskip}{0pt}
+  \setlength{\parsep}{0pt}
+\item \strong{\emph{handshake}} protocol, a messaging protocol that allows to
+  \emph{authenticate} the peers, and eventually restore a past encrypted
+  session.
+\item \strong{\emph{record}} protocol, permitting the encapsulation of higher level protocols,
+  like HTTP and even the next two sub-protocols. It is the fulcrum for all data
+  transfer.
+\item \strong{alert} protocol, which steps-in at any time from handshake to closure of the
+  session in order to signal a fatal error. The connection will be closed
+  immediately after sending an alert record.
+\item \strong{changespec} protocol, to negotiate with and notify  the receiver that
+  subsequent records will be protected under the just negotiated keys and
+  \texttt{Cipher Spec}.
 \end{itemize}
 We will proceed by describing in deep only the first two of these, due to their
-relevant role inside the conection and furthermore, because they are the only
+relevant role inside the connection and furthermore, because they are the only
 two we actually made use of during our investigations.
 
 
@@ -30,7 +82,7 @@ Different options:
 \begin{itemize}
 \item no session
 \item session
-\item client authenticaton
+\item client authentication
 \end{itemize}
 
 
