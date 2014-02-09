@@ -1,6 +1,63 @@
-\chapter{Pollard's $\rho$ factorization method}
+\chapter{Pollard's $\rho$ factorization method \label{chap:pollardrho}}
 
-$\rho$!
+Pollard's $\rho$ factorization method is based on the statistical idea behind
+the birthday paradox. It consists into indentifying a periodically recurrent
+sequence of integers in the ring of remainders with respect to the public
+modulus $N$, and claim that the period $\psi$ is one of the two primes
+factorizing $N$.
+
+\paragraph{Origins of the name} The $\rho$ name is devoted to the graphical
+representation of the algorithm: as we can see in figure ~\ref{fig:pollardrho},
+if we graphically represent the lookup over a graphic
+
+\begin{center}
+  \begin{tikzpicture}[scale=0.7, thick]
+    \tikzstyle{every node}=[draw,circle,fill=white,minimum size=4pt,
+                            inner sep=0pt]
+    \node (1) at (1.4, 0.2) [label=left:$x_1$] {};
+    \node (2) at (2.5, 3)   [label=left:$x_{i-2}$] {};
+    \node (3) at (3.25, 5)  [label=left:$x_{i-1}$] {};
+    \node (4) at (4, 7)     [label=left:$ x_i \equiv x_j $] {};
+    \node (5) at (6, 9)     [label=above:$x_{i+1}$] {};
+    \node (6) at (8, 7)     [label=right:$x_{i+2}$] {};
+    \node (7) at (6, 5)     [label=below:$x_{j-1}$] {};
+
+    \path (1) edge [dashed] (2);
+    \path (2) edge (3);
+    \path (3) edge (4);
+    \path (4) edge [bend left] (5);
+    \path (5) edge [bend left] (6);
+    \path (6) edge [bend left, dashed] (7);
+    \path (7) edge [bend left] (4);
+
+    %%\draw [decorate,decoration={brace, raise=1.5cm}] (1) -- (3)
+    %%node[draw=no] at (-1.5, 4) {tail};
+    \draw [decorate,decoration={brace, raise=3cm}] (5) -- (7)
+    node[draw=none] at (13, 7) {\footnotesize {periodic sequence}};
+
+\end{tikzpicture}
+\end{center}
+
+
+\paragraph{A more rigourous description}
+\begin{proof}
+\end{proof}
+
+\section{A Computer program for Pollard's $\rho$ method}
+
+Using the same trick we saw in section ~\ref{sec:pollard-1:implementing},  we
+chose to apply occasionally Euclid's algorithm by computing the accumulated
+product; algorithm ~\ref{alg:pollardrho} outlines what we have so far discussed,
+considering also the pascal transcript present in ~\cite{riesel} \S 5.
+
+\begin{algorithm}
+  \caption{Pollard's $\rho$ factorization \label{alg:pollardrho}}
+  \begin{algorithmic}[1]
+    \State $a \getsRandom \naturalN \setminus \{0, 2\}$
+    \State $x \getsRandom \naturalN$
+    \State $y \gets x$
+  \end{algorithmic}
+\end{algorithm}
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "question_authority"
