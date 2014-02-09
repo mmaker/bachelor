@@ -102,14 +102,85 @@ For the last step, remember that $k < d < \rfrac{1}{3} {}^4\sqrt{N}$:
   &= \abs{\frac{1-k(N-\eulerphi{N})}{Nd}} \\
   &\leq \abs{\frac{3k\sqrt{N}}{Nd}}
   = \frac{3k}{d\sqrt{N}}
-  < \frac{3(\rfrac{1}{3} {}^4\sqrt{N})}{d\sqrt{N}}
-  = \frac{1}{d{}^4\sqrt{N}}
+  < \frac{3(\rfrac{1}{3}\ {}^4\sqrt{N})}{d\sqrt{N}}
+  = \frac{1}{d{}^4\sqrt{N}} < \frac{1}{2d^2}
 \end{align*}
 
-This demonstrates the conditions of ~\ref{eq:wiener:cf_approx} and allows us to
-proceed with the continued fraction algorithm to converge to a solution.
+This demonstrates the conditions of ~\ref{eq:wiener:cf_approx} holds, and allows
+us to proceed with the continued fraction algorithm to converge to a solution
+~\cite{20years}.
+
+\paragraph{}
+We start by generating the $\log N$ continued fraction expansions of
+$\frac{e}{N}$, and for each convergent $\frac{k}{d}$,
+%% XXX. verify this
+which by contruction is already at the lowest terms, we verify if it produces a
+factorization of $N$.
+First we chack that $\eulerphi{N} = \frac{ed-1}{k}$ is
+integer. Then we solve ~\ref{eq:wiener:pq} in $x$ in order to find $p, q$:
+\begin{align}
+  \label{eq:wiener:pq}
+  x^2 - (N - \eulerphi{N} + 1)x + N = 0
+\end{align}
+The above equation is constructed so that the $x$ coefficient is the sum of the
+two primes, while the constant term $N$ is the product of the two. Therefore, if
+$\eulerphi{N}$ has been correctly guessed, the two roots will be $p$ and $q$.
+
 \section{Again on the engine™}
 
+The algorithm is pretty straightforward by itself: we just need to apply the
+definitions provided in ~\ref{eq:wiener:cf} and test each convergent until
+$\log N$ iterations have been reached.
+%% XXX. questo viene da 20 years, ma non e` spiegato perche`.
+A Continued fraction structure may look like this:
+
+\begin{minted}{c}
+  typedef struct cf {
+    bigfraction_t fs[3];  /* holding h_i/k_i, h_i-1/k_i-1, h_i-2/k_i-2 */
+    short i;              /* cycling in range(0, 3) */
+    bigfraction_t x;      /* pointer to the i-th fraction in fs */
+    BIGNUM* a;            /* current a_i */
+    BN_CTX* ctx;
+  } cf_t;
+\end{minted}
+where \texttt{bigfraction\_t} is jsut a pair of \texttt{BIGNUM} \!s
+$\angular{h_i, k_i}$. Whenever we need to produce a new convergent, we increment
+$i \pmod{3}$ and apply the definitions given. The fresh convergent must be
+tested with very simple algebraic operations. It is worth noting here that
+\ref{eq:wiener:pq} can be solved using the reduced discriminant formula, as
+$p, q$ are odd primes:
+\begin{align*}
+\Delta = \left( \frac{N-\eulerphi{N} + 1}{2} \right)^2 - N \\
+x_{\angular{p , q}} = - \frac{N - \eulerphi{N} + 1}{2} \pm \sqrt{\Delta}
+\end{align*}
+Assuming the existence of the procedures \texttt{cf\_init}, initializing a
+continued fraction structure, and \texttt{cf\_next} producing the next
+convergent, we provide an algorithm for attacking the RSA cipher via Wiener:
+
+\begin{algorithm}[H]
+  \caption{Wiener's Attack}
+  \label{alg:wiener}
+  \begin{algorithmic}[1]
+    \State $f \gets  \texttt{cf\_init}(e, N)$
+    \State $i \gets \ceil{\log N}$
+    \While{$i--$}
+    \State $k, d \gets \texttt{cf\_next}(f)$
+    \If{$k \nmid ed-1$} \strong{continue} \EndIf
+    \State $\eulerphi{N} \gets (ed - 1)\ //\ k$
+    \If{$\eulerphi{N}$ is odd} \strong{continue} \EndIf
+%% XXX. it could be that calling 'b' b/2 and 'delta' sqrt(delta/4) is
+%% misleading.
+    \State $b \gets (N - \eulerphi{N} + 1) \gg 1$
+    \State $\Delta, r \gets \dsqrt{b^2 - N}$
+    \If{$r \neq 0$} \strong{continue} \EndIf
+    \State $p, q \gets b \pm \Delta$
+    \State \strong{break}
+    \EndWhile
+    \State \Return p, q
+  \end{algorithmic}
+\end{algorithm}
+
+\section{Building a distributed version}
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "question_authority"
