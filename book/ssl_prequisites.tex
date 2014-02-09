@@ -14,47 +14,89 @@ end-to-end  encryption.
 \paragraph{Certification Authorities} are authorities to whom it is granted the
 power to \emph{authenticate} the peer. Pragmatically, they are public keys
 pre-installed on your computer that decide who and who not to trust employing
-of a digital signature. A more detailed analysis of the inside of a certificate
-will be given in section ~\ref{sec:ssl:x509}.
+a digital signature.
 In order to overcome the proliferation of keys to distribute, and satisfy the
 use-case of a mindless user willing to accomplish a secure transaction on the
-internet, the concept of a hierarchical model issuing digital certificates
-proliferated with the following trust model:
+internet, the following, hierarchical trust model proliferated (~\cite{rfc4158},
+Fig.2):
 \\
 \\
 %% E` BELLISSIMO QUESTO COSO
 \begin{center}
-  \begin{tikzpicture}[
-    scale=.8,
-    ->,>=stealth',
-    ,level/.style={sibling distance = 10cm/#1,
-      level distance = 2.5cm}]
-    \node  {Root CA}
-    child{ node {\small{Intermediate CA}}
-      child{ node  {Issuer CA}
-        child{ node {} edge from parent node[above left]
-          {\tiny{loltrust}}}
-        child{ node {}}
+\begin{tikzpicture}[
+  scale=0.9,
+  align=center,
+  level/.style={sibling distance=60mm/#1}]
+\node [draw] (z){Root CA}
+  child {node [circle,draw] (a) {CA}
+    child {node [circle,draw] (b) {CA}
+      child {node {$\vdots$}
+        child {node [circle,draw] (d) {EE}}
+        child {node [circle,draw] (e) {EE}}
       }
-      child{ node  {CA}
-        child{ node  {Sub-CA}}
-        child{ node  {}}
+      child {node {$\vdots$}}
+    }
+    child {node [circle,draw] (g) {CA}
+      child {node {$\vdots$}}
+      child {node {$\vdots$}}
+    }
+  }
+  child {node [circle,draw] (j) {CA}
+    child {node [circle,draw] (k) {CA}
+      child {node {$\vdots$}}
+      child {node {$\vdots$}}
+    }
+  child {node [circle,draw] (l) {CA}
+    child {node {$\vdots$}}
+    child {node (c) {$\vdots$}
+      child {node [circle,draw] (o) {EE}}
+      child {node [circle,draw] (p) {EE}
+        child [grow=right] {node (q) {$\Rightarrow$} edge from parent[draw=none]
+          child [grow=right] {node (q) {End Entities} edge from
+            parent[draw=none]
+            child [grow=up] {node (r) {$\vdots$} edge from parent[draw=none]
+              child [grow=up] {node (s)
+                {Certification\\ Authorities} edge from parent[draw=none]
+                child [grow=up] {node (t)
+                  {Certification\\ Authorities} edge from parent[draw=none]
+                  child [grow=up] {node (u) {Root Authorities} edge from
+                    parent[draw=none]}
+                }
+              }
+            }
+          }
+        }
       }
     }
-    child{ node {\small{Intermediate CA}}
-      child{ node  {CA}
-        child{ node  {hacked computer}}
-        child{ node  {CA}}
-      }
-      child{ node {GVMT CA}
-        child{ node  {}}
-        child{ node  {}}
-      }
-    }
-    ;
-  \end{tikzpicture}
+  }
+};
+\path (o) -- (e) node (x) [midway] {$\cdots$}
+  child [grow=down] {
+    %%node [draw] (y) {End User}
+    edge from parent[draw=none]
+  };
+\path (u) -- (z) node [midway] {$\Rightarrow$};
+\path (s) -- (l) node [midway] {$\Rightarrow$};
+\path (j) -- (t) node [midway] {$\Rightarrow$};
+%% \path (y) -- (x) node [midway] {$\Downarrow$};
+\path (e) -- (x) node [midway] {$\cdots$};
+\path (o) -- (x) node [midway] {$\cdots$};
+\path (r) -- (c) node [midway] {$\cdots$};
+\end{tikzpicture}
 \end{center}
+\vfill
 
+There are two types of authorities: root CAs and intermediate CAs. Root
+Authorities are the only nodes ultimately considered trustoworthy by the end
+user. Their private key is used to sign digital certificates, either to
+Certificate Authorities, to which is delegated the power of authenticating
+others, or End Entities, holders of a private key and their corresponding
+certificate whose identity has been verified.
+
+Upon connecting, the client will check to see if the certificate presented was issued
+by a CA present in the trust store (root CA); otherwise it will check to see if
+it has been issued by a truested CA, and so on until either a trusted CA is
+found or no
 
 \paragraph{The protocol} is actually a collection of many sub-protocols:
 \begin{itemize}
@@ -96,6 +138,7 @@ direction. At this point the server can either send back the challenge and
 generate a session-id, or it can ask for the client
 certificate and finally ask for it (client authentication).
 
+\vfill
 \section{The \texttt{record} protocol}
 All TLS protocol messages moves in records of up to 16K, containing 3
 main components: MAC-data, data, and padding.
