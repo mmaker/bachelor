@@ -2,20 +2,20 @@
 
 Transport Layer Security, formerly known as SSL (Secure Socket Layer), aims
 to bring some security features over a communication channel, specifically
-providing \strong{integrity} and \strong{confidentiality} of the message, \strong{authenticity} of the server and
-optionally the client.
+providing \strong{integrity} and \strong{confidentiality} of the message,
+\strong{authenticity} of the server and optionally the client.
 %% fuck osi layers: there is no code explicitly structuring the internet in 7
 %% layers.
 Many ancient application protocols wrapped themselves to be over TLS/SSL, with
 the only difference of the ``s'' appended to the protocol name (such as HTTPs,
-IMAPs).It is nowadays widely adopted all over the world, becoming the de-facto standard for
-end-to-end  encryption.
+IMAPs). It is nowadays widely adopted all over the world, becoming the de-facto
+standard for end-to-end  encryption.
 
 \paragraph{Certification Authorities} are authorities to whom it is granted the
 power to \emph{authenticate} the peer. Pragmatically, they are public keys
-pre-installed on your computer that decide who and who not to trust employing
+pre-installed on your computer that decide who and who not to trust by employing
 a digital signature.
-In order to overcome the proliferation of keys to distribute, and satisfy the
+In order to overcome the proliferation of keys to be distributed, and satisfy the
 use-case of a mindless user willing to accomplish a secure transaction on the
 internet, the following, hierarchical trust model proliferated (~\cite{rfc4158},
 Fig.2):
@@ -24,7 +24,7 @@ Fig.2):
 %% E` BELLISSIMO QUESTO COSO
 \begin{center}
 \begin{tikzpicture}[
-  scale=0.9,
+  scale=0.8,
   align=center,
   level/.style={sibling distance=60mm/#1}]
 \node [draw] (z){Root CA}
@@ -52,7 +52,7 @@ Fig.2):
       child {node [circle,draw] (o) {EE}}
       child {node [circle,draw] (p) {EE}
         child [grow=right] {node (q) {$\Rightarrow$} edge from parent[draw=none]
-          child [grow=right] {node (q) {End Entities} edge from
+          child [grow=right, xshift=1cm] {node (q) {End Entities} edge from
             parent[draw=none]
             child [grow=up] {node (r) {$\vdots$} edge from parent[draw=none]
               child [grow=up] {node (s)
@@ -95,8 +95,8 @@ certificate whose identity has been verified.
 
 Upon connecting, the client will check to see if the certificate presented was issued
 by a CA present in the trust store (root CA); otherwise it will check to see if
-it has been issued by a truested CA, and so on until either a trusted CA is
-found or no
+it has been issued by a trusted CA, and so on until either a trusted CA is
+found or no trusted authority is found. In the latter case, the connection is aborted.
 
 \paragraph{The protocol} is actually a collection of many sub-protocols:
 \begin{itemize}
@@ -116,9 +116,9 @@ found or no
   subsequent records will be protected under the just negotiated keys and
   \texttt{Cipher Spec}.
 \end{itemize}
-We will proceed with a brief synopsis of the first two of these protocols,due to
-their relevant role inside the connection and furthermore, because they are the
-only two we actually made use of during our investigations.
+We will proceed with a brief synopsis of the first two of these protocols, due to
+their relevant role inside the connection and furthermore, because they were the
+only two we actually used during our investigations.
 
 
 \section{The \texttt{handshake} protocol}
@@ -126,7 +126,8 @@ As mentioned above, the handshake occurs whenever a machine attempts to start
 a TLS connection. If there is no session identifier, a new one is being build
 up; otherwise the client will include the session-id in the initial
 communication and the server will eventually skip the key agreement phase since
-it has already happened recently.\footnote{``recently'' is not well-defined in
+%% XXX. check the use of verb happened
+it has happened recently.\footnote{``recently'' is not well-defined in
   the standard - it is suggested an upper limit of 24-hours lifetime, but the
   only constraint is that both client and server shall agree on it.}\\
 A new session-id identifier gets built via a challenge-response mechanism: the
@@ -140,19 +141,19 @@ certificate and finally ask for it (client authentication).
 
 \vfill
 \section{The \texttt{record} protocol}
-All TLS protocol messages moves in records of up to 16K, containing 3
+All TLS protocol messages move in records of up to 16K, containing 3
 main components: MAC-data, data, and padding.
 \\
 {MAC-data} is no other than the Message Authentication Code over the
 encrypted \emph{data} sent
-(SSL performs the encrypt-than-mac mode of operation).
+(SSL performs the encrypt-then-mac mode of operation).
 It provides \strong{authenticity} and \strong{integrity} of the message.
 Failure to authenticate, decrypt will result in I/O error and a close of the
 connection.
 \\
 {Data} is the actual message, compressed and encrypted. Compression comes
-for free in order to fasten cryptanalysis of the cipher, since protocols such
-as HTTP have a common set of standard message.
+for free in order to mitigate the cryptanalysis of the cipher, since protocols
+such as HTTP have a common set of standard messages.
 \\
 The {Padding} section contains informations about the padding algorithm
 adopted, and the padding size.
@@ -160,7 +161,7 @@ adopted, and the padding size.
 \section{What's inside a certificate \label{sec:ssl:x509}}
 SSL certificates employed the X.509 PKI standard, which specifies, among other
 things, the format for revocation lists, and certificate path validation
-algorithms:
+algorithms.
 \\
 \begin{center}
   \scalebox{0.7}{
@@ -189,7 +190,7 @@ Born before HTTP, it was initially thought \emph{in abstracto} to be
 extremely flexible and general\footnote{
   \textit{``X.509 certificates can contain just anything''} ~\cite{SSLiverse}
 }.
-And precisely this flexibility and its adaptation to the SSL/TLS protocol
+And precisely for this flexibility and its adaptation to the SSL/TLS protocol
 without a very-well defined structure have been its major flaws: it is still
 difficult to write good, reliable software parsing a X.509 certificate.
 
@@ -202,8 +203,8 @@ SSLv2 would allow a connection to be closed via a not-authenticated TCP segment
 with the \texttt{FIN} flag set. Padding informations are sent in clear, and the
 payload is not compressed before encrypting, allowing a malicious attacker
 traffic analysis capabilities. The ciphersuite is negotiated using
-non-authenticated informations, allowing an attacker to influence to choice and
-weaken the security of the communication.
+non-authenticated informations, allowing an attacker to influence the choice of
+the \texttt{Cipher Spec} and weaken the security of the communication.
 Most of these vulnerabilities have been addressed by the later SSLv3, which
 introduced compression and protection against truncation attacks.
 Its standardized twin, TLS 1.0, only differs on the cipher suite and key

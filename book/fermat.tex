@@ -85,25 +85,26 @@ aforementioned.
 
 \paragraph{How to chose the upper limit?}  Our choice of keeping straight with
 the limits of the standard is a mere choice of commodity: we are interested in
-finding public keys  not respecting it. Though, it it worth noting that what this
-limit \emph{states} is that at least one of the most significant $100$ bits
-should be different between the two primes:
+finding public keys  not respecting the standard.
+Though, it is worth noting that what this limit \emph{states} is that at least
+one of the most significant $100$ bits should be different between the two
+primes:
 
 \begin{bytefield}[
   endianness=big,
-  bitwidth=1.5em,
-%  bitformatting=\fakerange,
+  bitwidth=1.4em,
+  % bitformatting=\fakerange,
   ]{16}
   \\
-%  \bitheader{}
+  % \bitheader{}
   \\[1px]
-  \begin{rightwordgroup}{$2^{\frac{\log N}{2}-100}$}
+  \begin{rightwordgroup}{\small{$2^{\frac{\log N}{2}-100}$}}
     \bitbox{1}{0} & \bitbox{1}{0} & \bitbox{1}{0} & \bitbox{1}{0} &
     \bitbox{1}{0} & \bitbox{1}{0} & \bitbox{1}{0} & \bitbox{1}{0} &
     \bitbox{3}{\tiny $\cdots$} &
     \bitbox{1}{0} & \bitbox{1}{0} & \bitbox{1}{0} & \bitbox{1}{0} &
     \bitbox{1}{0} & \bitbox{1}{1} & \bitbox{1}{0} & \bitbox{1}{0} &
-    \bitbox{5}{\tiny $\cdots$}    & \bitbox{1}{0} & \bitbox{1}{0} &
+    \bitbox{3}{\tiny $\cdots$}    & \bitbox{1}{0} & \bitbox{1}{0} &
   \end{rightwordgroup}
   \\[1ex]
   \wordbox[]{1}{} &&
@@ -116,7 +117,7 @@ should be different between the two primes:
     \bitbox{1}{0} &
     \colorbitbox{lightgray}{1}{1} & \colorbitbox{lightgray}{1}{0} &
     \colorbitbox{lightgray}{1}{0} &
-    \colorbitbox{lightgray}{6}{\tiny{$\cdots$ least signif. bits $\cdots$}} &
+    \colorbitbox{lightgray}{4}{\tiny{$\cdots$ LSB $\cdots$}} &
     \colorbitbox{lightgray}{1}{0} &
   \end{rightwordgroup}
   \\[1ex]
@@ -128,11 +129,11 @@ should be different between the two primes:
     \bitbox{1}{0} &
     \colorbitbox{lightgray}{1}{0} & \colorbitbox{lightgray}{1}{0} &
     \colorbitbox{lightgray}{1}{0} &
-    \colorbitbox{lightgray}{6}{\tiny{$\cdots$ least signif. bits $\cdots$}} &
+    \colorbitbox{lightgray}{4}{\tiny{$\cdots$ LSB $\cdots$}} &
     \colorbitbox{lightgray}{1}{0} &
   \end{rightwordgroup}
 \end{bytefield}
-\vspace{20pt}
+\vfill
 
 For example, in the case of a RSA key $1024$, the binary difference between $p$
 and $q$ has to be greater than $2^{412}$, which means that, excluding corner-cases
@@ -143,14 +144,14 @@ top 100 most significant bits for the key to be considered safe.
 \section{Thoughts about a parallel solution}
 
 At first glance we might be willing to split the entire interval
-$\{ \ceil{\sqrt{N}}, \ldots, N-1 \}$ in equal parts, one assigned to per each
+$\{ \ceil{\sqrt{N}}, \ldots, N-1 \}$ in equal parts, one per each
 node. However, this would not be any more efficient than the trial division
-algorithm, and nevertheless it is worth noting that during each single iteration,
-the computational complexity is dominated by the square root $\dsqrt$ function,
-which belongs to the class \bigO{\log^2 N}, as we saw in section
-~\ref{sec:preq:sqrt}. Computing separatedly $x^2$ would add an overhead of the
-same order of magnitude \bigO{\log^2 N}, and thus result in a complete waste of
-resources.
+algorithm, and nevertheless during each single iteration, the computational
+complexity is dominated by the square root $\dsqrt$ function, which belongs to
+the class \bigO{\log^2 N}, as we saw in section ~\ref{sec:preq:sqrt}.
+Computing separatedly $x^2$ would add an overhead of the same order of magnitude
+\bigO{\log^2 N}, and thus result in a complete waste of resources.
+
 %%% Local Variables:
 %%% TeX-master: "question_authority.tex"
 %%% End:

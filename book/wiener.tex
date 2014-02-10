@@ -4,7 +4,7 @@ Wiener's attack was first published in 1989 as a result of cryptanalysis on the
 use of short RSA secret keys ~\cite{wiener}. It exploited the fact that it is
 possible to find the private key in \emph{polynomial time} using continued fractions
 expansions whenever a good estimate of the fraction $\frac{e}{N}$ is known.
-More specifically, given $d < \frac{1}{3} ^{4}\sqrt{N}$ one can efficiently
+More specifically, given $d < \frac{1}{3} \sqrt[4]{N}$ one can efficiently
 recover $d$ only knowing $\angular{N, e}$.
 
 The scandalous implication behind Wiener's attack is that, even if there are
@@ -17,9 +17,9 @@ RSA key-pair immune to this attack, namely
 (i) making $e > \sqrt{N}$ and
 (ii) $gcd(p-1, q-1)$ large.
 
-\section{Continued Fractions background \label{sec:wiener:cf}}
+\section{A background on Continued Fractions \label{sec:wiener:cf}}
 
-Let us call ``continued fraction'' any expression of the form:
+Let us call \emph{continued fraction} any expression of the form:
 %% why \cfrac sucks this much. |-------------------------|
 \begin{align*}
 a_0 + \frac{1}{a_1
@@ -27,10 +27,11 @@ a_0 + \frac{1}{a_1
     + \frac{1}{a_3
     + \frac{1}{a_4 + \ldots}}}}
 \end{align*}
-hereby described as a series for convenience:
+From now on, we eill consider only hereby described as a finite sequence of integers for convenience:
 $\angular{a_0, a_1, a_2, a_3,  \ \ldots, a_n}$.
-Any floating point number $x$ can be represented as a continued fraction, and
-for each $i < n$ there exists fraction $\rfrac{h_i}{k_i}$ approximating $x$.
+Any number $x \in \mathbb{Q}$ can be represented as a finite continued fraction,
+and for each $i < n$ there exists a fraction $\rfrac{h_i}{k_i}$ approximating
+$x$.
 By definition, each new approximation is recursively defined as:
 
 \begin{align}
@@ -53,15 +54,14 @@ By definition, each new approximation is recursively defined as:
   \end{cases}
 \end{align}
 
-After a small digression into the properties of continued fractions, Wiener, in
+After a small digression concerning the properties of continued fractions, Wiener, in
 ~\cite{wiener}, shows that, if a continued fraction $f'$ is an underestimate of
-another one $f$:
+another one $f$, i.e.
 \begin{align}
   f' = f(1-\delta)
 \end{align}
-
-Then it is possible to recover $f$, having $f'$, if $\delta$ is small
-enough, where small enough means:
+then it is possible to recover $f$, having $f'$, if $\delta$ is ``small
+enough'', where small enough means:
 \begin{align}
   \label{eq:wiener:cf_approx}
   \delta = 1 - \frac{f'}{f} < \frac{1}{\rfrac{3}{2}{h_1}{k_1}}
@@ -79,7 +79,7 @@ following:
   \item check whether $\rfrac{h_i}{k_i}$ is equal to $f$
 \end{enumerate}
 
-\section{The actual attack}
+\section{Constructing the attack}
 
 As we saw in ~\ref{sec:preq:rsa}, by construction the two exponents are such that
 $ed \equiv 1 \pmod{\varphi(N)}$. This implies that there exists a
@@ -94,7 +94,7 @@ the same problem we formalized in ~\ref{sec:wiener:cf}:
 Now we proceed by substituting $\eulerphi{N}$ with $N$, since for large $N$, one
 approximates the other. We consider also the difference of the two, limited by
 $\abs{\cancel{N} + p + q - 1 - \cancel{N}} < 3\sqrt{N}$.
-For the last step, remember that $k < d < \rfrac{1}{3} {}^4\sqrt{N}$:
+For the last step, remember that $k < d < \rfrac{1}{3}\sqrt[4]{N}$:
 
 \begin{align*}
   \abs{\frac{e}{N} - \frac{k}{d}} &= \abs{\frac{ed - kN}{Nd}} \\
@@ -102,8 +102,8 @@ For the last step, remember that $k < d < \rfrac{1}{3} {}^4\sqrt{N}$:
   &= \abs{\frac{1-k(N-\eulerphi{N})}{Nd}} \\
   &\leq \abs{\frac{3k\sqrt{N}}{Nd}}
   = \frac{3k}{d\sqrt{N}}
-  < \frac{3(\rfrac{1}{3}\ {}^4\sqrt{N})}{d\sqrt{N}}
-  = \frac{1}{d{}^4\sqrt{N}} < \frac{1}{2d^2}
+  < \frac{3(\rfrac{1}{3}\ \sqrt[4]{N})}{d\sqrt{N}}
+  = \frac{1}{d\sqrt[4]{N}} < \frac{1}{2d^2}
 \end{align*}
 
 This demonstrates the conditions of ~\ref{eq:wiener:cf_approx} holds, and allows
@@ -116,8 +116,8 @@ $\frac{e}{N}$, and for each convergent $\frac{k}{d}$,
 %% XXX. verify this
 which by contruction is already at the lowest terms, we verify if it produces a
 factorization of $N$.
-First we chack that $\eulerphi{N} = \frac{ed-1}{k}$ is
-integer. Then we solve ~\ref{eq:wiener:pq} in $x$ in order to find $p, q$:
+First we check that $\eulerphi{N} = \frac{ed-1}{k}$ is
+an integer. Then we solve ~\ref{eq:wiener:pq} in $x$ in order to find $p, q$:
 \begin{align}
   \label{eq:wiener:pq}
   x^2 - (N - \eulerphi{N} + 1)x + N = 0
@@ -143,7 +143,7 @@ A Continued fraction structure may look like this:
     BN_CTX* ctx;
   } cf_t;
 \end{minted}
-where \texttt{bigfraction\_t} is jsut a pair of \texttt{BIGNUM} \!s
+where \texttt{bigfraction\_t} is just a pair of \texttt{BIGNUM} \!s
 $\angular{h_i, k_i}$. Whenever we need to produce a new convergent, we increment
 $i \pmod{3}$ and apply the definitions given. The fresh convergent must be
 tested with very simple algebraic operations. It is worth noting here that
@@ -163,7 +163,7 @@ convergent, we provide an algorithm for attacking the RSA cipher via Wiener:
   \begin{algorithmic}[1]
     \State $f \gets  \texttt{cf\_init}(e, N)$
     \State $i \gets \ceil{\log N}$
-    \While{$i--$}
+    \While{$i-- > 0$}
     \State $k, d \gets \texttt{cf\_next}(f)$
     \If{$k \nmid ed-1$} \strong{continue} \EndIf
     \State $\eulerphi{N} \gets (ed - 1)\ //\ k$
