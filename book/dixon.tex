@@ -6,8 +6,11 @@ consists into taking random integers $r$ in $\{1, \ldots, N\}$ and look for thos
 where $r^2 \mod{N}$ is \emph{smooth}. If enough are found, then those integers
 can somehow be assembled, and so a fatorization of N attemped.
 
-
-\section{Quadratic Sieve}
+%% that's not really academic to be stated officially, but I would have never
+%% understood this section without Firas (thanks).
+%% <http://blog.fkraiem.org/2013/12/08/factoring-integers-dixons-algorithm/>
+%% I kept the voila` phrase, that was so lovely.
+\section{A little bit of History}
 During the latest century there has been a huge effort to approach the problem
 formulated by Fermat ~\ref{eq:fermat_problem} from different perspecives. This
 led to an entire family of algorithms known as \emph{Quadratic Sieve} [QS]. The
@@ -22,14 +25,68 @@ to look for \emph{multiples} of $N$:
 \end{align}
 and, once found, claim that $\gcd(N, x \pm y)$ are non-trial divisors of $N$
 just as we did in \ref{sec:fermat:implementation}.
-On the top of this,
+Kraitchick did not stop here: instead of trying $x^2 \equiv y^2 \pmod{N}$ he
+kept the value of previous attempt, and tries to find \emph{a product} of such
+values which is also a square. So we have a sequence
+\begin{align}
+  \label{eq:dixon:x_sequence}
+  \angular{x_0, \ldots, x_k} \mid \forall i \leq k \quad x_i^2 - N
+  \; \text{ is a perfect square}
+\end{align}
+and hence
+\begin{align*}
+  \prod_i (x_i^2 - N) = y^2
+\end{align*}
+that $\mod{N}$ is equivalent to:
+\begin{align}
+  \label{eq:dixon:fermat_revisited}
+  y^2 \equiv \prod_i x_i^2 - N \equiv \big( \prod_i x_i \big) ^2 \pmod{N}
+\end{align}
+and voil\`a our congruence of squares. For what concerns the generation of $x_i$
+with the property \ref{eq:dixon:x_sequence}, they can simply taken at random and
+tested using trial division.
 
-\section{stuff}
+\paragraph{Brillhart and Morrison} later proposed (\cite{morrison-brillhart}
+p.187) a better approach than trial division to find such $x$. Their idea aims
+to ease the enormous effort required by the trial division. In order to achieve
+this. they introduce a \emph{factor base} $\factorBase$ and generate random $x$
+such that $x^2 - N$ is $\factorBase$-smooth. Recalling what we anticipated in
+~\ref{sec:preq:numbertheory}, $\factorBase$ is a precomputed set of primes
+$p_i \in \naturalPrime$.
+This way the complexity of generating a new $x$ is dominated by
+\bigO{|\factorBase|}. Now that the right side of \ref{eq:dixon:fermat_revisited}
+has been satisfied, we have to select a subset of those $x$ so that their
+product can be seen as a square. Consider an \emph{exponent vector}
+$v_i = (\alpha_0, \alpha_1, \ldots, \alpha_r)$ associated with each $x_i$, where
+\begin{align*}
+  a_j = \begin{cases}
+    1 \quad \text{if $p_j$ divides $x_i$ to an odd power} \\
+    0 \quad \text{otherwise}
+    \end{cases}
+\end{align*}
+for each $0 \leq j \leq r $. There is no need to restrict ourselves for positive
+values of $x^2 -N$, so we are going to use $\alpha_0$ to indicate the sign. This
+benefit has a neglegible cost: we have to add the non-prime $-1$ to our factor
+base.
 
-at a computational cost asymptotically  best
-than all other ones previously described:
-\bigO{\beta(\log N \log \log N)^{\rfrac{1}{2}}}
-for some constant $\beta > 0$.
+Let now $\mathcal{M}$ be the rectangular matrix having per each $i$-th row the
+$v_i$ associated to $x_i$: this way each element $m_{ij}$ will be $v_i$'s
+$\alpha_j$. We are interested in finding set(s) of $x$ that satisfies
+\ref{eq:dixon:fermat_revisited}, possibly all of them.
+Define $K$ as the subsequence of $x_i$ whose product always have even powers.
+This is equivalent to look for the set of vectors $\{ w \mid wM = 0 \}$ by
+definition of matrix multiplication in $\mathbb{F}_2$.
+
+
+\paragraph{Dixon} Morrison and Brillhart's ideas of \cite{morrison-brillhart}
+were actually used for a slightly different factorization method, employing
+continued fractions instead of the square difference polynomial. Dixon refined
+those by porting to the quare problem, achieving a probabilistic factorization
+method working at a computational cost asymptotically  best than all other ones
+previously described: \bigO{\beta(\log N \log \log N)^{\rfrac{1}{2}}} for some
+constant $\beta > 0$ \cite{dixon}.
+
+\section{Computing the Kernel}
 
 %%% Local Variables:
 %%% mode: latex
