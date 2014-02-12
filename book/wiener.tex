@@ -27,7 +27,8 @@ a_0 + \frac{1}{a_1
     + \frac{1}{a_3
     + \frac{1}{a_4 + \ldots}}}}
 \end{align*}
-From now on, we eill consider only hereby described as a finite sequence of integers for convenience:
+Consider now any \emph{finite continued fraction}, conveniently represented with
+the sequence
 $\angular{a_0, a_1, a_2, a_3,  \ \ldots, a_n}$.
 Any number $x \in \mathbb{Q}$ can be represented as a finite continued fraction,
 and for each $i < n$ there exists a fraction $\rfrac{h_i}{k_i}$ approximating
@@ -54,9 +55,9 @@ By definition, each new approximation is recursively defined as:
   \end{cases}
 \end{align}
 
-After a small digression concerning the properties of continued fractions, Wiener, in
-~\cite{wiener}, shows that, if a continued fraction $f'$ is an underestimate of
-another one $f$, i.e.
+Among the prolific properties of such objects, firstly Wiener ~\cite{wiener}
+and later Boneh ~\cite{20years} discovered that, if a continued fraction $f'$ is
+an underestimate of another one $f$, i.e.
 \begin{align}
   f' = f(1-\delta)
 \end{align}
@@ -67,7 +68,7 @@ enough'', where small enough means:
   \delta = 1 - \frac{f'}{f} < \frac{1}{\rfrac{3}{2}{h_1}{k_1}}
 \end{align}
 \\
-The ``continued fraction algorithm'' allowing us to recover $f$ is the
+The \emph{continued fraction algorithm} allowing us to recover $f$ is the
 following:
 \begin{enumerate}[(i)]
   \setlength{\itemsep}{1pt}
