@@ -198,22 +198,29 @@ difficult to write good, reliable software parsing a X.509 certificate.
 
 The first, important difference to point out here is that SSLv2 is no more
 considered secure. There are known attacks on the ciphers adopted (md5, for
-example) as well as protocol flaws.
+example \cite{rfc6176}) as well as protocol flaws.
 SSLv2 would allow a connection to be closed via a not-authenticated TCP segment
-with the \texttt{FIN} flag set. Padding informations are sent in clear, and the
-payload is not compressed before encrypting, allowing a malicious attacker
-traffic analysis capabilities. The ciphersuite is negotiated using
+with the \texttt{FIN} flag set (\cite{rfc6176} \S 2). Padding informations are sent in
+clear, and the payload is not compressed before encrypting, allowing a malicious
+attacker traffic analysis capabilities \cite{sslpadding}. The ciphersuite is negotiated using
 non-authenticated informations, allowing an attacker to influence the choice of
-the \texttt{Cipher Spec} and weaken the security of the communication.
+the \texttt{Cipher Spec} and weaken the security of the communication
+\cite{rfc6176} \S 2.
 Most of these vulnerabilities have been addressed by the later SSLv3, which
 introduced compression and protection against truncation attacks.
 Its standardized twin, TLS 1.0, only differs on the cipher suite and key
 calculation requirements, strengthen in order to increase the security of the
-channel.
+channel \cite{rfc2246}.
 Both SSLv3 and TLS 1.0 have been threatened in 2011 by an attack that could break
 the same origin policy, known as BEAST. It is not dramatic, and almost any
 browser now mitigates its spectrum of action.
-TLS 1.1, and TLS 1.2 are considered safe as of today.
+
+Even if TLS 1.1, and TLS 1.2 are considered safe as of today, attacks such as
+CRIME, and lately BREACH constitute a new and valid instance of threat for HTTP
+compressions mechanisms. However, as their premises go beyond the scope of this
+document, those attacks have not been analyzed. For forther informations, see
+\url{http://breachattack.com/}.
+
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "question_authority.tex"
