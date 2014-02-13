@@ -20,6 +20,26 @@ $\naturalPrime \subset \naturalN$ is the set containing all prime intgers.
 The binary operator $\getsRandom$, always written as $x \getsRandom S$, has the
 meaning of ``pick a uniformly distributed random element $x$ from the set $S$''.
 % XXX.  following Dan Boneh notation
+\\
+The summation in $\mathbb{F}_2$ is always expressed with the circled plus,
+i.e. $a \xor b$.
+%% Since it is equivalent to the bitwise xor, we are going to use
+%% it as well in the pseudocode with the latter meaning.
+
+
+%%\section{Number Theory}
+
+%%What follows here is the definition and the formalization of some intuictive
+%%concepts that later are going to be taken as granted:
+%%the infinite cardinality of $\naturalPrime$,
+%%the definition of \emph{smoothness}, and
+%%the distribution of prime numbers in $\naturalN$.
+
+\begin{definition*}[Smoothness]
+A number $n$ is said to be $\factorBase$-smooth if and only if all its prime
+factors are contained in $\factorBase$.
+\end{definition*}
+
 
 \section{Algorithmic Complexity Notation}
 The notation used to describe asymptotic complexity follows the $O$-notation,

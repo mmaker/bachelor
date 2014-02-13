@@ -10,11 +10,13 @@ can somehow be assembled, and so a fatorization of N attemped.
 %% understood this section without Firas (thanks).
 %% <http://blog.fkraiem.org/2013/12/08/factoring-integers-dixons-algorithm/>
 %% I kept the voila` phrase, that was so lovely.
-\section{A little bit of History}
+\section{A little bit of History \label{sec:dixon:history}}
 During the latest century there has been a huge effort to approach the problem
 formulated by Fermat ~\ref{eq:fermat_problem} from different perspecives. This
-led to an entire family of algorithms known as \emph{Quadratic Sieve} [QS]. The
-core idea is still to find a pair of perfect squares whose difference can
+led to an entire family of algorithms, like \emph{Quadratic Sieve},
+\emph{Dixon}, \ldots.
+
+The core idea is still to find a pair of perfect squares whose difference can
 factorize $N$, but maybe Fermat's hypotesis can be made weaker.
 
 \paragraph{Kraitchick} was the first one popularizing the idea the instead of
@@ -40,7 +42,7 @@ and hence
 that $\mod{N}$ is equivalent to:
 \begin{align}
   \label{eq:dixon:fermat_revisited}
-  y^2 \equiv \prod_i x_i^2 - N \equiv \big( \prod_i x_i \big) ^2 \pmod{N}
+  y^2 \equiv \prod_i (x_i^2 - N) \equiv \big( \prod_i x_i \big) ^2 \pmod{N}
 \end{align}
 and voil\`a our congruence of squares. For what concerns the generation of $x_i$
 with the property \ref{eq:dixon:x_sequence}, they can simply taken at random and
@@ -51,7 +53,7 @@ p.187) a better approach than trial division to find such $x$. Their idea aims
 to ease the enormous effort required by the trial division. In order to achieve
 this. they introduce a \emph{factor base} $\factorBase$ and generate random $x$
 such that $x^2 - N$ is $\factorBase$-smooth. Recalling what we anticipated in
-~\ref{sec:preq:numbertheory}, $\factorBase$ is a precomputed set of primes
+~\ref{chap:preq}, $\factorBase$ is a precomputed set of primes
 $p_i \in \naturalPrime$.
 This way the complexity of generating a new $x$ is dominated by
 \bigO{|\factorBase|}. Now that the right side of \ref{eq:dixon:fermat_revisited}
@@ -64,29 +66,173 @@ $v_i = (\alpha_0, \alpha_1, \ldots, \alpha_r)$ associated with each $x_i$, where
     0 \quad \text{otherwise}
     \end{cases}
 \end{align*}
-for each $0 \leq j \leq r $. There is no need to restrict ourselves for positive
+for each $1 \leq j \leq r $. There is no need to restrict ourselves for positive
 values of $x^2 -N$, so we are going to use $\alpha_0$ to indicate the sign. This
 benefit has a neglegible cost: we have to add the non-prime $-1$ to our factor
-base.
+base $\factorBase$.
 
 Let now $\mathcal{M}$ be the rectangular matrix having per each $i$-th row the
 $v_i$ associated to $x_i$: this way each element $m_{ij}$ will be $v_i$'s
-$\alpha_j$. We are interested in finding set(s) of $x$ that satisfies
-\ref{eq:dixon:fermat_revisited}, possibly all of them.
-Define $K$ as the subsequence of $x_i$ whose product always have even powers.
-This is equivalent to look for the set of vectors $\{ w \mid wM = 0 \}$ by
-definition of matrix multiplication in $\mathbb{F}_2$.
+$\alpha_j$. We are interested in finding set(s) of the subsequences of $x_i$
+whose product always have even powers (\ref{eq:dixon:fermat_revisited}).
+Turns out that this is equivalent to look for the set of vectors
+$\{ w \mid wM = 0 \} = \ker(\mathcal{M})$ by definition of matrix multiplication
+in $\mathbb{F}_2$.
 
 
 \paragraph{Dixon} Morrison and Brillhart's ideas of \cite{morrison-brillhart}
 were actually used for a slightly different factorization method, employing
-continued fractions instead of the square difference polynomial. Dixon refined
-those by porting to the quare problem, achieving a probabilistic factorization
+continued fractions instead of the square difference polynomial. Dixon simply
+ported these to the square problem, achieving a probabilistic factorization
 method working at a computational cost asymptotically  best than all other ones
 previously described: \bigO{\beta(\log N \log \log N)^{\rfrac{1}{2}}} for some
 constant $\beta > 0$ \cite{dixon}.
 
-\section{Computing the Kernel}
+\section{Reduction Procedure}
+
+The following reduction procedure, extracted from ~\cite{morrison-brillhart}, is
+a forward part of the Gauss-Jordan elimination algorithm (carried out from right
+to left), and can be used to determine whether the set of exponent vectors is
+linearly dependent.
+
+For each $v_i$ described as above, associate a \emph{companion history vector}
+$h_i = (\beta_0, \beta_1, \ldots, \beta_f)$, where for $0 \leq m \leq f$:
+\begin{align*}
+  \beta_m = \begin{cases}
+    1 \quad \text{ if $m = i$} \\
+    0 \quad \text{ otherwise}
+    \end{cases}
+\end{align*}
+At this point, we have all data structures needed:
+\\
+\\
+\\
+
+
+\begin{center}
+  \emph{Reduction Procedure}
+\end{center}
+\begin{enumerate}[(i)]
+  \item Set $j=r$;
+  \item find the ``pivot vector'', i.e. the first vector
+    $e_i, \quad 0 \leq i \leq f$ such that $\alpha_j = 1$. If none is found, go
+    to (iv);
+  \item
+    \begin{enumerate}[(a)]
+      \item replace every following vector $e_m, \quad i < m \leq f$
+        whose rightmost $1$ is the $j$-th component, by the sum $e_i \xor e_m$;
+      \item whenever $e_m$ is replaced by $e_i \xor e_m$, replace also the
+        associated history vector $h_m$ with $h_i \xor h_m$;
+    \end{enumerate}
+  \item Reduce $j$ by $1$. If $j \geq 0$, return to (ii); otherwise stop.
+\end{enumerate}
+
+Algorithm \ref{alg:dixon:kernel} formalizes concepts so far discussed, by
+presenting a function \texttt{ker}, discovering linear dependencies in any
+rectangular matrix $\mathcal{M} \in (\mathbb{F}_2)^{(f \times r)}$
+and storing dependencies into a \emph{history matrix} $\mathcal{H}$.
+
+\begin{remark}
+  We are proceeding from right to left in order to conform with
+  \cite{morrison-brillhart}.
+  Instead, their choice lays on optimization reasons, which does
+  not apply any more to a modern calculator.
+\end{remark}
+
+\begin{algorithm}
+  \caption{Reduction Procedure  \label{alg:dixon:kernel}}
+  \begin{algorithmic}[1]
+    \Procedure{Ker}{$\mathcal{M}$}
+    \State $\mathcal{H} \gets \texttt{Id}(f)$
+    \Comment The initial $\mathcal{H}$ is the identity matrix
+
+    \For{$j = r \ldots 0$}
+    \Comment Reduce
+      \For{$i=0 \ldots f$}
+        \If{$\mathcal{M}_{i, j} = 1$}
+          \For{$i' = i \ldots f$}
+            \If{$\mathcal{M}_{i', k} = 1$}
+              \State $\mathcal{M}_{i'} = \mathcal{M}_i \xor \mathcal{M}_{i'}$
+              \State $\mathcal{H}_{i'} = \mathcal{H}_i \xor \mathcal{H}_{i'}$
+            \EndIf
+          \EndFor
+          \State \strong{break}
+        \EndIf
+      \EndFor
+    \EndFor
+
+    \For{$i = 0 \ldots f$}
+    \Comment Yield linear dependencies
+      \If{$\mathcal{M}_i = (0, \ldots, 0)$} \strong{yield} $H_i$ \EndIf
+    \EndFor
+    \EndProcedure
+  \end{algorithmic}
+\end{algorithm}
+
+
+\section{Gluing the shit toghether}
+
+Before gluing all toghether, we need one last building brick necessary for
+Dixon's factorization algorithm: a \texttt{smooth}($x$) function. In our
+specific case, we need a function that, given as input a number $x$, returns the
+empty set $\emptyset$ if $x^2 -N$ is not $\factorBase$-smooth. Otherwise,
+returns the pair $\angular{y, v}$ where $y = \dsqrt{x^2 - N}$ and
+$v = (\alpha_0, \ldots, \alpha_r)$ that we described in section
+\ref{sec:dixon:history}. Once we have established $\factorBase$, its
+implementation is fairly straightforward:
+
+\begin{algorithm}
+  \caption{Discovering Smoothness}
+  \begin{algorithmic}[1]
+    \Procedure{smooth}{$x$}
+      \State $y, r \gets x^2 -N$
+      \State $v \gets (\alpha_0 = 0, \ldots, \alpha_r = 0)$
+
+      \For{$i = 0 \ldots |\factorBase|$}
+        \If{$\factorBase_i \nmid x$} \strong{continue} \EndIf
+        \State $x \gets x// \factorBase_i$
+        \State $\alpha_i \gets \alpha_i \xor 1$
+      \EndFor
+      \If{$x = 1$} \State \Return $y, v$
+      \Else \State \Return $y, \emptyset$
+      \EndIf
+    \EndProcedure
+  \end{algorithmic}
+\end{algorithm}
+\paragraph{How do we choose $\factorBase$?}
+It's not easy to answer: if we choose $\factorBase$ small, we will rarely find
+$x^2 -N$ \emph{smooth}. If we chose it large, attempting to factorize $x^2 -N$
+with $\factorBase$ will pay the price of iterating through a large set.
+\cite{Crandall} \S 6.1 finds a solution for this employng complex analytic
+number theory. As a  result, the ideal value for $|\factorBase|$ is
+$e^{\sqrt{\ln N \ln \ln N}}$.
+
+\begin{algorithm}
+  \caption{Dixon}
+  \begin{algorithmic}
+    \State $i \gets 0$
+    \State $r \gets |\factorBase| + 5$
+    \Comment finding linearity requires redundance
+    \While{$i < r$}
+    \Comment Search for suitable pairs
+    \State $x_i \gets \{0, \ldots N\}$
+    \State $y_i, v_i \gets \texttt{smooth}(x_i)$
+    \If{$v_i \neq \emptyset$} $i++$ \EndIf
+  \EndWhile
+  \State $\mathcal{M} \gets \texttt{matrix}(v_0, \ldots, v_f)$
+  \For{$\angular{\lambda_0, \ldots, \lambda_k}
+    \text{ in } \texttt{ker}(\mathcal{M})$}
+  \Comment{Get relations}
+    \State $x \gets \prod_\lambda x_\lambda \pmod{N}$
+    \State $y \gets \dsqrt{\prod_\lambda y_\lambda \pmod{N}}$
+    \If{$\gcd(x+y, N) > 1$}
+      \State $p \gets \gcd(x+y, N)$
+      \State $q \gets \gcd(x-y, N)$
+      \State \Return $p, q$
+    \EndIf
+  \EndFor
+  \end{algorithmic}
+\end{algorithm}
 
 %%% Local Variables:
 %%% mode: latex
