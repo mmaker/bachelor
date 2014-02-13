@@ -1,0 +1,15 @@
+# -*- coding: utf-8 ; mode: org -*-
+
+#+TITLE:  Seventh report
+#+DATE:   2014-02-12
+#+AUTHOR: Michele Orru`
+#+EMAIL:  maker@tumbolandia.net
+
+Writing thesis. Summarizing its current status:
+
+* [60%]  DIXON
+* [100%] FERMAT
+* [95%]  WIENER
+* [60%]  POLLARD p-1
+* [30%]  POLLAPRD p+1
+* [100%] POLLARD ρ
