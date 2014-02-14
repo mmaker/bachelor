@@ -53,7 +53,7 @@ below here to better clarify the limits of this algorithm.
 
 At each iteration, the $i-$th state is hold by the pair $\angular{x, x^2}$.\\
 The later step, described by $\angular{x+1, (x+1)^2}$ can be computed efficiently
-considering the square of a binomial: $\angular{x+1, (x^2) + (x \ll 1) + 1}$.
+considering the square of a binomial: $\angular{x+1, x^2 + 2x + 1}$.
 The upper-bound, instead, is reached when
 $ \Delta = p - q  = x + y - x + y = 2y > 2^{-100}\sqrt{N}$.
 
@@ -64,14 +64,16 @@ aforementioned.
 \begin{algorithm}[H]
   \caption{Fermat Factorization \label{alg:fermat}}
   \begin{algorithmic}[1]
+    \Function{fermat}{ }
     \State $x \gets \floor{\sqrt{N}}$
-    \State $x^2 \gets xx$
+    \State $x' \gets x \cdot x$
 
     \Repeat
+    \State $x' \gets x' + 2x + 1$
     \State $x \gets x+1$
-    \State $x^2 \gets x^2 + x \ll 1 + 1$
-    \State $y, rest \gets \dsqrt{x^2 - N}$
-    \Until{ $rest \neq 0 \land y < \frac{\sqrt{N}}{2^{101}}$ }
+    \State $y, rest \gets \dsqrt{x' - N}$
+    \Until{ $rest \neq 0 \strong{ and } y < \frac{\sqrt{N}}{2^{101}}$ }
+    \Comment i.e., \ref{eq:fermat_problem} holds?
 
     \If{ $rest = 0$ }
     \State $p \gets x+y$
@@ -80,6 +82,7 @@ aforementioned.
     \Else
     \State \Return \textbf{nil}
     \EndIf
+    \EndFunction
     \end{algorithmic}
 \end{algorithm}
 

@@ -60,12 +60,13 @@ This way the complexity of generating a new $x$ is dominated by
 has been satisfied, we have to select a subset of those $x$ so that their
 product can be seen as a square. Consider an \emph{exponent vector}
 $v_i = (\alpha_0, \alpha_1, \ldots, \alpha_r)$ associated with each $x_i$, where
-\begin{align*}
-  a_j = \begin{cases}
+\begin{align}
+  \label{eq:dixon:alphas}
+  \alpha_j = \begin{cases}
     1 \quad \text{if $p_j$ divides $x_i$ to an odd power} \\
     0 \quad \text{otherwise}
-    \end{cases}
-\end{align*}
+  \end{cases}
+\end{align}
 for each $1 \leq j \leq r $. There is no need to restrict ourselves for positive
 values of $x^2 -N$, so we are going to use $\alpha_0$ to indicate the sign. This
 benefit has a neglegible cost: we have to add the non-prime $-1$ to our factor
@@ -142,15 +143,15 @@ and storing dependencies into a \emph{history matrix} $\mathcal{H}$.
 \begin{algorithm}
   \caption{Reduction Procedure  \label{alg:dixon:kernel}}
   \begin{algorithmic}[1]
-    \Procedure{Ker}{$\mathcal{M}$}
-    \State $\mathcal{H} \gets \texttt{Id}(f)$
-    \Comment The initial $\mathcal{H}$ is the identity matrix
+    \Function{Ker}{$\mathcal{M}$}
+    \State $\mathcal{H} \gets \texttt{Id}(f \times f)$
+    \Comment the initial $\mathcal{H}$ is the identity matrix
 
-    \For{$j = r \ldots 0$}
-    \Comment Reduce
-      \For{$i=0 \ldots f$}
+    \For{$j = r \strong{ downto } 0$}
+    \Comment reduce
+      \For{$i=0 \strong{ to } f$}
         \If{$\mathcal{M}_{i, j} = 1$}
-          \For{$i' = i \ldots f$}
+          \For{$i' = i \strong{ to } f$}
             \If{$\mathcal{M}_{i', k} = 1$}
               \State $\mathcal{M}_{i'} = \mathcal{M}_i \xor \mathcal{M}_{i'}$
               \State $\mathcal{H}_{i'} = \mathcal{H}_i \xor \mathcal{H}_{i'}$
@@ -161,11 +162,13 @@ and storing dependencies into a \emph{history matrix} $\mathcal{H}$.
       \EndFor
     \EndFor
 
-    \For{$i = 0 \ldots f$}
-    \Comment Yield linear dependencies
-      \If{$\mathcal{M}_i = (0, \ldots, 0)$} \strong{yield} $H_i$ \EndIf
+    \For{$i = 0 \strong{ to } f$}
+    \Comment yield linear dependencies
+      \If{$\mathcal{M}_i = (0, \ldots, 0)$}
+        \strong{yield} $\{\mu  \mid \mathcal{H}_{i,\mu} = 1\}$
+      \EndIf
     \EndFor
-    \EndProcedure
+    \EndFunction
   \end{algorithmic}
 \end{algorithm}
 
@@ -176,25 +179,27 @@ Before gluing all toghether, we need one last building brick necessary for
 Dixon's factorization algorithm: a \texttt{smooth}($x$) function. In our
 specific case, we need a function that, given as input a number $x$, returns the
 empty set $\emptyset$ if $x^2 -N$ is not $\factorBase$-smooth. Otherwise,
-returns the pair $\angular{y, v}$ where $y = \dsqrt{x^2 - N}$ and
-$v = (\alpha_0, \ldots, \alpha_r)$ that we described in section
-\ref{sec:dixon:history}. Once we have established $\factorBase$, its
+returns a vector $v = (\alpha_0, \ldots, \alpha_r)$ such that each $\alpha_j$ is
+defined just as in \ref{eq:dixon:alphas}. Once we have established $\factorBase$, its
 implementation is fairly straightforward:
 
 \begin{algorithm}
   \caption{Discovering Smoothness}
   \begin{algorithmic}[1]
+    \Require $\factorBase$, the factor base
     \Procedure{smooth}{$x$}
-      \State $y, r \gets x^2 -N$
-      \State $v \gets (\alpha_0 = 0, \ldots, \alpha_r = 0)$
+      \State $v \gets (\alpha_0 = 0, \ldots, \alpha_{|\factorBase|} = 0)$
 
-      \For{$i = 0 \ldots |\factorBase|$}
+      \If{$x < 0$} $\alpha_0 \gets 1$ \EndIf
+      \For{$i = 1 \strong{ to } |\factorBase|$}
         \If{$\factorBase_i \nmid x$} \strong{continue} \EndIf
         \State $x \gets x// \factorBase_i$
         \State $\alpha_i \gets \alpha_i \xor 1$
       \EndFor
-      \If{$x = 1$} \State \Return $y, v$
-      \Else \State \Return $y, \emptyset$
+      \If{$x = 1$}
+        \State \Return $v$
+      \Else
+        \State \Return \strong{nil}
       \EndIf
     \EndProcedure
   \end{algorithmic}
@@ -209,28 +214,32 @@ $e^{\sqrt{\ln N \ln \ln N}}$.
 
 \begin{algorithm}
   \caption{Dixon}
-  \begin{algorithmic}
+  \begin{algorithmic}[1]
+    \Require $\factorBase$, the factor base
+    \Function{dixon}{ }
     \State $i \gets 0$
     \State $r \gets |\factorBase| + 5$
     \Comment finding linearity requires redundance
     \While{$i < r$}
-    \Comment Search for suitable pairs
-    \State $x_i \gets \{0, \ldots N\}$
-    \State $y_i, v_i \gets \texttt{smooth}(x_i)$
+    \Comment search for suitable pairs
+    \State $x_i \getsRandom \{0, \ldots N\}$
+    \State $y_i \gets x_i^2 - N$
+    \State $v_i \gets \texttt{smooth}(y_i)$
     \If{$v_i \neq \emptyset$} $i++$ \EndIf
   \EndWhile
   \State $\mathcal{M} \gets \texttt{matrix}(v_0, \ldots, v_f)$
   \For{$\angular{\lambda_0, \ldots, \lambda_k}
-    \text{ in } \texttt{ker}(\mathcal{M})$}
-  \Comment{Get relations}
-    \State $x \gets \prod_\lambda x_\lambda \pmod{N}$
-    \State $y \gets \dsqrt{\prod_\lambda y_\lambda \pmod{N}}$
+    \strong{ in } \texttt{ker}(\mathcal{M})$}
+  \Comment get relations
+    \State $x \gets \prod\limits_{\mu \in \lambda} x_\mu \pmod{N}$
+    \State $y, r \gets \dsqrt{\prod\limits_{\mu \in \lambda} y_\mu \pmod{N}}$
     \If{$\gcd(x+y, N) > 1$}
       \State $p \gets \gcd(x+y, N)$
       \State $q \gets \gcd(x-y, N)$
       \State \Return $p, q$
     \EndIf
   \EndFor
+  \EndFunction
   \end{algorithmic}
 \end{algorithm}
 

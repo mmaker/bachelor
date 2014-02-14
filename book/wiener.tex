@@ -162,22 +162,24 @@ convergent, we provide an algorithm for attacking the RSA cipher via Wiener:
   \caption{Wiener's Attack}
   \label{alg:wiener}
   \begin{algorithmic}[1]
+    \Function{wiener}{ }
     \State $f \gets  \texttt{cf\_init}(e, N)$
-    \State $i \gets \ceil{\log N}$
-    \While{$i-- > 0$}
-    \State $k, d \gets \texttt{cf\_next}(f)$
-    \If{$k \nmid ed-1$} \strong{continue} \EndIf
-    \State $\eulerphi{N} \gets (ed - 1)\ //\ k$
-    \If{$\eulerphi{N}$ is odd} \strong{continue} \EndIf
+    \For{$\ceil{\log N} \text{ times }$}
+      \State $k, d \gets \texttt{cf\_next}(f)$
+      \If{$k \nmid ed-1$} \strong{continue} \EndIf
+      \State $\eulerphi{N} \gets (ed - 1)\ //\ k$
+      \If{$\eulerphi{N}$ is odd} \strong{continue} \EndIf
 %% XXX. it could be that calling 'b' b/2 and 'delta' sqrt(delta/4) is
 %% misleading.
-    \State $b \gets (N - \eulerphi{N} + 1) \gg 1$
-    \State $\Delta, r \gets \dsqrt{b^2 - N}$
-    \If{$r \neq 0$} \strong{continue} \EndIf
-    \State $p, q \gets b \pm \Delta$
-    \State \strong{break}
-    \EndWhile
+      \State $b \gets (N - \eulerphi{N} + 1) \gg 1$
+      \State $\Delta, r \gets \dsqrt{b^2 - N}$
+      \If{$r \neq 0$} \strong{continue} \EndIf
+      \State $p \gets b + \Delta$
+      \State $q \gets b - \Delta$
+      \State \strong{break}
+    \EndFor
     \State \Return p, q
+    \EndFunction
   \end{algorithmic}
 \end{algorithm}
 

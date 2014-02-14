@@ -68,15 +68,13 @@ protocol, \openssl implemented it with the following signature:
 The computation proceeds under the well-known Euclidean algorithm, specifically
 the binary variant developed by Josef Stein in 1961 \cite{AOCPv2}. This variant
 exploits some interesting properties of $gcd(a, b)$:
-\begin{itemize}
+\begin{enumerate}[(a)]
   \setlength{\itemsep}{1pt}
-  \setlength{\parskip}{0pt}
-  \setlength{\parsep}{0pt}
   \item if $a,\ b$ are even, then $gcd(a, b) = 2gcd(a/2, b/2)$;
   \item if $a$ is even and $b$ is odd, then $gcd(a, b) = gcd(a/2, b)$;
   \item  $gcd(a, b) = gcd(a-b, b)$, as in the standard Euclid algorithm;
   \item the sum of two odd numbers is always even.
-\end{itemize}
+\end{enumerate}
 
 % Donald Knuth, TAOCP, "a binary method", p. 388 VOL 2
 Both \cite{AOCPv2} and \cite{MITalg} analyze the running time of the
@@ -92,17 +90,21 @@ Anyway, both show that algorithm ~\ref{alg:gcd} belongs to the class
     \While{$b \neq 0$}
       \If{$a$ is odd}
         \If{$b$ is odd}
+          \Comment by property (c) and (d)
           \State $a \gets (a-b) \gg 1$
         \Else
+          \Comment by property (b)
           \State $b \gets b \gg 1$
         \EndIf
         \If{$a < b$} $a, b \gets b, a$ \EndIf
 
       \Else
         \If{$b$ is odd}
+        \Comment by property (b)
           \State $a \gets a \gg 1$
           \If{$a < b$} $a, b \gets b, a$ \EndIf
         \Else
+        \Comment by property (a)
           \State $k \gets k+1$
           \State $a, b \gets a \gg 1, b \gg 1$
         \EndIf
@@ -155,19 +157,22 @@ for completeness' sake, we report in table
   \caption{Square Root: Bombelli's algorithm}
   \label{alg:sqrt:bombelli}
   \begin{algorithmic}[1]
-    \Procedure{sqrt}{$n$}
+    \Function{sqrt}{$n$}
 
-    \State $i, g \gets 0, \{\}$
+    \State $i \gets 0; \quad g \gets \{\}$
     \While{$n > 0$}
+    \Comment take pairs of digits and store them in $g$
       \State $g_i \gets n \pmod{100}$
       \State $n \gets n // 100$
-      \State $i++$
+      \State $i \gets i + 1$
     \EndWhile
 
-    \State $x, r \gets 0, 0$
-    \For{$j \in \;  [i-1..0]$}
+    \State $x \gets 0; \quad r \gets 0$
+    \For{$j =  i-1 \strong{ downto } 0$}
       \State $r = 100r + g_i$
-      \For{$d \in \; [0, 9]$}
+      \Comment take next pair
+      \For{$d = 0 \strong{ to } 9$}
+      \Comment find gratest multiplier $d$
         \State $y' \gets d(20x + d)$
         \If{$y' > r$}  \textbf{break}
         \Else  \ \ $y \gets y'$
@@ -175,11 +180,12 @@ for completeness' sake, we report in table
       \EndFor
       \State $r \gets r - y$
       \State $x \gets 10x + d - 1$
+      \Comment $d$ is the next digit
     \EndFor
 
     \State \Return $x, r$
 
-    \EndProcedure
+    \EndFunction
   \end{algorithmic}
 \end{algorithm}
 
@@ -193,7 +199,7 @@ multiplications. This means that the complexity of this solutions belongs to
   found the pair $\angular{x, r}$ such that $(x+r)^2=a$, where $x$ is the mantissa,
   while $r$ is the decimal part. For our purpose this change is irrelevant: we
   just need to be able to distinguish perfect squares, and thus assert that $r$
-  is nonzero.
+  is zero.
 \end{remark}
 
 \paragraph{Dijkstra's Algorithm \label{par:preq:sqrt:dijkstra}} can be found in
@@ -224,44 +230,54 @@ $d = (b-a) \idiv 2$.
   \caption{Square Root: an intuitive, na\"ive implementation}
   \label{alg:sqrt:dijkstra_naif}
   \begin{algorithmic}[1]
-    \State $a, b \gets 0, n+1$
+    \Function{sqrt}{$n$}
+    \State $a \gets 0; \quad b \gets n+1$
     \While{$a+1 \neq b$}
       \State $d \gets (b-a) \idiv 2$
-      \If{$(a+d)^2 \leq n$}
-         $a \gets a+d$
-      \ElsIf{$(b-d)^2 > n$}
-         $b \gets b-d$
+      \If{$(a+d)^2 \leq n$} $a \gets a+d$
+      \Comment increment left bound
+      \ElsIf{$(b-d)^2 > n$} $b \gets b-d$
+      \Comment increment right bound
       \EndIf
     \EndWhile
-    \State \Return a
+    \State \Return $a, a^2-n$
+    \EndFunction
   \end{algorithmic}
 \end{algorithm}
-
 % heh, there's not much to explain here, that's almost the same in Dijkstra's
 % book, excluding the inspirative familiar portrait that led to the insight of
 % this change of varaibles.
 Now optimization proceeds with the following change of variables:
-$c = b-a$,
-$p = ac$,
-$q = c^2$,
-$r = n-a^2$;
-For any further details and explainations, the reference is still
-\cite{Dijkstra:adop}.
+\begin{enumerate}[a)]
+  \setlength{\itemsep}{1pt}
+  \setlength{\parskip}{0pt}
+  \setlength{\parsep}{0pt}
+\item $c = b-a$,
+\item $p = ac$,
+\item $q = c^2$,
+\item $r = n-a^2$;
+\end{enumerate}
+resulting in algorithm \ref{alg:sqrt:dijkstra}.
+For any further details, the reference is still \cite{Dijkstra:adop}.
 
 \begin{algorithm}[H]
   \caption{Square Root: final version}
   \label{alg:sqrt:dijkstra}
   \begin{algorithmic}[1]
-    \State $p, q, r \gets 0, 1, n$
-    \While{$q \leq n$} $q \gets q \gg 2$ \EndWhile
+    \Function{sqrt}{$n$}
+    \State $p \gets 0; \quad q \gets 1; \quad r \gets n$
+    \While{$q \leq n$} $q \gets q \ll 2$ \EndWhile
     \While{$q \neq 1$}
-      \State $q \gets q \ll 2$
+      \State $q \gets q \gg 2$
       \State $h \gets p+q$
       \State $p \gets q \ll 1$
       \State $h \gets 2p + q$
-      \If{$r \geq h$} $p, r \gets p+q, r-h$ \EndIf
+      \If{$r \geq h$}
+        \State $p \gets p+q$
+        \State $r \gets r-h$ \EndIf
     \EndWhile
-    \State \Return p
+    \State \Return $p, r$
+    \EndFunction
   \end{algorithmic}
 \end{algorithm}
 
