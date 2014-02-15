@@ -12,12 +12,12 @@ situations where having a small private exponent may be
 particularly tempting with respect to performance (for example, a smart card
 communication with a computer), they represent a threat to the security of the
 cipher.
-Fortunately, ~\cite{wiener} \S 6 presents a couple of precautions that make a
+Fortunately, ~\cite{wiener} \S 9 presents a couple of precautions that make a
 RSA key-pair immune to this attack, namely
 (i) making $e > \sqrt{N}$ and
 (ii) $gcd(p-1, q-1)$ large.
 
-\section{A background on Continued Fractions \label{sec:wiener:cf}}
+\section{Background on Continued Fractions \label{sec:wiener:cf}}
 
 Let us call \emph{continued fraction} any expression of the form:
 %% why \cfrac sucks this much. |-------------------------|
@@ -55,21 +55,40 @@ By definition, each new approximation is recursively defined as:
   \end{cases}
 \end{align}
 
-Among the prolific properties of such objects, firstly Wiener ~\cite{wiener}
-and later Boneh ~\cite{20years} discovered that, if a continued fraction $f'$ is
-an underestimate of another one $f$, i.e.
+Among the prolific properties of such objects, Legendre in 1768 discovered that,
+if a continued fraction $f' = \frac{\theta'}{\kappa'}$ is
+an underestimate of another one $f = \frac{\theta}{\kappa}$, i.e.
 \begin{align}
-  f' = f(1-\delta)
+  \abs{f - f'} = \delta
 \end{align}
-then it is possible to recover $f$, having $f'$, if $\delta$ is ``small
-enough'', where small enough means:
-\begin{align}
+then for a $\delta$ sufficiently small, $f$ is \emph{equal} to the $n$-th
+continued fraction expansion of $f'$ (\cite{smeets} \S 2). Formally,
+
+\begin{theorem*}[Legendre]
+  If $f = \frac{\theta}{\kappa}$,  $f' = \frac{\theta'}{\kappa'}$ and
+  $\gcd(\theta, \kappa) = 1$, then
+  \begin{align}
   \label{eq:wiener:cf_approx}
-  \delta = 1 - \frac{f'}{f} < \frac{1}{\rfrac{3}{2}{h_1}{k_1}}
-\end{align}
-\\
-The \emph{continued fraction algorithm} allowing us to recover $f$ is the
-following:
+    \abs{f' - \frac{\theta}{\kappa}} < \delta = \frac{1}{2\kappa^2}
+    \quad
+    \text{ implies that }
+    \quad
+    \begin{bmatrix}
+      \theta \\ \kappa
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+      \theta'_n \\ \kappa'_n
+    \end{bmatrix},
+    \quad
+    \text{ for some } n \geq 0
+  \end{align}
+\end{theorem*}
+
+Two centuries later, first Wiener \cite{wiener} and later Dan Boneh
+\cite{20years} leveraged this theorem in order to produce an algorithm able to
+recover $f$, having $f'$.
+The \emph{continued fraction algorithm}  is the following:
 \begin{enumerate}[(i)]
   \setlength{\itemsep}{1pt}
   \setlength{\parskip}{0pt}
@@ -85,7 +104,7 @@ following:
 As we saw in ~\ref{sec:preq:rsa}, by construction the two exponents are such that
 $ed \equiv 1 \pmod{\varphi(N)}$. This implies that there exists a
 $k \in \naturalN \mid ed = k\varphi(N) + 1$. This can be formalized to be
-the same problem we formalized in ~\ref{sec:wiener:cf}:
+the same problem we formalized in ~\ref{eq:wiener:cf_approx}:
 \begin{align*}
   ed = k\varphi(N) + 1 \\
   \abs{\frac{ed - k\eulerphi{N}}{d\eulerphi{N}}} = \frac{1}{d\eulerphi{N}} \\
@@ -107,9 +126,9 @@ For the last step, remember that $k < d < \rfrac{1}{3}\sqrt[4]{N}$:
   = \frac{1}{d\sqrt[4]{N}} < \frac{1}{2d^2}
 \end{align*}
 
-This demonstrates the conditions of ~\ref{eq:wiener:cf_approx} holds, and allows
-us to proceed with the continued fraction algorithm to converge to a solution
-~\cite{20years}.
+This demonstrates that the hypotesis of ~\ref{eq:wiener:cf_approx} is satisfied,
+and allows us to proceed with the continued fraction algorithm to converge to a
+solution ~\cite{20years}.
 
 \paragraph{}
 We start by generating the $\log N$ continued fraction expansions of
