@@ -162,9 +162,9 @@ convergent, we provide an algorithm for attacking the RSA cipher via Wiener:
   \caption{Wiener's Attack}
   \label{alg:wiener}
   \begin{algorithmic}[1]
-    \Function{wiener}{ }
+    \Function{wiener}{\PKArg}
     \State $f \gets  \texttt{cf\_init}(e, N)$
-    \For{$\ceil{\log N} \text{ times }$}
+    \For{$\ceil{\log N} \strong{ times }$}
       \State $k, d \gets \texttt{cf\_next}(f)$
       \If{$k \nmid ed-1$} \strong{continue} \EndIf
       \State $\eulerphi{N} \gets (ed - 1)\ //\ k$

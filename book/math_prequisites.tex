@@ -86,6 +86,7 @@ Anyway, both show that algorithm ~\ref{alg:gcd} belongs to the class
 \begin{algorithm}[H]
   \caption{\openssl's GCD \label{alg:gcd}}
   \begin{algorithmic}[1]
+    \Function{gcd}{$a, b$}
     \State $k \gets 0$
     \While{$b \neq 0$}
       \If{$a$ is odd}
@@ -111,7 +112,7 @@ Anyway, both show that algorithm ~\ref{alg:gcd} belongs to the class
       \EndIf
     \EndWhile
     \State \Return $a \ll k$
-
+    \EndFunction
   \end{algorithmic}
 \end{algorithm}
 

@@ -179,7 +179,7 @@ and respectively updating them via $x \gets f(x)$ and $y \gets f(f(y))$.
 \begin{algorithm}
   \caption{Pollard's $\rho$ factorization}
   \begin{algorithmic}[1]
-    \Function{rho}{ }
+    \Function{rho}{\PKArg}
     \State $x \getsRandom \naturalN$
     \State $y \gets x$
     \State $g \gets 1$
@@ -208,7 +208,7 @@ adopts this trick together with Brent's cycle-finding variant:
 \begin{algorithm}
   \caption{Pollard-Brent's factorization \label{alg:pollardrho}}
   \begin{algorithmic}[1]
-    \Function{rho}{ }
+    \Function{rho}{\PKArg}
     \State $s \gets 100$
     \Comment steps to check for $\gcd$
     \State $i \gets 1; \quad j' \gets j \gets 1$
