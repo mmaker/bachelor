@@ -299,9 +299,9 @@
           \hspace{3.2cm}{\@firstreader} \\   % senza spazio sopra 2.6
           \sigskip {Controrelatore:} {\,   \@secondreader} \\
         \else
-          \sigskip {Relatore: } \hspace{0.7cm} {\@supervisor} \\
+          \sigskip {Relatore: } \hspace{1.45cm} {\@supervisor} \\
           \sigskip
-          \sigskip {Controrelatore:} {\@secondreader} \\
+          \sigskip {Controrelatore:} \hspace{.62cm} {\@secondreader} \\
         \fi
      \fi
 
