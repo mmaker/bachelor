@@ -3,7 +3,7 @@
 
 In this chapter we formalize the notation used in the rest of the thesis, and
 furthermore attempt to discuss and study the elementary functions on which the
-project has been grounded.
+whole project has been grounded.
 \\
 The $\ll$ and $\gg$ are respectively used with the meaning of left and right
 bitwise shift, as usual in computer science.
@@ -262,7 +262,7 @@ $d = (b-a) \idiv 2$.
       \If{$(a+d)^2 \leq n$} $a \gets a+d$
       \Comment increment left bound
       \ElsIf{$(b-d)^2 > n$} $b \gets b-d$
-      \Comment increment right bound
+      \Comment decrement right bound
       \EndIf
     \EndWhile
     \State \Return $a, a^2-n$

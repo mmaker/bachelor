@@ -202,7 +202,14 @@ convergent, we provide an algorithm for attacking the RSA cipher via Wiener:
   \end{algorithmic}
 \end{algorithm}
 
-\section{Building a distributed version}
+\paragraph{Parallelism}
+Parallel implementation of this specific version of Wiener's Attack is
+difficult, because the inner loop is inherently serial. At best, parallelism
+could be employed to construct a constructor process, building the $f_n$
+convergents, and consumers receiving each of those and processing them
+seperatedly. The first one arriving to a solution, broadcasts a stop message to
+the others.
+
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "question_authority"

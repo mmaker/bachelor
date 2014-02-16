@@ -155,6 +155,9 @@ the class \bigO{\log^2 N}, as we saw in section ~\ref{sec:preq:sqrt}.
 Computing separatedly $x^2$ would add an overhead of the same order of magnitude
 \bigO{\log^2 N}, and thus result in a complete waste of resources.
 
+As a result of this, we advice the use of a strictly limited number of
+processors - like two or three - performing in parallel fermat's factorization
+method over different intervals.
 %%% Local Variables:
 %%% TeX-master: "question_authority.tex"
 %%% End:

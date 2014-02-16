@@ -10,7 +10,7 @@ can somehow be assembled, and so a fatorization of N attemped.
 %% understood this section without Firas (thanks).
 %% <http://blog.fkraiem.org/2013/12/08/factoring-integers-dixons-algorithm/>
 %% I kept the voila` phrase, that was so lovely.
-\section{A little bit of History \label{sec:dixon:history}}
+\section{Interlude \label{sec:dixon:history}}
 During the latest century there has been a huge effort to approach the problem
 formulated by Fermat ~\ref{eq:fermat_problem} from different perspecives. This
 led to an entire family of algorithms, like \emph{Quadratic Sieve},
@@ -173,7 +173,7 @@ and storing dependencies into a \emph{history matrix} $\mathcal{H}$.
 \end{algorithm}
 
 
-\section{Implementation}
+\section{An Implementation Perspective}
 
 Before gluing all toghether, we need one last building brick necessary for
 Dixon's factorization algorithm: a \texttt{smooth}($x$) function. In our
@@ -181,7 +181,16 @@ specific case, we need a function that, given as input a number $x$, returns the
 empty set $\emptyset$ if $x^2 -N$ is not $\factorBase$-smooth. Otherwise,
 returns a vector $v = (\alpha_0, \ldots, \alpha_r)$ such that each $\alpha_j$ is
 defined just as in \ref{eq:dixon:alphas}. Once we have established $\factorBase$, its
-implementation is fairly straightforward:
+implementation comes straightfoward.
+
+\paragraph{How do we choose $\factorBase$?}
+It's not easy to answer: if we choose $\factorBase$ small, we will rarely find
+$x^2 -N$ \emph{smooth}. If we chose it large, attempting to factorize $x^2 -N$
+with $\factorBase$ will pay the price of iterating through a large set.
+\cite{Crandall} \S 6.1 finds a solution for this employng complex analytic
+number theory. As a  result, the ideal value for $|\factorBase|$ is
+$e^{\sqrt{\ln N \ln \ln N}}$.
+
 
 \begin{algorithm}
   \caption{Discovering Smoothness}
@@ -204,13 +213,6 @@ implementation is fairly straightforward:
     \EndProcedure
   \end{algorithmic}
 \end{algorithm}
-\paragraph{How do we choose $\factorBase$?}
-It's not easy to answer: if we choose $\factorBase$ small, we will rarely find
-$x^2 -N$ \emph{smooth}. If we chose it large, attempting to factorize $x^2 -N$
-with $\factorBase$ will pay the price of iterating through a large set.
-\cite{Crandall} \S 6.1 finds a solution for this employng complex analytic
-number theory. As a  result, the ideal value for $|\factorBase|$ is
-$e^{\sqrt{\ln N \ln \ln N}}$.
 
 \begin{algorithm}
   \caption{Dixon}
@@ -242,6 +244,26 @@ $e^{\sqrt{\ln N \ln \ln N}}$.
   \EndFunction
   \end{algorithmic}
 \end{algorithm}
+
+\paragraph{Parallelization}
+
+Dixon's factorization is ideally suited to parallel implementation. Similarly to
+other methods like ECM and MPQS, treated in \cite{brent:parallel} \S 6.1,
+we can \emph{linearly} improve the running time by distributing across many
+nodes the discovery of $\factorBase$-smooth numbers.
+
+Depending on the granularity we desire - and the number of nodes available, we
+can even act on the \texttt{ker} function - but less easily.
+This idea would boil down to the same structure we discussed with Wiener's attack:
+one node - the \emph{producer} - discovers linear dependencies, while the others
+- the \emph{consumers} - attempt to factorize $N$.
+For this reason that we introduced the \texttt{yield} statement in line
+$12$ of algorithm \ref{alg:dixon:kernel}: the two jobs can be performed
+asynchronously.
+
+Certainly, due to the probabilistic nature of this algorithm, we can even think
+aboutrunning multiple instances of the same program. This solution is fairly
+effective in proportion to the development cost.
 
 %%% Local Variables:
 %%% mode: latex
