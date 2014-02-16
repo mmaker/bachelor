@@ -46,7 +46,7 @@ that $\mod{N}$ is equivalent to:
 \end{align}
 and voil\`a our congruence of squares (\cite{discretelogs} \S 4). For what
 concerns the generation of $x_i$ with the property \ref{eq:dixon:x_sequence},
-they can simply taken at random and tested using trial division.
+they can simply be taken at random and tested using trial division.
 
 \paragraph{Brillhart and Morrison} later proposed (\cite{morrison-brillhart}
 p.187) a better approach than trial division to find such $x$. Their idea aims
@@ -222,7 +222,7 @@ $e^{\sqrt{\ln N \ln \ln N}}$.
     \Comment finding linearity requires redundance
     \While{$i < r$}
     \Comment search for suitable pairs
-    \State $x_i \getsRandom \{0, \ldots N\}$
+    \State $x_i \getsRandom \naturalN_{< N}$
     \State $y_i \gets x_i^2 - N$
     \State $v_i \gets \texttt{smooth}(y_i)$
     \If{$v_i$} $i \gets i+1$ \EndIf

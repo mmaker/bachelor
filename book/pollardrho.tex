@@ -58,10 +58,10 @@ factor of $N$.
 \paragraph{Choosing the function} Ideally, $F$ should be easily computable, but
 at the same time random enough to reduce as much as possible the epacts
 ~\cite{Crandall} \S 5.2.1. Any quadratic function $F(x) = x^2 + b$ should be
-enough \footnote{
+enough\footnote{
   Note that this has been only empirically verified, and so far not been proved
-  (~\cite{riesel}, p. 177)}
-, provided that $b \in \naturalN \setminus \{0, 2\}$.
+  (~\cite{riesel}, p. 177)},
+provided that $b \in \naturalN \setminus \{0, 2\}$.
 For example, ~\cite{pollardMC} uses $x^2 -1$, meanwhile we are going to choose
 $F(x) = x^2 + 1$.
 
@@ -150,7 +150,7 @@ this algorithm, based on the birthday paradox.
 
 We can obviously substitute the $365$ with any set of cardinality $\zeta$
 to express the probability that a random function from $\integerZ_{\epsilon}$
-to $\integerZ_{\zeta}$ is injective. Back to our particular case,
+to $\integerZ_{\zeta}$ is injective. However, back to our particular case,
 we want to answer the question:
 
 \emph{
