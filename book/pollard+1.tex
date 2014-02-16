@@ -6,16 +6,172 @@ $p$ of a number $N$, if $p$ is such that $p+1$ has only small prime divisors.
 This method was presented in ~\cite{Williams:p+1} together with the results of
 the application of this method to a large number of composite numbers.
 
+\section{Background on Lucas Sequences}
+
+Let us call \emph{Lucas Sequence} the recurrence relation with parameters $\tau,
+\upsilon$
+\begin{align*}
+  \begin{cases}
+    U_0 = 0 \\
+    U_1 = 1 \\
+    U_n = \tau U_{n-1} - \upsilon U_{n-2}
+  \end{cases}
+  \quad
+  \begin{cases}
+    V_0 = 2 \\
+    V_1 = \tau \\
+    V_n = \tau V_{n-1} - \upsilon V_{n-2}
+  \end{cases}
+\end{align*}
+%% <https://en.wikipedia.org/wiki/Lucas_sequence> thanks wikipedia
+For respectively different values of $\tau, \upsilon$, Lucas Sequences have
+specific names:
+
+\begin{tabular}{c l@{\hskip 0pt} l@{\hskip 1pt} l l l}
+  $\bullet$ & $U($ & $\tau=1,$ & $\upsilon=-1)$ & \emph{Fibonacci numbers}; \\
+  $\bullet$ & $V($ & $\tau=1,$ & $\upsilon=-1)$ & \emph{Lucas numbers}; \\
+  $\bullet$ & $U($ & $\tau=3,$ & $\upsilon=2)$ & \emph{Mersenne numbers}.\\
+\end{tabular}
+\\
+\\
+For our purposes, $U_n$ is not necessary, and $\upsilon=1$\footnote{
+  Williams justifies this choice stating that choosing to compute a $U_n$ sequence
+  is far more computationally expensive than involving $V_n$; for what
+  concerns $\upsilon$, that simplifies Lehmer's theorem with no loss of
+  generality. For further references,
+  see \cite{Williams:p+1} \S 3.}.
+In order to simplify any later theorem, we just omit it. Therefore, the latter
+expression becomes:
+\begin{equation}
+  \label{eq:williams:ls}
+  \begin{cases}
+    V_0 = 2 \\
+    V_1 = \tau \\
+    V_n = \tau V_{n-1} - V_{n-2} \\
+  \end{cases}
+\end{equation}
+
+Three foundamental properties interpolate terms of Lucas Sequences:
+\begin{align}
+  & V_{2n+1} = \tau V_n - V_{n-1} \label{eq:ls:2n+1}\\
+  & V_{2n} = V_n^2 - 2 \label{eq:ls:2n}\\
+  & V_{2n-1} = V_nV_{n-1} - \tau \label{eq:ls:2n-1}
+\end{align}
+
+All these identities can be verified by direct substitution with
+\ref{eq:williams:ls}. What's interesting about the ones of above, is that we can
+exploit those to efficiently compute the product $V_{hk}$ if we are provided with
+$\angular{V_k, V_{k-1}}$ by considering the binary representation of the number
+$h$. In other words, we can consider each bit of $h$, starting from the least
+significant one: if it is zero, we use the multiplication formula
+\ref{eq:ls:2n}; otherwise the two addition formulas \ref{eq:ls:2n+1} and
+\ref{eq:ls:2n-1}.
+
+\begin{algorithm}[H]
+  \caption{Lucas Sequence Multiplier}
+  \begin{algorithmic}[1]
+    \Function{Lucas}{$V, V', a, \tau$}
+      \While{$a > 0$}
+        \If{$a$ is even }
+          \State $V'' \gets V^2 -2$
+          \Comment by equation \ref{eq:ls:2n}
+          \State $V' \gets VV' - \tau$
+          \Comment by equation \ref{eq:ls:2n-1}
+          \State $v \gets V''$
+        \ElsIf{$a$ is odd}
+          \State $V'' \gets \tau V^2 - VV' - \tau$
+          \Comment by equation \ref{eq:ls:2n+1}
+          \State $V' \gets V^2 -2$
+          \Comment by equation \ref{eq:ls:2n}
+          \State $V \gets V''$
+        \EndIf
+        \State $a \gets a \gg 1$
+      \EndWhile
+      \State \Return $V, V'$
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+
+Finally, we need the following (\cite{Williams:p+1} \S 2):
+\begin{theorem*}[Lehmer]
+  If $p$ is an odd prime and the Legendre symbol
+  $\legendre{\Delta}{p} = \varepsilon$, then:
+  \begin{align*}
+%%  &  U_{(p - \varepsilon)m} \equiv 0 \pmod{p} \\
+  &  V_{(p - \varepsilon)m} \equiv 2 \pmod{p}
+  \end{align*}
+\end{theorem*}
+
+
+
 \begin{remark}
-  In the end of ~\cite{Williams:p+1}, there is a small performance comparison
-  with Pollard's $p-1$:
-  ``The real problem with the $p+1$ test is the fact that it is quite slow. For
-  our program, we found that it was about nine times slower.''
-  Nevertheless, there is no further information about the way the two
-  factorization have been benchmarked.
+  From number theory we know that the probability that
+  $\mathbb{P}\{\epsilon = -1\} = \rfrac{1}{2}$.
+  But, there is reason to restrict ourselves for $\legendre{\Delta}{p} = -1$.
+  What's woth noring, though, is that a $p-1$ factorization attempt would be
+  quite slow with respect to Pollard's $p-1$ method. As a consequence of this,
+  we and \cite{Williams:p+1} proceeded running pollard first????
 \end{remark}
 
 
+\section{Dressing Up}
+
+At this point the factorization proceeds just by substituting the
+exponentiation and Fermat's theorem with lucas sequences and Lehmer's theorem
+introduced in the preceeding section. If we find a $Q$ satisfying $p+1 \mid Q
+\text{ or } p-1 \mid Q$ then, due to Lehmer's theorem $p \mid V_Q -2$ and thus
+$\gcd(V_Q -2, N)$ is a non-trial divisor of $N$.
+
+\begin{enumerate}[(i)]
+\item take a random, initial $\tau = V_1$; now let the \emph{base} be
+  $\angular{V_0, V_1}$.
+\item take the $i$-th prime in $\mathcal{P}$, starting from $0$, and call it be
+  $p_i$;
+\item assuming the current state is $\angular{V_k, V_{k-1}}$, compute the
+  successive terms of the sequence using additions and multiplications formula,
+  until you have $\angular{V_{p_ik}, V_{p_ik - 1}}$.
+\item just like with the Pollard $p-1$ method, repeat step (iii) for $e =
+  \ceil{\frac{\log N}{\log p_i}}$ times;
+\item select $Q = V_k - 2 \pmod{N}$ and check the $gcd$ with $N$, hoping this
+  leads to one of the two prime factors:
+\begin{align}
+  g = gcd(Q, N), \quad 1 < g < N \,.
+\end{align}
+If so, than we have finished, since $g$ itself and $\frac{N}{g}$
+are the two primes factorizing the public  modulus.
+Otherwise, if $g = 1$ we go back to to (ii), since $p-1 \nmid Q$ yet;
+if $g = N$ start back from scratch, as $pq \mid g_i$.
+%% riesel actually does not examine this case, strangely. However, it seems to
+%% be fairly probable that.
+
+\end{enumerate}
+
+
+
+\begin{algorithm}
+  \caption{Williams $p+1$ factorization}
+  \begin{algorithmic}[1]
+    \Require $\mathcal{P}$, the prime pool
+    \Function{Factorize}{$N, \tau$}
+      \State $V \gets 2$
+      \State $V' \gets \tau$
+      \For{$p_i \strong{ in } \mathcal{P}$}
+      \Comment step (i)
+        \State $e \gets \log \sqrt{N} // \log p_i$
+        \For{$e \strong{ times }$}
+          \State $V, V' \gets \textsc{lucas}(V, V', p_i, \tau)$
+          \Comment step (ii)
+          \State $Q \gets V -2$
+          \State $g \gets \gcd(Q, N)$
+          \Comment step (iii)
+          \If{$g = 1$} \Return \strong{nil}
+          \ElsIf{$g > 1$} \Return g
+          \EndIf
+        \EndFor
+      \EndFor
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "question_authority"
