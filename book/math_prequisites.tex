@@ -37,9 +37,30 @@ i.e. $a \xor b$.
 %%the distribution of prime numbers in $\naturalN$.
 
 \begin{definition*}[Smoothness]
-A number $n$ is said to be $\factorBase$-smooth if and only if all its prime
-factors are contained in $\factorBase$.
+  A number $n$ is said to be $\factorBase$-smooth if and only if all its prime
+  factors are contained in $\factorBase$.
 \end{definition*}
+
+\begin{definition*}[Quadratic Residue]
+  An integer $a$ is said to be a \emph{quadratic residue} $\mod n$ if it is
+  congruent to a perfect square $\!\mod n$:
+  \begin{equation*}
+    x^2 = a \pmod{n}
+  \end{equation*}
+\end{definition*}
+
+\begin{definition*}[Legendre Symbol]
+  The \emph{Legendre Symbol}, often contracted as $\legendre{a}{p}$ is a
+  function of two integers $a$ and $p$ defined as follows:
+  \begin{equation*}
+    \legendre{a}{p} = \begin{cases}
+      0  & \text{if $a \equiv 0 \pmod{p}$} \\
+      1  & \text{if $a$ is a quadratic residue modulo $p$} \\
+      -1 & \text{if $a$ is a non-residue modulo $p$} \\
+      \end{cases}
+  \end{equation*}
+\end{definition*}
+\vfill
 
 
 \section{Algorithmic Complexity Notation}
@@ -55,6 +76,9 @@ $$
 
 With $f(n) = \bigO{g(n)}$ we actually mean
 $f(n) \in \bigO{g(n)}$.
+Moreover, since the the expression ``running time'' has achieved a certain
+vogue, we shall sometimes use this term as interchangeable with ``complexity'',
+even though imprecise (\cite{Crandall} \S 1.1.4).
 
 \section{Euclid's Greatest Common Divisor \label{sec:preq:gcd}}
 
@@ -258,7 +282,7 @@ Now optimization proceeds with the following change of variables:
 \item $q = c^2$,
 \item $r = n-a^2$;
 \end{enumerate}
-resulting in algorithm \ref{alg:sqrt:dijkstra}.
+resulting into algorithm \ref{alg:sqrt:dijkstra}.
 For any further details, the reference is still \cite{Dijkstra:adop}.
 
 \begin{algorithm}[H]
