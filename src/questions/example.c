@@ -21,7 +21,8 @@ static BIO* out;
  * This functions returns false if `out` could not be opened.
  */
 static int
-example_question_setup(void) {
+example_question_setup(void)
+{
   out = BIO_new_fp(stdout, BIO_NOCLOSE);
 
   return (out != NULL);
