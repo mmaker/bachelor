@@ -4,8 +4,6 @@
 \NeedsTeXFormat{LaTeX2e}[1995/12/01]
 \ProvidesClass{thesis}
 
-
-
 \RequirePackage{amsmath}
 \RequirePackage{amssymb}
 \RequirePackage{amsthm}
@@ -294,14 +292,16 @@
     \else % not Ph.D. degree:
         \beginskip
         \iftwo@supervisors
-          \sigskip {Relatori: }  {\hspace{1.1cm} \@supervisor}
-
-          \hspace{3.2cm}{\@firstreader} \\   % senza spazio sopra 2.6
-          \sigskip {Controrelatore:} {\,   \@secondreader} \\
+          \sigskip \begin{tabular}{l@{\hskip 2cm} l}
+            Relatore: & {\@supervisor} \\ \\ \\
+            Correlatore: & {\@firstreader} \\ \\
+            Controrelatore: & {\@secondreader}
+          \end{tabular}
         \else
-          \sigskip {Relatore: } \hspace{1.45cm} {\@supervisor} \\
-          \sigskip
-          \sigskip {Controrelatore:} \hspace{.62cm} {\@secondreader} \\
+          \sigskip \begin{tabular}{l@{\hskip 2cm} l}
+            Relatore: & {\@supervisor} \\ \\ \\
+            Controrelatore: & {\@secondreader}
+          \end{tabular}
         \fi
      \fi
 
