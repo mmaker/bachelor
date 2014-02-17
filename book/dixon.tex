@@ -19,7 +19,7 @@ led to an entire family of algorithms, like \emph{Quadratic Sieve},
 The core idea is still to find a pair of perfect squares whose difference can
 factorize $N$, but maybe Fermat's hypotesis can be made weaker.
 
-\paragraph{Kraitchick} was the first one popularizing the idea the instead of
+\paragraph{Kraitchick} was the first one popularizing the idea that instead of
 looking for integers $\angular{x, y}$ such that $x^2 -y^2 = N$ it is sufficient
 to look for \emph{multiples} of $N$:
 \begin{align}
@@ -59,7 +59,8 @@ This way the complexity of generating a new $x$ is dominated by
 \bigO{|\factorBase|}. Now that the right side of \ref{eq:dixon:fermat_revisited}
 has been satisfied, we have to select a subset of those $x$ so that their
 product can be seen as a square. Consider an \emph{exponent vector}
-$v_i = (\alpha_0, \alpha_1, \ldots, \alpha_r)$ associated with each $x_i$, where
+$v_i = (\alpha_0, \alpha_1, \ldots, \alpha_r)$ with $r = |\factorBase|$
+associated with each $x_i$, where
 \begin{align}
   \label{eq:dixon:alphas}
   \alpha_j = \begin{cases}
@@ -72,12 +73,15 @@ values of $x^2 -N$, so we are going to use $\alpha_0$ to indicate the sign. This
 benefit has a neglegible cost: we have to add the non-prime $-1$ to our factor
 base $\factorBase$.
 
-Let now $\mathcal{M}$ be the rectangular matrix having per each $i$-th row the
-$v_i$ associated to $x_i$: this way each element $m_{ij}$ will be $v_i$'s
-$\alpha_j$. We are interested in finding set(s) of the subsequences of $x_i$
+Let now $M \in \mathbb{F}_2^{(f \times r)}$,
+for some $f \geq r$,
+be the rectangular matrix having per each $i$-th row the
+$v_i$ associated to $x_i$: this way each matrix element $m_{ij}$ will be the
+$j$-th component of $v_i$.
+We are interested in finding set(s) of the subsequences of $x_i$
 whose product always have even powers (\ref{eq:dixon:fermat_revisited}).
 Turns out that this is equivalent to look for the set of vectors
-$\{ w \mid wM = 0 \} = \ker(\mathcal{M})$ by definition of matrix multiplication
+$\{ w \mid wM = 0 \} = \ker(M)$ by definition of matrix multiplication
 in $\mathbb{F}_2$.
 
 
@@ -85,11 +89,11 @@ in $\mathbb{F}_2$.
 were actually used for a slightly different factorization method, employing
 continued fractions instead of the square difference polynomial. Dixon simply
 ported these to the square problem, achieving a probabilistic factorization
-method working at a computational cost asymptotically  best than all other ones
-previously described: \bigO{\beta(\log N \log \log N)^{\rfrac{1}{2}}} for some
-constant $\beta > 0$ \cite{dixon}.
+method working at a computational cost asymptotically better than all other ones
+previously described: \bigO{\exp \{\beta(\log N \log \log N )^{\rfrac{1}{2}}\}}
+for some constant $\beta > 0$ \cite{dixon}.
 
-\section{Reduction Procedure}
+\section{Breaching the kernel}
 
 The following reduction procedure, extracted from ~\cite{morrison-brillhart}, is
 a forward part of the Gauss-Jordan elimination algorithm (carried out from right
@@ -108,7 +112,6 @@ At this point, we have all data structures needed:
 \\
 \\
 \\
-
 
 \begin{center}
   \emph{Reduction Procedure}
@@ -130,8 +133,8 @@ At this point, we have all data structures needed:
 
 Algorithm \ref{alg:dixon:kernel} formalizes concepts so far discussed, by
 presenting a function \texttt{ker}, discovering linear dependencies in any
-rectangular matrix $\mathcal{M} \in (\mathbb{F}_2)^{(f \times r)}$
-and storing dependencies into a \emph{history matrix} $\mathcal{H}$.
+rectangular matrix $M \in \mathbb{F}_2^{(f \times r)}$
+and storing dependencies into a \emph{history matrix} $H$.
 
 \begin{remark}
   We are proceeding from right to left in order to conform with
@@ -143,18 +146,18 @@ and storing dependencies into a \emph{history matrix} $\mathcal{H}$.
 \begin{algorithm}
   \caption{Reduction Procedure  \label{alg:dixon:kernel}}
   \begin{algorithmic}[1]
-    \Function{Ker}{$\mathcal{M}$}
-    \State $\mathcal{H} \gets \texttt{Id}(f \times f)$
-    \Comment the initial $\mathcal{H}$ is the identity matrix
+    \Function{Ker}{$M$}
+    \State $H \gets \texttt{Id}(f \times f)$
+    \Comment the initial $H$ is the identity matrix
 
     \For{$j = r \strong{ downto } 0$}
     \Comment reduce
       \For{$i=0 \strong{ to } f$}
-        \If{$\mathcal{M}_{i, j} = 1$}
+        \If{$M_{i, j} = 1$}
           \For{$i' = i \strong{ to } f$}
-            \If{$\mathcal{M}_{i', k} = 1$}
-              \State $\mathcal{M}_{i'} = \mathcal{M}_i \xor \mathcal{M}_{i'}$
-              \State $\mathcal{H}_{i'} = \mathcal{H}_i \xor \mathcal{H}_{i'}$
+            \If{$M_{i', k} = 1$}
+              \State $M_{i'} = Mi \xor M_{i'}$
+              \State $H_{i'} = H_i \xor H_{i'}$
             \EndIf
           \EndFor
           \State \strong{break}
@@ -164,8 +167,8 @@ and storing dependencies into a \emph{history matrix} $\mathcal{H}$.
 
     \For{$i = 0 \strong{ to } f$}
     \Comment yield linear dependencies
-      \If{$\mathcal{M}_i = (0, \ldots, 0)$}
-        \strong{yield} $\{\mu  \mid \mathcal{H}_{i,\mu} = 1\}$
+      \If{$M_i = (0, \ldots, 0)$}
+        \strong{yield} $\{\mu  \mid H_{i,\mu} = 1\}$
       \EndIf
     \EndFor
     \EndFunction
@@ -226,12 +229,12 @@ $e^{\sqrt{\ln N \ln \ln N}}$.
     \Comment search for suitable pairs
     \State $x_i \getsRandom \naturalN_{< N}$
     \State $y_i \gets x_i^2 - N$
-    \State $v_i \gets \texttt{smooth}(y_i)$
+    \State $v_i \gets \textsc{smooth}(y_i)$
     \If{$v_i$} $i \gets i+1$ \EndIf
   \EndWhile
-  \State $\mathcal{M} \gets \texttt{matrix}(v_0, \ldots, v_f)$
+  \State $M \gets \texttt{matrix}(v_0, \ldots, v_f)$
   \For{$\lambda = \{\mu_0, \ldots, \mu_k\}
-    \strong{ in } \texttt{ker}(\mathcal{M})$}
+    \strong{ in } \textsc{ker}(M)$}
   \Comment get relations
     \State $x \gets \prod\limits_{\mu \in \lambda} x_\mu \pmod{N}$
     \State $y, r \gets \dsqrt{\prod\limits_{\mu \in \lambda} y_\mu \pmod{N}}$
@@ -245,7 +248,7 @@ $e^{\sqrt{\ln N \ln \ln N}}$.
   \end{algorithmic}
 \end{algorithm}
 
-\paragraph{Parallelization}
+\paragraph{Parallelism}
 
 Dixon's factorization is ideally suited to parallel implementation. Similarly to
 other methods like ECM and MPQS, treated in \cite{brent:parallel} \S 6.1,

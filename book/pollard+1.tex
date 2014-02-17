@@ -34,14 +34,15 @@ specific names:
 \end{tabular}
 \\
 \\
-For our purposes, $U_n$ is not necessary, and $\upsilon=1$\footnote{
+For our purposes, $U_n$ is not necessary, and $\upsilon=1$.\footnote{
   Williams justifies this choice stating that choosing to compute a $U_n$ sequence
   is far more computationally expensive than involving $V_n$; for what
   concerns $\upsilon$, that simplifies Lehmer's theorem with no loss of
   generality. For further references,
-  see \cite{Williams:p+1} \S 3.}.
-In order to simplify any later theorem, we just omit it. Therefore, the latter
-expression becomes:
+  see \cite{Williams:p+1} \S 3.}
+In order to simplify any later theorem, we just omit $U_n$, and assume $\upsilon
+= 1$.
+Therefore, the latter expression becomes:
 \begin{equation}
   \label{eq:williams:ls}
   \begin{cases}
@@ -60,7 +61,7 @@ Three foundamental properties interpolate terms of Lucas Sequences:
 
 All these identities can be verified by direct substitution with
 \ref{eq:williams:ls}. What's interesting about the ones of above, is that we can
-exploit those to efficiently compute the product $V_{hk}$ if we are provided with
+exploit them to efficiently compute the product $V_{hk}$ if we are provided with
 $\angular{V_k, V_{k-1}}$ by considering the binary representation of the number
 $h$. In other words, we can consider each bit of $h$, starting from the least
 significant one: if it is zero, we use the multiplication formula
@@ -95,7 +96,7 @@ significant one: if it is zero, we use the multiplication formula
 Finally, we need the following (\cite{Williams:p+1} \S 2):
 \begin{theorem*}[Lehmer]
   If $p$ is an odd prime and the Legendre symbol
-  $\legendre{\Delta}{p} = \varepsilon$, then:
+  $\varepsilon = \legendre{\Delta}{p}$, then:
   \begin{align*}
 %%  &  U_{(p - \varepsilon)m} \equiv 0 \pmod{p} \\
   &  V_{(p - \varepsilon)m} \equiv 2 \pmod{p}
@@ -106,18 +107,20 @@ Finally, we need the following (\cite{Williams:p+1} \S 2):
 
 \begin{remark}
   From number theory we know that the probability that
-  $\mathbb{P}\{\epsilon = -1\} = \rfrac{1}{2}$.
-  But, there is reason to restrict ourselves for $\legendre{\Delta}{p} = -1$.
-  What's woth noring, though, is that a $p-1$ factorization attempt would be
-  quite slow with respect to Pollard's $p-1$ method. As a consequence of this,
-  we and \cite{Williams:p+1} proceeded running pollard first????
+  $\mathbb{P}\{\varepsilon = -1\} = \rfrac{1}{2}$.
+  There is no reason to restrict ourselves to
+  $\legendre{\Delta}{p} = -1$.
+  In the alternative case of $\varepsilon = 1$, the factorization yields the
+  same factors as Pollard's $p-1$ method, but slowerly.
+  For this reason, when we look up for a $p-1$ factorization, it is advisable
+  to attempt the attack presented in the previous chapter \cite{Williams:p+1}.
 \end{remark}
 
 
 \section{Dressing up}
 
 At this point the factorization proceeds just by substituting the
-exponentiation and Fermat's theorem with lucas sequences and Lehmer's theorem
+exponentiation and Fermat's theorem with Lucas sequences and Lehmer's theorem
 introduced in the preceeding section. If we find a $Q$ satisfying $p+1 \mid Q
 \text{ or } p-1 \mid Q$ then, due to Lehmer's theorem $p \mid V_Q -2$ and thus
 $\gcd(V_Q -2, N)$ is a non-trial divisor of $N$.
@@ -125,7 +128,7 @@ $\gcd(V_Q -2, N)$ is a non-trial divisor of $N$.
 \begin{enumerate}[(i)]
 \item take a random, initial $\tau = V_1$; now let the \emph{base} be
   $\angular{V_0, V_1}$.
-\item take the $i$-th prime in $\mathcal{P}$, starting from $0$, and call it be
+\item take the $i$-th prime in $\mathcal{P}$, starting from $0$, and call it
   $p_i$;
 \item assuming the current state is $\angular{V_k, V_{k-1}}$, compute the
   successive terms of the sequence using additions and multiplications formula,
@@ -140,7 +143,7 @@ $\gcd(V_Q -2, N)$ is a non-trial divisor of $N$.
 If so, than we have finished, since $g$ itself and $\frac{N}{g}$
 are the two primes factorizing the public  modulus.
 Otherwise, if $g = 1$ we go back to to (ii), since $p-1 \nmid Q$ yet;
-if $g = N$ start back from scratch, as $pq \mid g_i$.
+if $g = N$ start back from scratch, as $pq \mid g$.
 %% riesel actually does not examine this case, strangely. However, it seems to
 %% be fairly probable that.
 

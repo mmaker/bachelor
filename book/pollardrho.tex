@@ -169,7 +169,7 @@ Since any of the two primes factoring $N$ is bounded above by $\sqrt{N}$, we
 will find a periodic sequence, and thus a factor, in time \bigO{\sqrt[4]{N}}.
 
 
-\section{A Computer program for Pollard's $\rho$ method}
+\section{An Implementation Perspective}
 
 The initial algorithm described by Pollard \cite{pollardMC} and consultable
 immediately below, looks for the pair $\angular{x_i, x_{2i}}$ such that
@@ -204,6 +204,16 @@ An immediate improvement of this algorithm would be to occasionally compute Eucl
 algorithm over the accumulated product to save some computation cycles, just as
 we saw in section~\ref{sec:pollard-1:implementing}. The next code fragment
 adopts this trick together with Brent's cycle-finding variant:
+
+\paragraph{Parallelism}
+Unfortunately, a parallel implementation of the $\rho$ algorithm would not
+provide a linear speedup.
+
+The computation of the $x_i$ sequence is intrinsecally serial; the only
+plausible approach to parallelism would be to try several different pseudorandom
+sequences, in which case $m$ different machines processing $m$ different
+sequences in parallel would be no more than \bigO{\sqrt{m}}
+efficient (\cite{brent:parallel} \S 3).
 
 \begin{algorithm}
   \caption{Pollard-Brent's factorization \label{alg:pollardrho}}

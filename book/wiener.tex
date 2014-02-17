@@ -31,9 +31,17 @@ Consider now any \emph{finite continued fraction}, conveniently represented with
 the sequence
 $\angular{a_0, a_1, a_2, a_3,  \ \ldots, a_n}$.
 Any number $x \in \mathbb{Q}$ can be represented as a finite continued fraction,
-and for each $i < n$ there exists a fraction $\rfrac{h_i}{k_i}$ approximating
+and for each $i < n$ there exists a fraction $\rfrac{h}{k}$ approximating
 $x$.
-By definition, each new approximation is recursively defined as:
+By definition, each new approximation
+$$
+\begin{bmatrix}
+  h_i \\ k_i
+\end{bmatrix}
+=
+\angular{a_0, a_1, \ \ldots, a_i}
+$$
+is recursively defined as:
 
 \begin{align}
   \label{eq:wiener:cf}
@@ -61,8 +69,9 @@ an underestimate of another one $f = \frac{\theta}{\kappa}$, i.e.
 \begin{align}
   \abs{f - f'} = \delta
 \end{align}
-then for a $\delta$ sufficiently small, $f$ is \emph{equal} to the $n$-th
-continued fraction expansion of $f'$ (\cite{smeets} \S 2). Formally,
+then for a $\delta$ sufficiently small, $f'$ is \emph{equal} to the $n$-th
+continued fraction expansion of $f$, for some $n \geq 0$ (\cite{smeets} \S 2).
+Formally,
 
 \begin{theorem*}[Legendre]
   If $f = \frac{\theta}{\kappa}$,  $f' = \frac{\theta'}{\kappa'}$ and
@@ -74,11 +83,11 @@ continued fraction expansion of $f'$ (\cite{smeets} \S 2). Formally,
     \text{ implies that }
     \quad
     \begin{bmatrix}
-      \theta \\ \kappa
+      \theta' \\ \kappa'
     \end{bmatrix}
     =
     \begin{bmatrix}
-      \theta'_n \\ \kappa'_n
+      \theta_n \\ \kappa_n
     \end{bmatrix},
     \quad
     \text{ for some } n \geq 0
@@ -99,7 +108,7 @@ The \emph{continued fraction algorithm}  is the following:
   \item check whether $\rfrac{h_i}{k_i}$ is equal to $f$
 \end{enumerate}
 
-\section{Constructing the attack}
+\section{Continued Fraction Algorithm applied to RSA}
 
 As we saw in ~\ref{sec:preq:rsa}, by construction the two exponents are such that
 $ed \equiv 1 \pmod{\varphi(N)}$. This implies that there exists a
@@ -146,7 +155,7 @@ The above equation is constructed so that the $x$ coefficient is the sum of the
 two primes, while the constant term $N$ is the product of the two. Therefore, if
 $\eulerphi{N}$ has been correctly guessed, the two roots will be $p$ and $q$.
 
-\section{Again on the engine™}
+\section{An Implementation Perspective}
 
 The algorithm is pretty straightforward by itself: we just need to apply the
 definitions provided in ~\ref{eq:wiener:cf} and test each convergent until
@@ -205,10 +214,10 @@ convergent, we provide an algorithm for attacking the RSA cipher via Wiener:
 \paragraph{Parallelism}
 Parallel implementation of this specific version of Wiener's Attack is
 difficult, because the inner loop is inherently serial. At best, parallelism
-could be employed to construct a constructor process, building the $f_n$
-convergents, and consumers receiving each of those and processing them
-seperatedly. The first one arriving to a solution, broadcasts a stop message to
-the others.
+could be employed to split the task into a \emph{constructor} process, building
+the $f_n$ convergents, and many \emph{consumers} receiving each convergent to be
+processed seperatedly.
+The first one arriving to a solution, broadcasts a stop message to the others.
 
 %%% Local Variables:
 %%% mode: latex
