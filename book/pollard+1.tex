@@ -54,8 +54,8 @@ Therefore, the latter expression becomes:
 
 Three foundamental properties interpolate terms of Lucas Sequences:
 \begin{align}
-  & V_{2n+1} = \tau V_n - V_{n-1} \label{eq:ls:2n+1}\\
-  & V_{2n} = V_n^2 - 2 \label{eq:ls:2n}\\
+  & V_{2n+1} = \tau V_n^2 - V_n V_{n-1} - \tau \label{eq:ls:2n+1} \\
+  & V_{2n} = V_n^2 - 2 \label{eq:ls:2n} \\
   & V_{2n-1} = V_nV_{n-1} - \tau \label{eq:ls:2n-1}
 \end{align}
 
@@ -78,7 +78,7 @@ significant one: if it is zero, we use the multiplication formula
           \Comment by equation \ref{eq:ls:2n}
           \State $V' \gets VV' - \tau$
           \Comment by equation \ref{eq:ls:2n-1}
-          \State $v \gets V''$
+          \State $V \gets V''$
         \ElsIf{$a$ is odd}
           \State $V'' \gets \tau V^2 - VV' - \tau$
           \Comment by equation \ref{eq:ls:2n+1}
@@ -156,8 +156,8 @@ if $g = N$ start back from scratch, as $pq \mid g$.
   \begin{algorithmic}[1]
     \Require $\mathcal{P}$, the prime pool
     \Function{Factorize}{$N, \tau$}
-      \State $V \gets 2$
-      \State $V' \gets \tau$
+      \State $V \gets \tau$
+      \State $V' \gets 2$
       \For{$p_i \strong{ in } \mathcal{P}$}
       \Comment step (i)
         \State $e \gets \log \sqrt{N} // \log p_i$
