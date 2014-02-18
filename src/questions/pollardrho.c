@@ -69,6 +69,7 @@ pollardrho_question_ask_rsa(const RSA *rsa)
   BN_free(x);
   BN_free(y);
   BN_free(gcd);
+  BN_free(two);
   return ret;
 }
 
