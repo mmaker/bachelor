@@ -17,7 +17,8 @@ QUESTIONS = $(WIENER_QUESTION) $(POLLARD_QUESTION) $(DIXON_QUESTION) \
 
 QLIBSOURCES =         qarith.c         include/qarith.h \
 	            qstrings.c         include/qstrings.h \
-                allquestions.c         include/questions.h
+                allquestions.c         include/questions.h \
+	              primes.c         include/primes.h
 
 lib_LIBRARIES = libquestions.a
 libquestions_a_SOURCES = $(QUESTIONS) $(QLIBSOURCES)

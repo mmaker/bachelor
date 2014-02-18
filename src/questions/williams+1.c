@@ -45,7 +45,7 @@ void lucas(BIGNUM *v, BIGNUM *w,
       BN_sub(w, w, BN_value_one());
     } else {
       BN_sqr(vv, v, ctx);
-      /* v = v² - 2*/
+      /* v = v² - 2 */
       BN_sub(u, vv, BN_value_one());
       BN_sub(u, u, BN_value_one());
       /* w = vw - τ */

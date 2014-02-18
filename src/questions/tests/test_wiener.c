@@ -31,7 +31,7 @@ void test_wiener(void)
   assert(WienerQuestion.ask_rsa(rsa));
 }
 
-int main(int argc, char ** argv)
+int main(int argc, char **argv)
 {
   if (WienerQuestion.setup) WienerQuestion.setup();
 
