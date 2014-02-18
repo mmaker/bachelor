@@ -1,0 +1,2 @@
+../../qa -a metadata -f esse3.pem | grep -qi 'TERENA SSL CA'
+[[ $? == 0 ]] || exit 1
