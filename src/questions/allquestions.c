@@ -44,4 +44,5 @@ void select_all_questions(void)
   REGISTER_QUESTION(PollardQuestion);
   REGISTER_QUESTION(FermatQuestion);
   REGISTER_QUESTION(MetadataQuestion);
+  REGISTER_QUESTION(PollardRhoQuestion);
 }

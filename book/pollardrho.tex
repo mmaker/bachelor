@@ -186,9 +186,11 @@ and respectively updating them via $x \gets f(x)$ and $y \gets f(f(y))$.
     \While{$g = 1$}
       \State $x \gets x^2 + 1 \pmod{N}$
       \State $y \gets y^4 + 2y^2 + 2 \pmod{N}$
-      \State $g \gets gcd(x, y)$
+      \State $g \gets gcd(|x - y|, N)$
     \EndWhile
-    \Return $g$
+    \If{$g = N$} \Return \strong{nil}
+    \Else \ \ \Return $g$
+    \EndIf
     \EndFunction
   \end{algorithmic}
 \end{algorithm}
