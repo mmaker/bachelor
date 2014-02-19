@@ -204,9 +204,10 @@ $e^{\sqrt{\ln N \ln \ln N}}$.
 
       \If{$x < 0$} $\alpha_0 \gets 1$ \EndIf
       \For{$i = 1 \strong{ to } |\factorBase|$}
-        \If{$\factorBase_i \nmid x$} \strong{continue} \EndIf
-        \State $x \gets x// \factorBase_i$
-        \State $\alpha_i \gets \alpha_i \xor 1$
+        \While{$\factorBase_i \mid x$}
+          \State $x \gets x// \factorBase_i$
+          \State $\alpha_i \gets \alpha_i \xor 1$
+        \EndWhile
       \EndFor
       \If{$x = 1$}
         \State \Return $v$

@@ -6,6 +6,8 @@
  * based on lucas sequences and Lehmer's theorem.
  *
  */
+#include <stdint.h>
+
 #include <openssl/rsa.h>
 #include <openssl/bn.h>
 
