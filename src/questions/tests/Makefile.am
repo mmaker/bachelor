@@ -1,6 +1,6 @@
 
 # unittesting my ass
-LDADD=../libquestions.a -lssl -lcrypto
+LDADD = ../libquestions.a -lssl -lcrypto
 
 check_PROGRAMS = test_qarith test_qstrings test_wiener test_pollard test_dixon \
 	         test_williams test_primes

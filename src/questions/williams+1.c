@@ -9,6 +9,7 @@
 #include <openssl/rsa.h>
 #include <openssl/bn.h>
 
+#include "qa/questions/primes.h"
 #include "qa/questions/qarith.h"
 #include "qa/questions/questions.h"
 
@@ -60,15 +61,64 @@ void lucas(BIGNUM *v, BIGNUM *w,
   BN_free(vw);
 }
 
+/**
+ * \brief William's p+1 factorization.
+ *
+ */
 static RSA*
 williams_question_ask_rsa(const RSA* rsa)
 {
   RSA *ret = NULL;
+  BIGNUM *p = BN_new();
+  BIGNUM *gcd = BN_new();
+  BIGNUM
+    *v = BN_new(),
+    *w = BN_new();
+  BIGNUM *n;
+  BIGNUM *tau = BN_new();
+  BIGNUM *q = BN_new();
+  int e, i;
+  BN_CTX *ctx = BN_CTX_new();
+
+  n = rsa->n;
+  BN_one(gcd);
+  BN_one(w); BN_uiadd1(w);
+  BN_pseudo_rand(tau, 512, 0, 0);
+  BN_copy(v, tau);
+  /* In the future, accumulated values: BN_one(q); */
+
+  for (primes_init(); primes_next(p); ) {
+    e = BN_num_bits(n) / (BN_num_bits(p));
+    for (i=0; i < e; i++) {
+      lucas(v, w, p, tau, ctx);
+      /* XXX. unsafe. */
+      BN_mod(v, v, n, ctx);
+      BN_mod(w, w, n, ctx);
+      /* q = v - 2 */
+      BN_sub(q, v, BN_value_one());
+      BN_sub(q, q, BN_value_one());
+      /* gcd test */
+      BN_gcd(gcd, q, n, ctx);
+      if (BN_cmp(gcd, BN_value_one()) == 1) goto end;
+    }
+  }
+
+ end:
+  BN_free(p);
+
+  if (BN_ucmp(gcd, n) != 0) {
+    ret = RSA_new();
+    ret->n = rsa->n;
+    ret->e = rsa->e;
+    ret->p = BN_dup(gcd);
+    ret->q = BN_new();
+    BN_div(ret->q, NULL, n, gcd, ctx);
+  }
   return ret;
 }
 
 qa_question_t WilliamsQuestion = {
   .name = "p+1",
-  .pretty_name = "William's p+1 factorization",
+  .pretty_name = "Williams' p+1 factorization",
   .ask_rsa = williams_question_ask_rsa
 };
