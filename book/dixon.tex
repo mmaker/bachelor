@@ -154,7 +154,7 @@ and storing dependencies into a \emph{history matrix} $H$.
     \Comment reduce
       \For{$i=0 \strong{ to } f$}
         \If{$M_{i, j} = 1$}
-          \For{$i' = i \strong{ to } f$}
+          \For{$i' = i+1 \strong{ to } f$}
             \If{$M_{i', k} = 1$}
               \State $M_{i'} = Mi \xor M_{i'}$
               \State $H_{i'} = H_i \xor H_{i'}$

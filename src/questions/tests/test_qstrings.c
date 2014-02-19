@@ -3,7 +3,8 @@
 
 #include "qa/questions/qstrings.h"
 
-void test_is_vzero(void)
+void
+test_is_vzero(void)
 {
   const char *v = "\x0\x0\x0\x1\x0\x1";
 
@@ -13,7 +14,8 @@ void test_is_vzero(void)
 }
 
 
-void test_vxor(void)
+void
+test_vxor(void)
 {
   size_t i;
   char v[10] = "\0\1\0\1\0\1\0\1\0\1";
@@ -31,6 +33,8 @@ void test_vxor(void)
     assert(v[i] == 0);
 
 }
+
+
 int main(int argc, char **argv)
 {
   test_is_vzero();

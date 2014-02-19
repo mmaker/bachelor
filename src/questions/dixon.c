@@ -22,6 +22,7 @@
 #include <openssl/bn.h>
 
 #include "qa/questions/questions.h"
+#include "qa/questions/qstrings.h"
 #include "qa/questions/qdixon.h"
 
 
@@ -68,6 +69,34 @@ matrix_free(matrix_t *m)
   free(m);
 }
 
+/*
+ * \ref Kernel into a binary matrix.
+ *
+ * Discover linear dependencies using a refined version of the Gauss-Jordan
+ * algorithm, from Brillhart and Morrison.
+ *
+ * \return h, the history matrix
+ *
+ */
+matrix_t *
+kernel(matrix_t *m)
+{
+  int i, j, k;
+  matrix_t *h = identity_matrix_new(m->f);
+
+  for (j=0; j!=m->r; j++)
+    for (i=0;  i != m->f; i++)
+      if (m->M[i][j]) {
+        for (k=i+1; k != m->f; k++)
+          if (m->M[k][j]) {
+            vxor(m->M[k], m->M[k], m->M[i], m->r);
+            vxor(h->M[k], h->M[k], h->M[i], h->r);
+          }
+        break;
+      }
+
+  return h;
+}
 
 qa_question_t DixonQuestion = {
   .name = "dixon",
