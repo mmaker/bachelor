@@ -7,7 +7,7 @@
  * order to attempt a factorization of N.
  */
 
-#include <openssl/x509.h>
+#include <openssl/rsa.h>
 
 #include <qa/questions/qarith.h>
 #include <qa/questions/questions.h>

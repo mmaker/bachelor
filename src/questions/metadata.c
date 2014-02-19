@@ -7,6 +7,7 @@
 #include <openssl/pem.h>
 #include <openssl/rsa.h>
 #include <openssl/x509.h>
+
 #include "qa/questions/questions.h"
 
 
@@ -79,7 +80,7 @@ metadata_question_ask_crt(X509* crt)
 
 
     EVP_PKEY_free(pkey);
-    return 1;
+    return 0;
 }
 
 qa_question_t MetadataQuestion = {

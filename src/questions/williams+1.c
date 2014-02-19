@@ -19,9 +19,10 @@
  * Given a pair <Vᵢ, Vᵢ₋₁>, terms of a lucas sequence with parameter τ,
  * compute <Vₕᵢ, Vₕᵢ₋₁>
  */
-void lucas(BIGNUM *v, BIGNUM *w,
-           BIGNUM *h, BIGNUM *tau,
-           BN_CTX *ctx)
+void
+lucas(BIGNUM *v, BIGNUM *w,
+      BIGNUM *h, BIGNUM *tau,
+      BN_CTX *ctx)
 {
   BIGNUM *vv;
   BIGNUM *vw;
