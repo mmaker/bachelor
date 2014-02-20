@@ -4,6 +4,7 @@
  *
  */
 #include <openssl/bn.h>
+#include <openssl/rsa.h>
 
 #include "qa/questions/qarith.h"
 
@@ -171,4 +172,48 @@ int BN_sqrtmod(BIGNUM* dv, BIGNUM* rem, BIGNUM* a, BN_CTX* ctx)
   BN_free(shift);
   BN_free(adj);
   return BN_is_zero(rem);
+}
+
+
+RSA* qa_RSA_recover(const RSA *rsapub,
+                    const BIGNUM *p,
+                    BN_CTX *ctx)
+{
+  RSA *rsapriv = RSA_new();
+  BIGNUM *p1 = BN_new();
+  BIGNUM *q1 = BN_new();
+  BIGNUM *phi = BN_new();
+
+  /* guard for most common errors */
+  if (BN_is_zero(rsapub->n) ||
+      BN_is_zero(p) ||
+      !BN_cmp(rsapub->n, p) ||
+      !BN_cmp(p, BN_value_one())) {
+    fprintf(stderr, "[!] Incorrect vaues for RSA recovery\n");
+    return NULL;
+  }
+
+  /* copy public key informations */
+  rsapriv->n = BN_dup(rsapub->n);
+  rsapriv->e = BN_dup(rsapub->e);
+  /* retrieve the second prime */
+  rsapriv->p = BN_dup(p);
+  rsapriv->q = BN_new();
+  BN_div(rsapriv->q, NULL, rsapriv->n, rsapriv->p, ctx);
+  /* retrieve phi */
+  BN_sub(p1, rsapriv->p, BN_value_one());
+  BN_sub(q1, rsapriv->q, BN_value_one());
+  BN_mul(phi, p1, q1, ctx);
+  /* retrieve the private exponent */
+  rsapriv->d = BN_new();
+  BN_mod_inverse(rsapriv->d, rsapriv->e, phi, ctx);
+  /* some other openssl shit */
+  BN_mod(rsapriv->dmq1, rsapriv->d, q1, ctx);
+  BN_mod(rsapriv->dmp1, rsapriv->d, p1, ctx);
+  BN_mod_inverse(rsapriv->iqmp, rsapriv->q, rsapriv->p, ctx);
+
+  BN_free(q1);
+  BN_free(p1);
+  BN_free(phi);
+  return rsapriv;
 }
