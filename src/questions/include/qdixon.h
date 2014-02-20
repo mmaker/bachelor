@@ -18,4 +18,6 @@ void matrix_free(matrix_t *m);
 
 matrix_t *kernel(matrix_t *m);
 
+int dixon_smooth(BIGNUM *x, BN_CTX *ctx, char *v, size_t len);
+
 #endif /* _QA_DIXON_H_ */

@@ -68,12 +68,35 @@ test_kernel(void)
   assert(h->M[3][2] == 0);
 }
 
+void
+test_dixon_smooth(void)
+{
+  BIGNUM *n = BN_new();
+  BN_CTX *ctx = BN_CTX_new();
+  char v[50];
+
+
+  BN_dec2bn(&n, "-2");
+  assert(dixon_smooth(n, ctx, v, 50));
+  assert(v[0] == 1);
+  assert(v[1] == 1);
+
+  BN_dec2bn(&n, "-12");
+  assert(dixon_smooth(n, ctx, v, 50));
+  assert(v[0] == 1);
+  assert(v[1] == 0);
+  assert(v[2] == 1);
+
+  BN_free(n);
+  return;
+}
 
 int
 main(int argc, char **argv)
 {
   test_matrix();
   test_kernel();
+  test_dixon_smooth();
 
   return 0;
 }

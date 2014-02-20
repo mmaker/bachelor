@@ -98,6 +98,102 @@ kernel(matrix_t *m)
   return h;
 }
 
+/**
+ * \brief Check for smoothness, incuding negative numbers.
+ *
+ * As there is no reason to reject negative numbers, provided that the product is positive, we are going to include the sign into the fist element of `v`, as to indicate the sign.
+ */
+int dixon_smooth(BIGNUM *y, BN_CTX *ctx, char *v, size_t len)
+{
+  short neg, ret;
+
+  /* is yᵢ smooth? */
+  neg = BN_is_negative(y);
+  if (neg) BN_set_negative(y, 0);
+  ret = smooth(y, ctx, v+1, len-1);
+  if (neg) BN_set_negative(y, 1);
+  v[0] = neg;
+
+  return ret;
+}
+
+static RSA*
+dixon_question_ask_rsa(const RSA *rsa)
+{
+  size_t primes = 5;
+  size_t r = primes + 1;
+  size_t f = primes + 5;
+  size_t i, j;
+  RSA *ret = NULL;
+  BIGNUM
+    *x, *y,
+    *sqy, *rem,
+    *gcd;
+  BN_CTX *ctx = BN_CTX_new();
+  struct bnpair {
+    BIGNUM *x;
+    BIGNUM *y;
+  } *R;
+  matrix_t *m;
+  matrix_t *h;
+
+
+  /** STEP 1: INITIALIZATION **/
+  /* plus one for the sign */
+  m = matrix_new(f, r);
+  R = malloc(sizeof(struct bnpair) * f);
+  for (i=0; i != r; R[i].x = BN_new(), R[i].y = BN_new(), i++);
+
+  /** STEP 2: GENERATING R, THE POOL OF B-SMOOTH NUMBERS */
+  for (i=0; i < r; ) {
+    BN_pseudo_rand_range(R[i].x, rsa->n);
+    /* yᵢ = xᵢ² - N */
+    BN_sqr(R[i].y, R[i].x, ctx);
+    BN_sub(R[i].y, R[i].y, rsa->n);
+    if (dixon_smooth(R[i].y, ctx, m->M[i], r)) i++;
+  }
+
+  fprintf(stderr, "dio can\n");
+  /** STEP 3: FINDING EVEN POWERS AND ATTEMPTING FACTORIZATION **/
+  h = kernel(m);
+
+  x = BN_new(); BN_one(x);
+  sqy = BN_new(); BN_one(sqy);
+  y = BN_new();
+  rem = BN_new();
+  gcd = BN_new();
+
+  for (i=0; i!=f; i++)
+    /* if we found an even power */
+    if (is_vzero(m->M[i], f)) {
+      /* compute x, y² */
+      for (j=0; j!=f; j++)
+        if (h->M[i][j]) {
+          BN_mul(x, x, R[j].x, ctx);
+          BN_mul(sqy, sqy, R[j].y, ctx);
+        }
+      BN_sqrtmod(y, rem, sqy, ctx);
+      if (!BN_is_zero(rem)) { fprintf(stderr, "Fatal sqrt() error!\n"); exit(1);}
+      BN_gcd(gcd, x, y, ctx);
+      if (BN_cmp(gcd, rsa->n) < 0 && BN_cmp(gcd, BN_value_one()) > 0) {
+        ret = RSA_new();
+        ret->p = BN_dup(gcd);
+        ret->q = BN_new();
+        BN_div(ret->q, NULL, ret->p, rsa->n, ctx);
+        ret->n = BN_dup(rsa->n);
+      }
+    }
+
+  BN_free(x);
+  BN_free(y);
+  BN_free(sqy);
+  BN_free(rem);
+  BN_free(gcd);
+  BN_CTX_free(ctx);
+  matrix_free(m);
+  return ret;
+}
+
 qa_question_t DixonQuestion = {
   .name = "dixon",
   .pretty_name = "Dixon's Factorization"
