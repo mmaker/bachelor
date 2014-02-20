@@ -46,4 +46,5 @@ void select_all_questions(void)
   REGISTER_QUESTION(MetadataQuestion);
   REGISTER_QUESTION(PollardRhoQuestion);
   REGISTER_QUESTION(WilliamsQuestion);
+  REGISTER_QUESTION(DixonQuestion);
 }

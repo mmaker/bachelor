@@ -15,13 +15,14 @@
  * while e, d . ed ≡ 1 (mod φ(N))  are respectively the public and the private
  * exponent.
  */
-
-#include <stdint.h>
+#include <assert.h>
 #include <strings.h>
 
 #include <openssl/bn.h>
 
 #include "qa/questions/questions.h"
+#include "qa/questions/primes.h"
+#include "qa/questions/qarith.h"
 #include "qa/questions/qstrings.h"
 #include "qa/questions/qdixon.h"
 
@@ -98,6 +99,7 @@ kernel(matrix_t *m)
   return h;
 }
 
+
 /**
  * \brief Check for smoothness, incuding negative numbers.
  *
@@ -117,18 +119,42 @@ int dixon_smooth(BIGNUM *y, BN_CTX *ctx, char *v, size_t len)
   return ret;
 }
 
+/**
+ * \brief Discover a number x such that x² - n is smooth.
+ *
+ */
+inline void
+discover_smooth(BIGNUM *y, BIGNUM *x, BIGNUM *n,
+                BN_CTX *ctx, char *v, size_t len)
+{
+  do {
+    BN_pseudo_rand_range(x, n);
+    /* yᵢ = xᵢ² - N */
+    BN_sqr(y, x, ctx);
+    BN_sub(y, y, n);
+
+  } while (!dixon_smooth(y, ctx, v, len));
+}
+
 static RSA*
 dixon_question_ask_rsa(const RSA *rsa)
 {
-  size_t primes = 5;
-  size_t r = primes + 1;
+  /*
+   * take exp(sqrt(ln N ln ln N))
+   *    ≅ 1.44 * 2^(sqrt(lg N lg lg N))
+   *    ≅ ³/₂ * 2^(sqrt(lg N 10)) for keys of 1024 bits.
+   */
+  size_t primes = 3 * (1 << (BN_num_bits(rsa->n) * 5)) / 2;
   size_t f = primes + 5;
+  size_t r = primes + 1;
   size_t i, j;
   RSA *ret = NULL;
   BIGNUM
-    *x, *y,
-    *sqy, *rem,
-    *gcd;
+    *x = BN_new(),
+    *y = BN_new(),
+    *sqy = BN_new(),
+    *rem = BN_new(),
+    *gcd = BN_new();
   BN_CTX *ctx = BN_CTX_new();
   struct bnpair {
     BIGNUM *x;
@@ -138,31 +164,26 @@ dixon_question_ask_rsa(const RSA *rsa)
   matrix_t *h;
 
 
-  /** STEP 1: INITIALIZATION **/
+  /** STEP 1: initialization **/
   /* plus one for the sign */
   m = matrix_new(f, r);
   R = malloc(sizeof(struct bnpair) * f);
-  for (i=0; i != r; R[i].x = BN_new(), R[i].y = BN_new(), i++);
-
-  /** STEP 2: GENERATING R, THE POOL OF B-SMOOTH NUMBERS */
-  for (i=0; i < r; ) {
-    BN_pseudo_rand_range(R[i].x, rsa->n);
-    /* yᵢ = xᵢ² - N */
-    BN_sqr(R[i].y, R[i].x, ctx);
-    BN_sub(R[i].y, R[i].y, rsa->n);
-    if (dixon_smooth(R[i].y, ctx, m->M[i], r)) i++;
+  for (i=0; i!=f; i++) {
+    R[i].x = BN_new();
+    R[i].y = BN_new();
   }
 
-  fprintf(stderr, "dio can\n");
-  /** STEP 3: FINDING EVEN POWERS AND ATTEMPTING FACTORIZATION **/
+  /** STEP 2 generating R */
+  for (i=0; i < m->f; i++) {
+    fprintf(stderr, "[!] Discovering %zdth smooth number\n", i);
+    discover_smooth(R[i].y, R[i].x, rsa->n,
+                    ctx, m->M[i], m->r);
+  }
+
+  /** STEP 3: break & enter. */
   h = kernel(m);
-
-  x = BN_new(); BN_one(x);
-  sqy = BN_new(); BN_one(sqy);
-  y = BN_new();
-  rem = BN_new();
-  gcd = BN_new();
-
+  BN_one(x);
+  BN_one(sqy);
   for (i=0; i!=f; i++)
     /* if we found an even power */
     if (is_vzero(m->M[i], f)) {
@@ -173,9 +194,10 @@ dixon_question_ask_rsa(const RSA *rsa)
           BN_mul(sqy, sqy, R[j].y, ctx);
         }
       BN_sqrtmod(y, rem, sqy, ctx);
-      if (!BN_is_zero(rem)) { fprintf(stderr, "Fatal sqrt() error!\n"); exit(1);}
+      assert(!BN_is_zero(rem));
       BN_gcd(gcd, x, y, ctx);
-      if (BN_cmp(gcd, rsa->n) < 0 && BN_cmp(gcd, BN_value_one()) > 0) {
+      if (BN_cmp(gcd, rsa->n) < 0 &&
+          BN_cmp(gcd, BN_value_one()) > 0) {
         ret = RSA_new();
         ret->p = BN_dup(gcd);
         ret->q = BN_new();
@@ -184,6 +206,12 @@ dixon_question_ask_rsa(const RSA *rsa)
       }
     }
 
+  /* free all the shit */
+  for (i=0; i!=f; i++) {
+    BN_free(R[i].x);
+    BN_free(R[i].y);
+  }
+  free(R);
   BN_free(x);
   BN_free(y);
   BN_free(sqy);
@@ -191,10 +219,12 @@ dixon_question_ask_rsa(const RSA *rsa)
   BN_free(gcd);
   BN_CTX_free(ctx);
   matrix_free(m);
+
   return ret;
 }
 
 qa_question_t DixonQuestion = {
   .name = "dixon",
-  .pretty_name = "Dixon's Factorization"
+  .pretty_name = "Dixon's Factorization",
+  .ask_rsa = dixon_question_ask_rsa
 };

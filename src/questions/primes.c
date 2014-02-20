@@ -68,7 +68,6 @@ smooth(BIGNUM *x, BN_CTX *ctx, char* v, size_t thresh)
   pit_t *it;
   size_t i;
 
-  i = 0;
   BN_zero(rem);
   bzero(v, thresh);
   if (BN_cmp(x, BN_value_one()) < 1) return 0;
@@ -77,8 +76,12 @@ smooth(BIGNUM *x, BN_CTX *ctx, char* v, size_t thresh)
   for (it = primes_init();
        primes_next(it, p) && i < thresh;
        i++) {
+    if (BN_cmp(p, x) > 0) break;
+
     BN_div(dv, rem, x, p, ctx);
-    for (v[i] = 0; BN_is_zero(rem); BN_div(dv, rem, x, p, ctx)) {
+    for (v[i] = 0;
+         BN_is_zero(rem);
+         BN_div(dv, rem, x, p, ctx)) {
       v[i] = (v[i] + 1) % 2;
       BN_copy(x, dv);
 

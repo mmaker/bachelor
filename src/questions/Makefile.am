@@ -1,3 +1,4 @@
+
 SUBDIRS = tests/
 
 # following the fucking manual, I am putting headers into the _SOURCES variable
@@ -5,7 +6,7 @@ SUBDIRS = tests/
 EXAMPLE_QUESTION = example.c
 WIENER_QUESTION = wiener.c    include/qwiener.h
 POLLARD_QUESTION = pollard.c    include/qpollard.h
-DIXON_QUESTION = dixon.c
+DIXON_QUESTION = dixon.c    include/qdixon.h
 FERMAT_QUESTION = fermat.c
 METADATA_QUESTION = metadata.c
 POLLARDRHO_QUESTION = pollardrho.c

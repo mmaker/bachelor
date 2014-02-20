@@ -224,7 +224,7 @@ $e^{\sqrt{\ln N \ln \ln N}}$.
     \Require $\factorBase$, the factor base
     \Function{dixon}{\PKArg}
     \State $i \gets 0$
-    \State $r \gets |\factorBase| + 5$
+    \State $r \getsRandom \naturalN_{ > |\factorBase|}$
     \Comment finding linearity requires redundance
     \While{$i < r$}
     \Comment search for suitable pairs
@@ -236,12 +236,13 @@ $e^{\sqrt{\ln N \ln \ln N}}$.
   \State $M \gets \texttt{matrix}(v_0, \ldots, v_f)$
   \For{$\lambda = \{\mu_0, \ldots, \mu_k\}
     \strong{ in } \textsc{ker}(M)$}
-  \Comment get relations
-    \State $x \gets \prod\limits_{\mu \in \lambda} x_\mu \pmod{N}$
-    \State $y, r \gets \dsqrt{\prod\limits_{\mu \in \lambda} y_\mu \pmod{N}}$
-    \If{$\gcd(x+y, N) > 1$}
-      \State $p \gets \gcd(x+y, N)$
-      \State $q \gets \gcd(x-y, N)$
+    \Comment get relations
+    \State $x \gets \prod_{\mu \in \lambda} x_\mu \pmod{N}$
+    \State $y, r \gets \dsqrt{\prod_{\mu \in \lambda} y_\mu \pmod{N}}$
+    \State $g  \gets \gcd(x+y, N)$
+    \If{$1 < \gcd < N$}
+      \State $p \gets g $
+      \State $q \gets N//p$
       \State \Return $p, q$
     \EndIf
   \EndFor

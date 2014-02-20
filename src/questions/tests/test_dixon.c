@@ -91,12 +91,30 @@ test_dixon_smooth(void)
   return;
 }
 
+void
+test_discover_smooth(void)
+{
+  BIGNUM
+    *x = BN_new(),
+    *y = BN_new(),
+    *n = BN_new();
+  BN_CTX *ctx = BN_CTX_new();
+  int len = 50;
+  char v[len + 1];
+
+  BN_dec2bn(&n, "541");
+  discover_smooth(y, x, n, ctx, v, len);
+  assert(v[0] == 1 || v[0] == 0);
+}
+
+
 int
 main(int argc, char **argv)
 {
   test_matrix();
   test_kernel();
   test_dixon_smooth();
+  test_discover_smooth();
 
   return 0;
 }
