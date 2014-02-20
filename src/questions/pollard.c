@@ -26,19 +26,18 @@
 #include <openssl/err.h>
 
 #include "qa/questions/questions.h"
+#include "qa/questions/primes.h"
 #include "qa/questions/qarith.h"
 #include "qa/questions/qpollard.h"
 
 
-static BIGNUM *two;
+static BIGNUM *two = NULL;
 
 static int
 pollard1_question_setup(void)
 {
   /* create 2 */
-  two = BN_new();
-  BN_one(two);
-  BN_uadd(two, two, BN_value_one());
+  BN_dec2bn(&two, "2");
   return 1;
 }
 
@@ -49,6 +48,47 @@ pollard1_question_teardown(void)
   return 1;
 }
 
+/**
+ * \brief Pollard (p-1) factorization.
+ *
+ */
+static RSA*
+pollard1_question_ask_rsa(const RSA* rsa)
+{
+  RSA *ret = NULL;
+  BIGNUM *p = BN_new();
+  BIGNUM *b = BN_new();
+  BIGNUM *q = BN_new();
+  BIGNUM *r = BN_new();
+  BIGNUM *gcd = BN_new();
+  BN_CTX *ctx = BN_CTX_new();
+  pit_t *it;
+  long thresh = 1 << 20;
+  int e;
+
+  BN_pseudo_rand_range(b, rsa->n);
+  it=primes_init();
+  for (primes_next(it, p); thresh-- ; primes_next(it, p))  {
+    e = BN_num_bits(rsa->n) / BN_num_bits(p);
+    while (e-- && !ret) {
+      /* XXX. unsafe. */
+      BN_mod_exp(b, b, p, rsa->n, ctx);
+      BN_sub(q, b, BN_value_one());
+      BN_gcd(gcd, q, rsa->n, ctx);
+      if (BN_cmp(gcd, rsa->n) && BN_cmp(gcd, BN_value_one()))
+          ret = qa_RSA_recover(rsa, gcd, ctx);
+    }
+  }
+
+  BN_free(p);
+  BN_free(q);
+  BN_free(b);
+  BN_free(r);
+  BN_free(gcd);
+  BN_CTX_free(ctx);
+
+  return ret;
+}
 
 /**
  * \brief Pollard (p-1) factorization.
@@ -63,7 +103,7 @@ pollard1_question_teardown(void)
  *
  */
 static RSA*
-pollard1_question_ask_rsa(const RSA *rsa)
+naive_pollard1_question_ask_rsa(const RSA *rsa)
 {
   RSA *ret = NULL;
   BIGNUM *a, *B, *a1;
@@ -109,7 +149,7 @@ pollard1_question_ask_rsa(const RSA *rsa)
 
 
 qa_question_t PollardQuestion = {
-  .name = "pollard1",
+  .name = "p-1",
   .pretty_name = "Pollard's (p-1) factorization",
   .setup = pollard1_question_setup,
   .teardown = pollard1_question_teardown,
