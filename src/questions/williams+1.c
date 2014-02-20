@@ -82,6 +82,7 @@ williams_question_ask_rsa(const RSA* rsa)
   BIGNUM *q = BN_new();
   int e, i;
   BN_CTX *ctx = BN_CTX_new();
+  pit_t *pit;
 
   n = rsa->n;
   BN_one(gcd);
@@ -90,7 +91,7 @@ williams_question_ask_rsa(const RSA* rsa)
   BN_copy(v, tau);
   /* In the future, accumulated values: BN_one(q); */
 
-  for (primes_init(); primes_next(p); ) {
+  for (pit = primes_init(); primes_next(pit, p); ) {
     e = BN_num_bits(n) / (BN_num_bits(p));
     for (i=0; i < e; i++) {
       lucas(v, w, p, tau, ctx);
@@ -108,6 +109,7 @@ williams_question_ask_rsa(const RSA* rsa)
 
  end:
   BN_free(p);
+  prime_iterator_free(pit);
 
   if (BN_ucmp(gcd, n) != 0) {
     ret = RSA_new();

@@ -3,6 +3,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <openssl/bn.h>
+
 #include "qa/questions/qdixon.h"
 #include "qa/questions/qstrings.h"
 
