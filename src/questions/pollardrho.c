@@ -56,14 +56,8 @@ pollardrho_question_ask_rsa(const RSA *rsa)
     BN_gcd(gcd, tmp, n, ctx);
   }
 
-  if (BN_ucmp(gcd, n) != 0) {
-    ret = RSA_new();
-    ret->n = rsa->n;
-    ret->e = rsa->e;
-    ret->p = BN_dup(gcd);
-    ret->q = BN_new();
-    BN_div(ret->q, NULL, n, gcd, ctx);
-  }
+  if (BN_ucmp(gcd, n) != 0)
+    ret = qa_RSA_recover(rsa, gcd, ctx);
 
   BN_free(tmp);
   BN_free(x);

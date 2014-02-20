@@ -69,7 +69,6 @@ pollard1_question_ask_rsa(const RSA *rsa)
   BIGNUM *a, *B, *a1;
   BIGNUM *gcd, *rem;
   BIGNUM *n;
-  BIGNUM *p, *q;
   BN_CTX *ctx;
 
   n = rsa->n;
@@ -95,14 +94,8 @@ pollard1_question_ask_rsa(const RSA *rsa)
   }
 
   /* Either p or q found :) */
-  if (!BN_is_zero(B)) {
-    ret = RSA_new();
-    ret->n = rsa->n;
-    ret->e = rsa->e;
-    ret->q = q = BN_new();
-    ret->p = p = BN_dup(gcd);
-    BN_div(q, NULL, n, gcd, ctx);
-  }
+  if (!BN_is_zero(B))
+    ret = qa_RSA_recover(rsa, gcd, ctx);
 
   BN_free(a);
   BN_free(B);

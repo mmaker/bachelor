@@ -184,7 +184,7 @@ dixon_question_ask_rsa(const RSA *rsa)
   h = kernel(m);
   BN_one(x);
   BN_one(sqy);
-  for (i=0; i!=f; i++)
+  for (i=0; i!=f && !ret; i++)
     /* if we found an even power */
     if (is_vzero(m->M[i], f)) {
       /* compute x, y² */
@@ -197,13 +197,8 @@ dixon_question_ask_rsa(const RSA *rsa)
       assert(!BN_is_zero(rem));
       BN_gcd(gcd, x, y, ctx);
       if (BN_cmp(gcd, rsa->n) < 0 &&
-          BN_cmp(gcd, BN_value_one()) > 0) {
-        ret = RSA_new();
-        ret->p = BN_dup(gcd);
-        ret->q = BN_new();
-        BN_div(ret->q, NULL, ret->p, rsa->n, ctx);
-        ret->n = BN_dup(rsa->n);
-      }
+          BN_cmp(gcd, BN_value_one()) > 0)
+        ret = qa_RSA_recover(rsa, gcd, ctx);
     }
 
   /* free all the shit */

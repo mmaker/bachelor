@@ -37,4 +37,5 @@ bigfraction_t* cf_next(cf_t *f);
 int BN_sqrtmod(BIGNUM* dv, BIGNUM* rem, BIGNUM* a, BN_CTX* ctx);
 
 RSA* qa_RSA_recover(const RSA *rsapub, const BIGNUM *p, BN_CTX *ctx);
+
 #endif /* _QA_ARITH_H_ */
