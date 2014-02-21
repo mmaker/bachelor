@@ -21,6 +21,8 @@
 #define SERIAL  "serial"
 #define BITLEN  "bitlen"
 #define PKEY    "public key"
+#define NBITLEN "N bits"
+#define EBITLEN "e bits"
 
 static BIO* out;
 
@@ -63,14 +65,15 @@ metadata_question_ask_crt(X509* crt)
   BN_free(serial);
 
   /* public key */
-  pkey = X509_get_pubkey(crt);
-  BIO_printf(out, "%-10s\n", PKEY);
-  PEM_write_bio_RSAPublicKey(out, pkey->pkey.rsa);
-  BIO_printf(out, "\r\n\r\n");
+  /* pkey = X509_get_pubkey(crt); */
+  /* BIO_printf(out, "%-10s\n", PKEY); */
+  /* PEM_write_bio_RSAPublicKey(out, pkey->pkey.rsa); */
+  /* BIO_printf(out, "\r\n\r\n"); */
 
 
   /* public key bitlength */
-  BIO_printf(out, "%-10s: %d\n", BITLEN, EVP_PKEY_bits(pkey));
+  BIO_printf(out, "%-10s: %d\n", BITLEN,
+             EVP_PKEY_bits(pkey));
 
   /* XXX.  Compression. TLS version.
    * This needs access to the socket.
@@ -83,10 +86,22 @@ metadata_question_ask_crt(X509* crt)
     return 0;
 }
 
+RSA *metadata_question_ask_rsa(const RSA* rsa)
+{
+  BIO_printf(out, "%-10s: %d\n", NBITLEN,
+             BN_num_bits(rsa->n));
+
+  BIO_printf(out, "%-10s: %d\n", EBITLEN,
+             BN_num_bits(rsa->e));
+
+  return NULL;
+}
+
 qa_question_t MetadataQuestion = {
   .name = "metadata",
   .pretty_name = "Metadata",
   .setup = metadata_question_setup,
   .teardown = metadata_question_teardown,
-  .ask_crt = metadata_question_ask_crt
+  .ask_crt = metadata_question_ask_crt,
+  .ask_rsa = metadata_question_ask_rsa
 };
