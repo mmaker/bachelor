@@ -204,8 +204,9 @@ and respectively updating them via $x \gets f(x)$ and $y \gets f(f(y))$.
 
 An immediate improvement of this algorithm would be to occasionally compute Euclid's
 algorithm over the accumulated product to save some computation cycles, just as
-we saw in section~\ref{sec:pollard-1:implementing}. The next code fragment
-adopts this trick together with Brent's cycle-finding variant:
+we saw in section~\ref{sec:pollard-1:implementing}. The next code fragment - algorithm
+\ref{alg:pollardrho} - adopts this trick together with Brent's cycle-finding variant
+(\cite{pollard-brent}\S 7).
 
 \paragraph{Parallelism}
 Unfortunately, a parallel implementation of the $\rho$ algorithm would not
@@ -218,7 +219,7 @@ sequences in parallel would be no more than \bigO{\sqrt{m}}
 efficient (\cite{brent:parallel} \S 3).
 
 \begin{algorithm}
-  \caption{Pollard-Brent's factorization (\cite{pollard-brent}\S 7)
+  \caption{Pollard-Brent's factorization
     \label{alg:pollardrho}}
   \begin{algorithmic}[1]
     \Function{rho}{\PKArg}
@@ -248,8 +249,9 @@ efficient (\cite{brent:parallel} \S 3).
       \EndWhile
       \State $r \gets r \ll 1$
     \EndWhile
-    \If{$g = N$} \Repeat
+    \If{$g = N$}
     \Comment too far; fall back to latest epoch
+    \Repeat
       \State $ys \gets ys^2 + 1 \pmod{N}$
       \State $g \gets \gcd(N, \abs{x -ys})$
     \Until{$g > 1$} \EndIf

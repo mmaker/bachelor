@@ -56,96 +56,57 @@ static RSA*
 pollard1_question_ask_rsa(const RSA* rsa)
 {
   RSA *ret = NULL;
-  BIGNUM *p = BN_new();
-  BIGNUM *b = BN_new();
-  BIGNUM *q = BN_new();
-  BIGNUM *r = BN_new();
-  BIGNUM *gcd = BN_new();
+  BIGNUM
+    *p = BN_new(),
+    *b = BN_new(),
+    *b1 = BN_new(),
+    *q = BN_new(),
+    *r = BN_new(),
+    *g = BN_new();
   BN_CTX *ctx = BN_CTX_new();
   pit_t *it;
-  long thresh = 1 << 20;
-  int e;
+  long j;
+  /* long back; */
+  int e, k, m = 100;
+
 
   BN_pseudo_rand_range(b, rsa->n);
-  it=primes_init();
-  for (primes_next(it, p); thresh-- ; primes_next(it, p))  {
+  BN_one(g);
+  BN_one(q);
+  for (it = primes_init();
+       BN_is_one(g) && primes_next(it, p);
+       )  {
     e = BN_num_bits(rsa->n) / BN_num_bits(p);
-    while (e-- && !ret) {
-      /* XXX. unsafe. */
-      BN_mod_exp(b, b, p, rsa->n, ctx);
-      BN_sub(q, b, BN_value_one());
-      BN_gcd(gcd, q, rsa->n, ctx);
-      if (BN_cmp(gcd, rsa->n) && BN_cmp(gcd, BN_value_one()))
-          ret = qa_RSA_recover(rsa, gcd, ctx);
+    for (k = 0; k < e && BN_is_one(g); k += m) {
+      /* back = primes_tell(it); */
+      for (j = (m > e) ? e : m; j; j--) {
+        BN_mod_exp(b, b, p, rsa->n, ctx);
+        BN_sub(b1, b, BN_value_one());
+        BN_mod_mul(q, q, b1, rsa->n, ctx);
+      }
+      BN_gcd(g, q, rsa->n, ctx);
     }
   }
+
+  /* replay latest epoch */
+  /* if (BN_cmp(g, rsa->n)) { */
+  /*   primes_seek(it, back); */
+
+  /* } */
+  if (BN_cmp(g, rsa->n) && !BN_is_one(g))
+      ret = qa_RSA_recover(rsa, g, ctx);
 
   BN_free(p);
   BN_free(q);
   BN_free(b);
+  BN_free(b1);
   BN_free(r);
-  BN_free(gcd);
+  BN_free(g);
   BN_CTX_free(ctx);
 
   return ret;
 }
 
-/**
- * \brief Pollard (p-1) factorization.
- *
- * Trivially the algorithm computes a = 2^(B!) (mod N), and then verifies that
- * gcd(a-1, N) is a nontrivial factor of N.
- *
- * According to Wikipedia™,
- * « By Dixon's theorem, the probability that the largest factor of such a
- * number is less than (p − 1)^ε is roughly ε^(−ε); so there is a probability of
- * about 3^(−3) = 1/27 that a B value of n^(1/6) will yield a factorisation.»
- *
- */
-static RSA*
-naive_pollard1_question_ask_rsa(const RSA *rsa)
-{
-  RSA *ret = NULL;
-  BIGNUM *a, *B, *a1;
-  BIGNUM *gcd, *rem;
-  BIGNUM *n;
-  BN_CTX *ctx;
-
-  n = rsa->n;
-  a = BN_new();
-  B = BN_new();
-  a1 = BN_new();
-  gcd = BN_new();
-  rem = BN_new();
-  ctx = BN_CTX_new();
-
-  /* take ⁸√N */
-  BN_sqrtmod(gcd, rem, n, NULL);
-  BN_sqrtmod(B, rem, gcd, NULL);
-  /* compute 2^(B!) */
-  for (BN_copy(a, two), BN_one(gcd);
-       !(BN_is_zero(B) || !BN_is_one(gcd) || BN_cmp(gcd, n)==0);
-       BN_usub(B, B, BN_value_one())) {
-
-    BN_mod_exp(a, a, B, n, ctx);
-    /* p ≟ gcd(a-1, N) */
-    BN_usub(a1, a, BN_value_one());
-    BN_gcd(gcd, a1, n, ctx);
-  }
-
-  /* Either p or q found :) */
-  if (!BN_is_zero(B))
-    ret = qa_RSA_recover(rsa, gcd, ctx);
-
-  BN_free(a);
-  BN_free(B);
-  BN_free(a1);
-  BN_free(gcd);
-  BN_free(rem);
-  BN_CTX_free(ctx);
-
-  return ret;
-}
 
 
 qa_question_t PollardQuestion = {

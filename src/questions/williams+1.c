@@ -72,47 +72,56 @@ static RSA*
 williams_question_ask_rsa(const RSA* rsa)
 {
   RSA *ret = NULL;
-  BIGNUM *p = BN_new();
-  BIGNUM *gcd = BN_new();
   BIGNUM
     *v = BN_new(),
-    *w = BN_new();
-  BIGNUM *n;
-  BIGNUM *tau = BN_new();
-  BIGNUM *q = BN_new();
-  int e, i;
+    *v2 = BN_new(),
+    *w = BN_new(),
+    *n = rsa->n,
+    *tau = BN_new(),
+    *q = BN_new(),
+    *p = BN_new(),
+    *g = BN_new();
+  int e, k, j, m = 100;
   BN_CTX *ctx = BN_CTX_new();
   pit_t *pit;
 
-  n = rsa->n;
-  BN_one(gcd);
+  BN_one(g);
   BN_one(w); BN_uiadd1(w);
   BN_pseudo_rand(tau, 512, 0, 0);
   BN_copy(v, tau);
-  /* In the future, accumulated values: BN_one(q); */
+  BN_one(q);
 
-  for (pit = primes_init(); primes_next(pit, p); ) {
+  for (pit = primes_init();
+       BN_is_one(g) && primes_next(pit, p);
+       ) {
     e = BN_num_bits(n) / (BN_num_bits(p));
-    for (i=0; i < e; i++) {
-      lucas(v, w, p, tau, ctx);
-      /* XXX. unsafe. */
-      BN_mod(v, v, n, ctx);
-      BN_mod(w, w, n, ctx);
-      /* q = v - 2 */
-      BN_sub(q, v, BN_value_one());
-      BN_sub(q, q, BN_value_one());
+    for (k = 0; k < e && BN_is_one(g); k += m) {
+      for (j = (m > e) ? e : m; j; j--) {
+        lucas(v, w, p, tau, ctx);
+        /* XXX. unsafe. */
+        BN_mod(v, v, n, ctx);
+        BN_mod(w, w, n, ctx);
+        /* q = v - 2 */
+        BN_sub(v2, v, BN_value_one());
+        BN_sub(v2, v2, BN_value_one());
+        BN_mod_mul(q, q, v2, n, ctx);
+      }
       /* gcd test */
-      BN_gcd(gcd, q, n, ctx);
-      if (BN_cmp(gcd, BN_value_one()) == 1) goto end;
+      BN_gcd(g, q, n, ctx);
     }
   }
 
- end:
-  BN_free(p);
-  prime_iterator_free(pit);
+  if (BN_cmp(g, n))
+    ret = qa_RSA_recover(rsa, g, ctx);
 
-  if (BN_ucmp(gcd, n) != 0)
-    ret = qa_RSA_recover(rsa, gcd, ctx);
+  BN_free(v);
+  BN_free(v2);
+  BN_free(w);
+  BN_free(tau);
+  BN_free(p);
+  BN_free(q);
+  BN_free(g);
+  prime_iterator_free(pit);
 
   return ret;
 }
