@@ -218,45 +218,44 @@ sequences in parallel would be no more than \bigO{\sqrt{m}}
 efficient (\cite{brent:parallel} \S 3).
 
 \begin{algorithm}
-  \caption{Pollard-Brent's factorization \label{alg:pollardrho}}
+  \caption{Pollard-Brent's factorization (\cite{pollard-brent}\S 7)
+    \label{alg:pollardrho}}
   \begin{algorithmic}[1]
     \Function{rho}{\PKArg}
-    \State $s \gets 100$
-    \Comment steps to check for $\gcd$
-    \State $i \gets 1; \quad j' \gets j \gets 1$
-    \Comment step and period counters
-    \State $x' \gets x \getsRandom \naturalN$
-    \Comment the $x_i$ discussed above
-    \State $y' \gets y \gets x^2 + 1$
-    \Comment the $x_j$ discussed above
-    \State $k \gets 0; \quad q \gets \abs{x-y}$
+    \State $r \gets 1$
+    \State $q \gets 1$
+    \Comment the accumulated $\gcd$
+    \State $g \gets 1$
+    \State $m \gets 100$
+    \Comment steps before checking for $\gcd$
+    \State $y \getsRandom \naturalN_{< N}$
     \While{$g = 1$}
-      \State $x \gets y$ \Comment $x_i = 2^k$
-      \State $j \gets 3 \cdot 2^{k} + 1$
-      \State $k \gets k+1$
-      \While{$j \leq 2^k$}
-        \State $j \gets j+1; \quad i \gets i+1$
-        \Comment increment step and period counters
+      \State $x \gets y$
+      \For{$r \strong{ times }$}
         \State $y \gets y^2 + 1 \pmod{N}$
-        \State $q \gets q \cdot \abs{x - y}$
-        \If{$ i \mid s$} \Comment time to compute $\gcd$?
-          \State $g \gets \gcd(q, N)$
-          \If{$g = N$}
-            \Comment too far: fall back to latest epoch
-            \State $s \gets 1; \quad  g \gets 1$
-            \State $j \gets j'; \quad x \gets x'; \quad y \gets y'$
-          \ElsIf{$g = 1$}
-            \Comment save current state
-            \State $x' \gets x; \quad y' \gets y$
-            \State $j' \gets j$
-          \Else
-            \State $p \gets g$
-            \State $q \gets N//p$
-            \State \Return $p, q$
-          \EndIf
-        \EndIf
+      \EndFor
+      \State $k \gets 0$
+      \While{$k \leq r \strong{ and } g = 1$}
+        \State $ys \gets y$
+        \Comment backup state
+        \For{$\min\{m, r-k\} \strong{ times }$}
+        \Comment accumulate values to test later
+          \State $y \gets y^2 + 1 \pmod{N}$
+          \State $q \gets q \cdot \abs{x -y} \pmod{N}$
+        \EndFor
+        \State $k \gets k + m$
+        \State $g \gets \gcd(q, N)$
       \EndWhile
+      \State $r \gets r \ll 1$
     \EndWhile
+    \If{$g = N$} \Repeat
+    \Comment too far; fall back to latest epoch
+      \State $ys \gets ys^2 + 1 \pmod{N}$
+      \State $g \gets \gcd(N, \abs{x -ys})$
+    \Until{$g > 1$} \EndIf
+    \If{$g = 1$} \Return \strong{nil}
+    \Else \ \ \Return $g$
+    \EndIf
     \EndFunction
   \end{algorithmic}
 \end{algorithm}
