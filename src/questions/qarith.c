@@ -217,3 +217,8 @@ RSA* qa_RSA_recover(const RSA *rsapub,
   BN_free(phi);
   return rsapriv;
 }
+
+inline BIGNUM *BN_min(BIGNUM *a, BIGNUM *b)
+{
+  return (BN_cmp(a, b) < 0) ? a : b;
+}

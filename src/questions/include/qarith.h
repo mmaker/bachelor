@@ -5,6 +5,9 @@
 /* shortcut macros. */
 #define BN_uiadd1(a) BN_uadd(a, a, BN_value_one())
 
+#define BN_abs(a)  BN_set_negative(a, 0)
+
+
 /**
  * Fractions made of bignums.
  */
@@ -32,6 +35,8 @@ void cf_free(cf_t* f);
 
 bigfraction_t* cf_next(cf_t *f);
 
+
+BIGNUM* BN_min(BIGNUM *a, BIGNUM *b);
 
 /* square root calculation */
 int BN_sqrtmod(BIGNUM* dv, BIGNUM* rem, BIGNUM* a, BN_CTX* ctx);

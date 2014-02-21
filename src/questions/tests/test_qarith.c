@@ -206,11 +206,50 @@ test_qa_RSA_recover(void)
   BN_CTX_free(ctx);
 }
 
+
+void
+test_BN_min(void)
+{
+  BIGNUM *a = BN_new();
+  BIGNUM *b = BN_new();
+
+  BN_dec2bn(&a, "10");
+  BN_dec2bn(&b, "11");
+  assert(!BN_cmp(BN_min(a, b), a));
+
+  BN_dec2bn(&a, "-100");
+  BN_dec2bn(&b, "-101");
+  assert(!BN_cmp(BN_min(a, b), b));
+
+  BN_free(a);
+  BN_free(b);
+}
+
+void
+test_BN_abs(void)
+{
+  BIGNUM *a = BN_new();
+  BIGNUM *check = BN_new();
+
+  BN_dec2bn(&a, "-100");
+  BN_dec2bn(&check, "100");
+  BN_abs(a);
+  assert(!BN_cmp(a, check));
+
+  BN_abs(a);
+  assert(!BN_cmp(a, check));
+
+  BN_free(check);
+  BN_free(a);
+}
+
 int main(int argc, char **argv)
 {
   test_cf();
   test_BN_sqrtmod();
   test_qa_RSA_recover();
+  test_BN_min();
+  test_BN_abs();
 
   return 0;
 
