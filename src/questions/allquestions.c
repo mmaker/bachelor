@@ -47,4 +47,5 @@ void select_all_questions(void)
   REGISTER_QUESTION(PollardRhoQuestion);
   REGISTER_QUESTION(WilliamsQuestion);
   REGISTER_QUESTION(DixonQuestion);
+  REGISTER_QUESTION(PollardBrentRhoQuestion);
 }
