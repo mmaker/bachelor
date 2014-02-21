@@ -22,21 +22,18 @@
 static RSA *
 fermat_question_ask(const RSA *rsa)
 {
-  BN_CTX *ctx;
-  BIGNUM *a, *b, *a2, *b2;
-  BIGNUM *n;
-  BIGNUM *tmp, *rem, *dssdelta;
+  BIGNUM
+    *a = BN_new(),
+    *b = BN_new(),
+    *a2 = BN_new(),
+    *b2 = BN_new();
+  BIGNUM *n = rsa->n;
+  BIGNUM
+    *tmp = BN_new(),
+    *rem = BN_new(),
+    *dssdelta = BN_new();
+  BN_CTX *ctx = BN_CTX_new();
   RSA *ret = NULL;
-
-  ctx = BN_CTX_new();
-  n = rsa->n;
-  a = BN_new();
-  b = BN_new();
-  a2 = BN_new();
-  b2 = BN_new();
-  rem = BN_new();
-  tmp = BN_new();
-  dssdelta = BN_new();
 
   BN_sqrtmod(tmp, rem, n, ctx);
   /* Δ = |p - q| = |a + b - a + b| = |2b| > √N  2⁻¹⁰⁰ */
@@ -46,7 +43,7 @@ fermat_question_ask(const RSA *rsa)
 
   do {
     /* a² += 2a + 1 */
-    BN_lshift(tmp, a, 1);
+    BN_lshift1(tmp, a);
     BN_uiadd1(tmp);
     BN_uadd(a2, a2, tmp);
     /* a += 1 */
@@ -58,15 +55,10 @@ fermat_question_ask(const RSA *rsa)
   } while (!BN_is_zero(rem) && BN_ucmp(b, dssdelta) < 1);
 
   if (BN_is_zero(rem)) {
-    /* p, q found :) */
-    ret = RSA_new();
-    ret->q = BN_new();
-    ret->p = BN_new();
-
     BN_sqrtmod(a, rem, a2, ctx);
     assert(BN_is_zero(rem));
-    BN_uadd(ret->p, a, b);
-    BN_usub(ret->q, a, b);
+    BN_uadd(a, a, b);
+    ret = qa_RSA_recover(rsa, a, ctx);
   }
 
   BN_CTX_free(ctx);
@@ -75,6 +67,8 @@ fermat_question_ask(const RSA *rsa)
   BN_free(a2);
   BN_free(b2);
   BN_free(dssdelta);
+  BN_free(tmp);
+  BN_free(rem);
   return ret;
 }
 

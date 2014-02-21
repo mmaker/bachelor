@@ -42,10 +42,10 @@ void select_question(const char *);
 void select_all_questions(void);
 
 #define REGISTER_QUESTION(q)                      \
-  {                                               \
+  do {                                            \
       extern struct qa_question q;                \
       LIST_INSERT_HEAD(&questions, &q, qs);       \
-  }
+  } while (0);
 
 
 #endif /* _QA_QUESTIONS_H_ */
