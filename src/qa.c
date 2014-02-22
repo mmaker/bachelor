@@ -124,8 +124,8 @@ qa_init(const struct qa_conf* conf)
   bio_out = BIO_new_fp(stdout, BIO_NOCLOSE);
   bio_err = BIO_new_fp(stderr, BIO_NOCLOSE);
 
-  /* Initialize SSL Library by registering algorithms. */
-  SSL_library_init();
+
+  QA_library_init();
 
   if (!conf->attacks) select_all_questions();
   else select_question(conf->attacks);

@@ -41,6 +41,8 @@ LIST_HEAD(listhead, qa_question) questions;
 void select_question(const char *);
 void select_all_questions(void);
 
+void QA_library_init(void);
+
 #define REGISTER_QUESTION(q)                      \
   do {                                            \
       extern struct qa_question q;                \

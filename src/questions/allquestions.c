@@ -11,7 +11,16 @@
 #include <string.h>
 #include <bsd/sys/queue.h>
 
+#include <openssl/ssl.h>
 #include "qa/questions/questions.h"
+
+void QA_library_init(void)
+{
+  /* Initialize SSL Library by registering algorithms. */
+  SSL_library_init();
+  SSL_load_error_strings();
+}
+
 
 /**
  * \brief Select a single question to be used.
