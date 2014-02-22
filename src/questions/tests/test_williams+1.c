@@ -8,7 +8,6 @@
 
 void test_lucas(void)
 {
-  BIGNUM *two = BN_new();
   BIGNUM *v = BN_new();
   BIGNUM *w = BN_new();
   BIGNUM *h = BN_new();
@@ -18,14 +17,13 @@ void test_lucas(void)
     *wcheck = BN_new();
   BN_CTX *ctx = BN_CTX_new();
 
-  BN_one(two); BN_uiadd1(two);
-  BN_copy(w, two);
+  BN_copy(w, BN_value_two());
   BN_dec2bn(&tau, "5");
   BN_copy(v, tau);
 
   /* <V₁, V₀> */
   assert(!BN_cmp(v, tau));
-  assert(!BN_cmp(w, two));
+  assert(!BN_cmp(w, BN_value_two()));
   /* <V₃, V₂> */
   BN_dec2bn(&h, "3");
   BN_dec2bn(&vcheck, "110");

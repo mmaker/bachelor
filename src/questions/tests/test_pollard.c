@@ -23,8 +23,6 @@ void test_pollard(void)
 
 int main(int argc, char **argv)
 {
-  PollardQuestion.setup();
   test_pollard();
-  PollardQuestion.teardown();
   return 0;
 }

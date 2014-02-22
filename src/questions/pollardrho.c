@@ -118,7 +118,6 @@ pollardrho_question_ask_rsa(const RSA *rsa)
     *x = NULL,
     *y = NULL;
   BIGNUM *n;
-  BIGNUM* two;
   BIGNUM *tmp;
   BIGNUM *gcd;
   BN_CTX *ctx;
@@ -129,13 +128,11 @@ pollardrho_question_ask_rsa(const RSA *rsa)
   y = BN_new();
   tmp = BN_new();
   n = rsa->n;
-  two = BN_new();
 
   /* initialization */
   BN_one(gcd);
   BN_pseudo_rand(x, 512, 0, 0);
   BN_copy(y, x);
-  BN_one(two); BN_uiadd1(two);
 
 
   while (BN_is_one(gcd)) {
@@ -147,7 +144,7 @@ pollardrho_question_ask_rsa(const RSA *rsa)
     BN_mod_sqr(y, tmp, n, ctx);
     BN_lshift1(tmp, tmp);
     BN_mod_add(y, y, tmp, n, ctx);
-    BN_mod_add(y, y, two, n, ctx);
+    BN_mod_add(y, y, BN_value_two(), n, ctx);
     /* gcd(|x-y|, N) */
     BN_mod_sub(tmp, x, y, n, ctx);
     BN_gcd(gcd, tmp, n, ctx);
@@ -160,7 +157,6 @@ pollardrho_question_ask_rsa(const RSA *rsa)
   BN_free(x);
   BN_free(y);
   BN_free(gcd);
-  BN_free(two);
   return ret;
 }
 

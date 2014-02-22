@@ -31,23 +31,6 @@
 #include "qa/questions/qpollard.h"
 
 
-static BIGNUM *two = NULL;
-
-static int
-pollard1_question_setup(void)
-{
-  /* create 2 */
-  BN_dec2bn(&two, "2");
-  return 1;
-}
-
-static int
-pollard1_question_teardown(void)
-{
-  BN_free(two);
-  return 1;
-}
-
 /**
  * \brief Pollard (p-1) factorization.
  *
@@ -112,8 +95,8 @@ pollard1_question_ask_rsa(const RSA* rsa)
 qa_question_t PollardQuestion = {
   .name = "p-1",
   .pretty_name = "Pollard's (p-1) factorization",
-  .setup = pollard1_question_setup,
-  .teardown = pollard1_question_teardown,
+  .setup = NULL,
+  .teardown = NULL,
   .test = NULL,
   .ask_rsa = pollard1_question_ask_rsa,
   .ask_crt = NULL

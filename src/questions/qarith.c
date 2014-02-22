@@ -8,6 +8,19 @@
 
 #include "qa/questions/qarith.h"
 
+const BIGNUM *BN_value_two(void)
+{
+  static const BN_ULONG data_two = 2L;
+  static const BIGNUM const_two = {
+    (BN_ULONG *) &data_two,
+    1,
+    1,
+    0,
+    BN_FLG_STATIC_DATA
+  };
+
+  return &const_two;
+}
 
 cf_t* cf_new(void)
 {

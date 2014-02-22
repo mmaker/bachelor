@@ -243,6 +243,18 @@ test_BN_abs(void)
   BN_free(a);
 }
 
+
+void test_BN_value_two(void)
+{
+  BIGNUM *two = BN_new();
+
+  BN_dec2bn(&two, "2");
+  assert(!BN_cmp(two, BN_value_two()));
+
+  BN_free(two);
+}
+
+
 int main(int argc, char **argv)
 {
   test_cf();
@@ -250,6 +262,7 @@ int main(int argc, char **argv)
   test_qa_RSA_recover();
   test_BN_min();
   test_BN_abs();
+  test_BN_value_two();
 
   return 0;
 

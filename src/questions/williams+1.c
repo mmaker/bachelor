@@ -45,13 +45,11 @@ lucas(BIGNUM *v, BIGNUM *w,
       BN_sub(u, u, vw);
       BN_sub(u, u, tau);
       /* w = w² - 2 */
-      BN_sub(w, vv, BN_value_one());
-      BN_sub(w, w, BN_value_one());
+      BN_sub(w, vv, BN_value_two());
     } else {
       BN_sqr(vv, v, ctx);
       /* v = v² - 2 */
-      BN_sub(u, vv, BN_value_one());
-      BN_sub(u, u, BN_value_one());
+      BN_sub(u, vv, BN_value_two());
       /* w = vw - τ */
       BN_mul(vw, v, w, ctx);
       BN_sub(w, vw, tau);
