@@ -1,5 +1,5 @@
 ../../qa -a fermat fermat.pem > /dev/null
-[[ $? == 0 ]] || exit 1
+[[ $? == 1 ]] || exit 1
 
 ../../qa -a fermat fermat2.pem > /dev/null
-[[ $? == 0 ]] || exit 1
+[[ $? == 1 ]] || exit 1

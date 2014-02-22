@@ -140,7 +140,7 @@ qa_init(const struct qa_conf* conf)
   else
     error(EXIT_FAILURE, 0, "iternal error: unable to determine source type.");
   if (!crt && !rsa)
-    error(EXIT_FAILURE, errno, "Unable to open source.");
+    error(EXIT_FAILURE, errno, "Unable to open source \"%s\" :", conf->src);
 
   exitcode = qa_dispose(crt, rsa);
   X509_free(crt);
@@ -187,7 +187,7 @@ qa_dispose(X509 *crt, RSA *rsa)
         (priv = q->ask_rsa(pub))) {
       fprintf(stderr, "[\\] Key Broken using %s.\n", q->pretty_name);
       print_rsa_private(priv);
-      return EXIT_SUCCESS;
+      return 1;
     }
 
     /*
@@ -206,7 +206,7 @@ qa_dispose(X509 *crt, RSA *rsa)
   }
 
   /*
-   *  Key seems resistent: exit with status -1
+   *  Key seems resistent: exit successfully.
    */
-  return -1;
+  return 0;
 }

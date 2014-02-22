@@ -65,7 +65,7 @@ metadata_question_ask_crt(X509* crt)
   BN_free(serial);
 
   /* public key */
-  /* pkey = X509_get_pubkey(crt); */
+  pkey = X509_get_pubkey(crt);
   /* BIO_printf(out, "%-10s\n", PKEY); */
   /* PEM_write_bio_RSAPublicKey(out, pkey->pkey.rsa); */
   /* BIO_printf(out, "\r\n\r\n"); */
