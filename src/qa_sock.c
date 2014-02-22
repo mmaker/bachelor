@@ -16,6 +16,7 @@
 #include "qa/qa.h"
 #include "qa/qa_sock.h"
 
+#define TIMEOUT 5
 #define SOCKET_PROTOCOL 0
 #define INVALID_SOCKET  (-1)
 
@@ -64,18 +65,23 @@ int host_port(char *uri, char **host, char **service)
   return 1;
 }
 
+
+/**
+ * \brief Instantiate a new TCP connection.
+ *
+ * Attempt to create tcp connection with  with the remote host `host`
+ * - eventually resolved - over port `port`.
+ * \return -1 on failure, the socket file descriptor otherwise.
+ *
+ */
 int init_client(const char *host, const char *port)
 {
-  struct addrinfo hints;
+  int s, i;
   struct addrinfo *result, *rp;
-  int s;
-  int i;
-
-
-  hints.ai_family = AF_UNSPEC;
-  hints.ai_socktype = SOCK_STREAM;
-  hints.ai_flags = 0;
-  hints.ai_protocol = 0;
+  struct timeval timeout = {
+    .tv_sec = TIMEOUT,
+    .tv_usec = 0
+  };
 
   if ((i=getaddrinfo(host, port, NULL, &result))) {
     BIO_printf(bio_err, "Error: %s\n", gai_strerror(i));
@@ -91,11 +97,16 @@ int init_client(const char *host, const char *port)
     if (rp->ai_protocol == SOCK_STREAM) {
        i = 0;
        i = setsockopt(s, SOL_SOCKET, SO_KEEPALIVE, (char*) &i, sizeof(i));
-       if (i < 0) exit(EXIT_FAILURE);
+       if (i < 0) return -1;
+       i = setsockopt(s, SOL_SOCKET, SO_RCVTIMEO,
+                      (char *) &timeout, sizeof(struct timeval));
+       if (i < 0) return -1;
     }
+
 
     if (connect(s, rp->ai_addr, rp->ai_addrlen) != -1) break;
   }
+
   if (!rp) return -1;
 
   return s;
@@ -106,8 +117,9 @@ int init_client(const char *host, const char *port)
  */
 typedef struct qa_connection {
   int socket;   /**< socket file descriptor. */
-  SSL* ssl;     /**< ssl handler for this connection. */
-  SSL_CTX* ctx; /**< ssl context used in this connection. */
+  SSL *ssl;     /**< ssl handler for this connection. */
+  BIO  *sbio;
+  SSL_CTX *ctx; /**< ssl context used in this connection. */
 } qa_connection_t;
 
 
@@ -124,6 +136,8 @@ static void qa_connection_free(struct qa_connection* c)
 {
   if (!c) return;
 
+  if (c->sbio)
+    BIO_free(c->sbio);
   if (c->socket != -1)
     close(c->socket);
   if (c->ssl) {
@@ -155,13 +169,17 @@ static int verify_callback(int ok, X509_STORE_CTX* ctx)
 struct qa_connection* qa_connection_new(char* address)
 {
   struct qa_connection* c = NULL;
+  struct timeval timeout = {
+    .tv_sec = TIMEOUT,
+    .tv_usec = 0
+  };
   char *host, *port;
 
   /* parse input address */
   if (!host_port(address, &host, &port)) goto error;
   if (!port) port = "https";
 
-  c = malloc(sizeof(struct qa_connection));
+  c = calloc(1, sizeof(struct qa_connection));
   if (!c) goto error;
   /* set up context, and protocol versions */
   c->ctx = SSL_CTX_new(SSLv23_client_method());
@@ -172,10 +190,15 @@ struct qa_connection* qa_connection_new(char* address)
   if (!c->ssl) goto error;
   /* open the socket over ssl */
   c->socket = init_client(host, port);
-  if (c->socket == -1)                goto error;
-  if (!SSL_set_fd(c->ssl, c->socket)) goto error;
-  if (SSL_connect(c->ssl) != 1)       goto error;
+  c->sbio = BIO_new_dgram(c->socket, BIO_NOCLOSE);
+  // BIO_ctrl(c->sbio, BIO_CTRL_DGRAM_SET_SEND_TIMEOUT, 0, &timeout);
+  BIO_ctrl(c->sbio, BIO_CTRL_DGRAM_SET_RECV_TIMEOUT, 0, &timeout);
 
+  if (c->socket == -1)
+    goto error;
+  SSL_set_bio(c->ssl, c->sbio, c->sbio);
+  if (SSL_connect(c->ssl) != 1)
+    goto error;
   SSL_set_connect_state(c->ssl);
   return c;
 
