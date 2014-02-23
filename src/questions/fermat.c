@@ -55,8 +55,6 @@ fermat_question_ask(const RSA *rsa)
   } while (!BN_is_zero(rem) && BN_ucmp(b, dssdelta) < 1);
 
   if (BN_is_zero(rem)) {
-    BN_sqrtmod(a, rem, a2, ctx);
-    assert(BN_is_zero(rem));
     BN_uadd(a, a, b);
     ret = qa_RSA_recover(rsa, a, ctx);
   }
