@@ -5,6 +5,7 @@
  * After retrieving a valid configuration from the frontend, this file takes
  * care of running the actual mainloop.
  */
+#include "config.h"
 
 #include <assert.h>
 #include <error.h>
@@ -12,8 +13,12 @@
 #include <stdint.h>
 #include <string.h>
 #include <unistd.h>
-#include <bsd/sys/queue.h>
 
+#ifdef HAVE_OPENMPI
+#include <mpi.h>
+#endif
+
+#include <bsd/sys/queue.h>
 #include <openssl/err.h>
 #include <openssl/pem.h>
 #include <openssl/ssl.h>
@@ -124,7 +129,6 @@ qa_init(const struct qa_conf* conf)
   bio_out = BIO_new_fp(stdout, BIO_NOCLOSE);
   bio_err = BIO_new_fp(stderr, BIO_NOCLOSE);
 
-
   QA_library_init();
 
   if (!conf->attacks) select_all_questions();
@@ -150,15 +154,30 @@ qa_init(const struct qa_conf* conf)
 static int
 qa_dispose(X509 *crt, RSA *rsa)
 {
+  int exit_code = EXIT_SUCCESS;
   RSA *pub;
-  RSA *priv;
+  RSA *priv = NULL;
   qa_question_t *q;
+#ifdef HAVE_OPENMPI
+  int proc, procs, i;
+#endif
 
   if (!rsa && crt)  pub = X509_get_pubkey(crt)->pkey.rsa;
   else pub = rsa;
-
   printf("[+] Certificate acquired\n");
+
+#ifdef HAVE_OPENMPI
+  MPI_Comm_rank(MPI_COMM_WORLD, &proc);
+  MPI_Comm_size(MPI_COMM_WORLD, &procs);
+  i = 0;
+#endif
+
   LIST_FOREACH(q, &questions, qs) {
+
+#ifdef HAVE_OPENMPI
+    if (i++ %  procs != proc) continue;
+#endif
+
     printf( "[-] Running: %s\n", q->pretty_name);
 
     /*
@@ -180,6 +199,11 @@ qa_dispose(X509 *crt, RSA *rsa)
     }
 
     /*
+     * Attempt to attack the X509 certificate.
+     */
+    if (crt && q->ask_crt)  q->ask_crt(crt);
+
+    /*
      * Attempt to attack RSA. If the attack went ok, there's no need to go
      * on. Print out a nice message and then quit.
      */
@@ -187,13 +211,9 @@ qa_dispose(X509 *crt, RSA *rsa)
         (priv = q->ask_rsa(pub))) {
       fprintf(stderr, "[\\] Key Broken using %s.\n", q->pretty_name);
       print_rsa_private(priv);
-      return 1;
+      exit_code = EXIT_FAILURE;
+      break;
     }
-
-    /*
-     * Attempt to attack the X509 certificate.
-     */
-    if (crt && q->ask_crt)  q->ask_crt(crt);
 
     /*
      * Shut down the given question. If it fails, print an error messae and go
@@ -205,8 +225,11 @@ qa_dispose(X509 *crt, RSA *rsa)
     }
   }
 
+  if (priv) RSA_free(priv);
+  MPI_Abort(MPI_COMM_WORLD, -1);
+  QA_library_del();
   /*
    *  Key seems resistent: exit successfully.
    */
-  return 0;
+  return EXIT_SUCCESS;
 }

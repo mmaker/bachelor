@@ -6,12 +6,15 @@
  * Implements procedures for addign and removing questions from the global \ref
  * questions variable.
  */
+#include "config.h"
 
 #include <assert.h>
 #include <string.h>
 #include <bsd/sys/queue.h>
 
 #include <openssl/ssl.h>
+#include <mpi.h>
+
 #include "qa/questions/questions.h"
 
 void QA_library_init(void)
@@ -19,8 +22,12 @@ void QA_library_init(void)
   /* Initialize SSL Library by registering algorithms. */
   SSL_library_init();
   SSL_load_error_strings();
-}
+#ifdef HAVE_OPENMPI
+  /* OpenMPI initialization */
+  MPI_Init(0 , NULL);
+#endif
 
+}
 
 /**
  * \brief Select a single question to be used.

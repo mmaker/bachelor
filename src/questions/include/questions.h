@@ -43,6 +43,12 @@ void select_all_questions(void);
 
 void QA_library_init(void);
 
+#ifdef HAVE_OPENMPI
+#define QA_library_del() MPI_Finalize()
+#else
+#define QA_library_del() ((void) 0)
+#endif
+
 #define REGISTER_QUESTION(q)                      \
   do {                                            \
       extern struct qa_question q;                \
