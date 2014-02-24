@@ -40,6 +40,7 @@ LIST_HEAD(listhead, qa_question) questions;
 
 void select_question(const char *);
 void select_all_questions(void);
+int run_question(qa_question_t *q, X509 *crt, RSA *pub);
 
 void QA_library_init(void);
 

@@ -154,9 +154,8 @@ qa_init(const struct qa_conf* conf)
 static int
 qa_dispose(X509 *crt, RSA *rsa)
 {
-  int exit_code = EXIT_SUCCESS;
+  int exit_code;
   RSA *pub;
-  RSA *priv = NULL;
   qa_question_t *q;
 #ifdef HAVE_OPENMPI
   int proc, procs, i;
@@ -179,57 +178,29 @@ qa_dispose(X509 *crt, RSA *rsa)
 #endif
 
     printf( "[-] Running: %s\n", q->pretty_name);
-
-    /*
-     * Run setup. If it fails, then print an error message and go to the next
-     * question.
-     */
-    if (q->setup && q->setup() <= 0)  {
-      fprintf(stderr, "[x] Unexpected error loading question %s\n", q->pretty_name);
-      continue;
-    }
-
-    /*
-     * Run test. If the test is undecidible or either ok, go on. Otherwise,
-     * print an error message and go to the next question.
-     */
-    if (q->test && q->test(crt) < 0) {
-      fprintf(stderr, "[|] Question %s cannot attack the given certificate.\n", q->pretty_name);
-      continue;
-    }
-
-    /*
-     * Attempt to attack the X509 certificate.
-     */
-    if (crt && q->ask_crt)  q->ask_crt(crt);
-
-    /*
-     * Attempt to attack RSA. If the attack went ok, there's no need to go
-     * on. Print out a nice message and then quit.
-     */
-    if (q->ask_rsa &&
-        (priv = q->ask_rsa(pub))) {
-      fprintf(stderr, "[\\] Key Broken using %s.\n", q->pretty_name);
-      print_rsa_private(priv);
-      exit_code = EXIT_FAILURE;
-      break;
-    }
-
-    /*
-     * Shut down the given question. If it fails, print an error messae and go
-     * on.
-     */
-    if (q->teardown && q->teardown() <= 0) {
-      fprintf(stderr, "[x] Unexpected error shutting down question %s.\n", q->pretty_name);
-      continue;
-    }
+    switch (run_question(q, crt, pub)) {
+      case -3:
+        fprintf(stderr, "[x] Unexpected error shutting down question %s\n", q->pretty_name);
+        exit_code = EXIT_FAILURE;
+      case -2:
+        fprintf(stderr, "[x] Unexpected error loading question %s\n", q->pretty_name);
+        exit_code = EXIT_FAILURE;
+        break;
+      case -1:
+        fprintf(stderr, "[|] Question %s cannot attack the given certificate.\n", q->pretty_name);
+        exit_code = EXIT_SUCCESS;
+        break;
+      default:
+        fprintf(stderr, "[\\] Key Broken using %s.\n", q->pretty_name);
+        exit_code = EXIT_SUCCESS;
+        goto end;
+      }
   }
 
-  if (priv) RSA_free(priv);
-  MPI_Abort(MPI_COMM_WORLD, -1);
+end:
   QA_library_del();
   /*
    *  Key seems resistent: exit successfully.
    */
-  return EXIT_SUCCESS;
+  return exit_code;
 }
