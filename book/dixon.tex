@@ -176,6 +176,14 @@ and storing dependencies into a \emph{history matrix} $H$.
   \end{algorithmic}
 \end{algorithm}
 
+\begin{remark}
+The \texttt{yield} statement in line $12$ of algorithm \ref{alg:dixon:kernel}
+has the same semantics as in the python programming language.
+It is intended to underline the fact that each $\{\mu  \mid H_{i,\mu} = 1\}$
+can lead to a solution for \ref{eq:dixon:x_sequence}, and therefore their
+generation can be performed asynchronously.
+\end{remark}
+
 
 \section{An Implementation Perspective}
 
@@ -264,9 +272,6 @@ can even act on the \texttt{ker} function - but less easily.
 This idea would boil down to the same structure we discussed with Wiener's attack:
 one node - the \emph{producer} - discovers linear dependencies, while the others
 - the \emph{consumers} - attempt to factorize $N$.
-For this reason that we introduced the \texttt{yield} statement in line
-$12$ of algorithm \ref{alg:dixon:kernel}: the two jobs can be performed
-asynchronously.
 
 Certainly, due to the probabilistic nature of this algorithm, we can even think
 about running multiple instances of the same program. This solution is fairly
