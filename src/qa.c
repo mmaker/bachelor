@@ -179,19 +179,23 @@ qa_dispose(X509 *crt, RSA *rsa)
 
     printf( "[-] Running: %s\n", q->pretty_name);
     switch (run_question(q, crt, pub)) {
-      case -3:
-        fprintf(stderr, "[x] Unexpected error shutting down question %s\n", q->pretty_name);
-        exit_code = EXIT_FAILURE;
-      case -2:
-        fprintf(stderr, "[x] Unexpected error loading question %s\n", q->pretty_name);
-        exit_code = EXIT_FAILURE;
-        break;
-      case -1:
-        fprintf(stderr, "[|] Question %s cannot attack the given certificate.\n", q->pretty_name);
-        exit_code = EXIT_SUCCESS;
-        break;
-      default:
-        fprintf(stderr, "[\\] Key Broken using %s.\n", q->pretty_name);
+    case -3:
+      fprintf(stderr, "[x] Unexpected error shutting down question %s\n", q->pretty_name);
+      exit_code = EXIT_FAILURE;
+    case -2:
+      fprintf(stderr, "[x] Unexpected error loading question %s\n", q->pretty_name);
+      exit_code = EXIT_FAILURE;
+      break;
+    case -1:
+      fprintf(stderr, "[|] Question %s cannot attack the given certificate.\n", q->pretty_name);
+      exit_code = EXIT_SUCCESS;
+      break;
+    case 0 :
+      fprintf(stderr, "[♥] Key is resistant to %s\n", q->pretty_name);
+      exit_code = EXIT_SUCCESS;
+      break;
+    default:
+        fprintf(stderr, "[\\] Key has been Broken using %s.\n", q->pretty_name);
         exit_code = EXIT_SUCCESS;
         goto end;
       }

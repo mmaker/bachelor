@@ -162,13 +162,13 @@ pollardrho_question_ask_rsa(const RSA *rsa)
 
 qa_question_t PollardRhoQuestion = {
   .name = "pollardrho",
-  .pretty_name = "Pollard's rho factorization",
+  .pretty_name = "Pollard's ρ factorization",
   .ask_rsa = pollardrho_question_ask_rsa
 };
 
 
 qa_question_t PollardBrentRhoQuestion = {
   .name = "pollard-brent",
-  .pretty_name = "Pollard-Brent's rho factorization",
+  .pretty_name = "Pollard-Brent's ρ factorization",
   .ask_rsa = pollardbrent_question_ask_rsa
 };
