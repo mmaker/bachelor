@@ -23,6 +23,8 @@
 #define PKEY    "public key"
 #define NBITLEN "N bits"
 #define EBITLEN "e bits"
+#define MODULUS "modulus"
+#define E       "pub exp"
 
 static BIO* out;
 
@@ -88,11 +90,21 @@ metadata_question_ask_crt(X509* crt)
 
 RSA *metadata_question_ask_rsa(const RSA* rsa)
 {
+  char *s;
+
   BIO_printf(out, "%-10s: %d\n", NBITLEN,
              BN_num_bits(rsa->n));
 
   BIO_printf(out, "%-10s: %d\n", EBITLEN,
              BN_num_bits(rsa->e));
+
+  s = BN_bn2hex(rsa->e);
+  BIO_printf(out, "%-10s: %s\n", E, s);
+  OPENSSL_free(s);
+
+  s = BN_bn2hex(rsa->n);
+  BIO_printf(out, "%-10s: %s\n", MODULUS, s);
+  OPENSSL_free(s);
 
   return NULL;
 }
