@@ -4,6 +4,8 @@
  * \brief Fast access to a prime pool
  *
  */
+#include <errno.h>
+#include <error.h>
 #include <strings.h>
 
 #include <openssl/bn.h>
@@ -20,7 +22,9 @@ static const char *PRIME_POOL_FILE = "primes.txt";
  */
 pit_t *primes_init(void)
 {
-  return fopen(PRIME_POOL_FILE, "r");
+  pit_t *ret = fopen(PRIME_POOL_FILE, "r");
+  if (!ret) error(EXIT_FAILURE, errno, "Unable to open primes database.");
+  return ret;
 }
 
 
