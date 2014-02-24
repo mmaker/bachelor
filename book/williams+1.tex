@@ -168,7 +168,7 @@ if $g = N$ start back from scratch, as $pq \mid g$.
           \State $g \gets \gcd(Q, N)$
           \Comment step (iii)
           \If{$g = 1$} \Return \strong{nil}
-          \ElsIf{$g > 1$} \Return g
+          \ElsIf{$g > 1$} \Return $g, N//g$
           \EndIf
         \EndFor
       \EndFor

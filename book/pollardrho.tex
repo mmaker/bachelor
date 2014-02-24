@@ -189,7 +189,7 @@ and respectively updating them via $x \gets f(x)$ and $y \gets f(f(y))$.
       \State $g \gets gcd(|x - y|, N)$
     \EndWhile
     \If{$g = N$} \Return \strong{nil}
-    \Else \ \ \Return $g$
+    \Else \ \ \Return $g, N//g$
     \EndIf
     \EndFunction
   \end{algorithmic}
@@ -256,7 +256,7 @@ efficient (\cite{brent:parallel} \S 3).
       \State $g \gets \gcd(N, \abs{x -ys})$
     \Until{$g > 1$} \EndIf
     \If{$g = 1$} \Return \strong{nil}
-    \Else \ \ \Return $g$
+    \Else \ \ \Return $g, N//g$
     \EndIf
     \EndFunction
   \end{algorithmic}

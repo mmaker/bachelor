@@ -59,7 +59,7 @@ This way the complexity of generating a new $x$ is dominated by
 \bigO{|\factorBase|}. Now that the right side of \ref{eq:dixon:fermat_revisited}
 has been satisfied, we have to select a subset of those $x$ so that their
 product can be seen as a square. Consider an \emph{exponent vector}
-$v_i = (\alpha_0, \alpha_1, \ldots, \alpha_r)$ with $r = |\factorBase|$
+$v_i = (\alpha_0, \alpha_1, \ldots, \alpha_{r-1})$ with $r = |\factorBase| + 1$
 associated with each $x_i$, where
 \begin{align}
   \label{eq:dixon:alphas}
@@ -68,13 +68,14 @@ associated with each $x_i$, where
     0 \quad \text{otherwise}
   \end{cases}
 \end{align}
-for each $1 \leq j \leq r $. There is no need to restrict ourselves for positive
-values of $x^2 -N$, so we are going to use $\alpha_0$ to indicate the sign. This
-benefit has a neglegible cost: we have to add the non-prime $-1$ to our factor
-base $\factorBase$.
+for each $1 \leq j < r $. There is no need to restrict ourselves for positive
+values of $x^2 -N$, so we are going to use $\alpha_0$ to indicate the sign -$1$
+if negative, $0$ otherwise.
+This benefit has a neglegible cost: we have to add the non-prime $-1$ to our
+factor base $\factorBase$.
 
 Let now $M \in \mathbb{F}_2^{(f \times r)}$,
-for some $f \geq r$,
+for some $f > r$,
 be the rectangular matrix having per each $i$-th row the
 $v_i$ associated to $x_i$: this way each matrix element $m_{ij}$ will be the
 $j$-th component of $v_i$.
@@ -101,7 +102,7 @@ to left), and can be used to determine whether the set of exponent vectors is
 linearly dependent.
 
 For each $v_i$ described as above, associate a \emph{companion history vector}
-$h_i = (\beta_0, \beta_1, \ldots, \beta_f)$, where for $0 \leq m \leq f$:
+$h_i = (\beta_0, \beta_1, \ldots, \beta_{f-1})$, where for $0 \leq m < f$:
 \begin{align*}
   \beta_m = \begin{cases}
     1 \quad \text{ if $m = i$} \\
@@ -119,13 +120,13 @@ At this point, we have all data structures needed:
 \begin{enumerate}[(i)]
   \item Set $j=r$;
   \item find the ``pivot vector'', i.e. the first vector
-    $e_i, \quad 0 \leq i \leq f$ such that $\alpha_j = 1$. If none is found, go
+    $v_i, \quad 0 \leq i < f$ such that $\alpha_j = 1$. If none is found, go
     to (iv);
   \item
     \begin{enumerate}[(a)]
-      \item replace every following vector $e_m, \quad i < m \leq f$
-        whose rightmost $1$ is the $j$-th component, by the sum $e_i \xor e_m$;
-      \item whenever $e_m$ is replaced by $e_i \xor e_m$, replace also the
+      \item replace every following vector $v_m, \quad i < m < f$
+        whose rightmost $1$ is the $j$-th component, by the sum $v_i \xor v_m$;
+      \item whenever $v_m$ is replaced by $v_i \xor v_m$, replace also the
         associated history vector $h_m$ with $h_i \xor h_m$;
     \end{enumerate}
   \item Reduce $j$ by $1$. If $j \geq 0$, return to (ii); otherwise stop.
@@ -150,13 +151,13 @@ and storing dependencies into a \emph{history matrix} $H$.
     \State $H \gets \texttt{Id}(f \times f)$
     \Comment the initial $H$ is the identity matrix
 
-    \For{$j = r \strong{ downto } 0$}
+    \For{$j = r-1 \strong{ downto } 0$}
     \Comment reduce
-      \For{$i=0 \strong{ to } f$}
+      \For{$i=0 \strong{ to } f-1$}
         \If{$M_{i, j} = 1$}
-          \For{$i' = i+1 \strong{ to } f$}
+          \For{$i' = i+1 \strong{ to } f-1$}
             \If{$M_{i', k} = 1$}
-              \State $M_{i'} = Mi \xor M_{i'}$
+              \State $M_{i'} = M_i \xor M_{i'}$
               \State $H_{i'} = H_i \xor H_{i'}$
             \EndIf
           \EndFor
@@ -165,8 +166,8 @@ and storing dependencies into a \emph{history matrix} $H$.
       \EndFor
     \EndFor
 
-    \For{$i = 0 \strong{ to } f$}
-    \Comment yield linear dependencies
+    \For{$i = 0 \strong{ to } f-1$}
+    \Comment yield  linear dependencies
       \If{$M_i = (0, \ldots, 0)$}
         \strong{yield} $\{\mu  \mid H_{i,\mu} = 1\}$
       \EndIf
@@ -180,8 +181,8 @@ and storing dependencies into a \emph{history matrix} $H$.
 
 Before gluing all toghether, we need one last building brick necessary for
 Dixon's factorization algorithm: a \texttt{smooth}($x$) function. In our
-specific case, we need a function that, given as input a number $x$, returns the
-empty set $\emptyset$ if $x^2 -N$ is not $\factorBase$-smooth. Otherwise,
+specific case, we need a function that, given as input a number $x$, returns
+\strong{nil} if $x^2 -N$ is not $\factorBase$-smooth. Otherwise,
 returns a vector $v = (\alpha_0, \ldots, \alpha_r)$ such that each $\alpha_j$ is
 defined just as in \ref{eq:dixon:alphas}. Once we have established $\factorBase$, its
 implementation comes straightfoward.
@@ -190,8 +191,9 @@ implementation comes straightfoward.
 It's not easy to answer: if we choose $\factorBase$ small, we will rarely find
 $x^2 -N$ \emph{smooth}. If we chose it large, attempting to factorize $x^2 -N$
 with $\factorBase$ will pay the price of iterating through a large set.
-\cite{Crandall} \S 6.1 finds a solution for this employng complex analytic
-number theory. As a  result, the ideal value for $|\factorBase|$ is
+\cite{Crandall} \S 6.1 finds a solution for this problem by employing complex
+analytic number theory.
+ As a  result, the ideal value for $|\factorBase|$ is
 $e^{\sqrt{\ln N \ln \ln N}}$.
 
 
@@ -224,23 +226,23 @@ $e^{\sqrt{\ln N \ln \ln N}}$.
     \Require $\factorBase$, the factor base
     \Function{dixon}{\PKArg}
     \State $i \gets 0$
-    \State $r \getsRandom \naturalN_{ > |\factorBase|}$
+    \State $f \getsRandom \naturalN_{ > |\factorBase|}$
     \Comment finding linearity requires redundance
-    \While{$i < r$}
+    \While{$i < f$}
     \Comment search for suitable pairs
     \State $x_i \getsRandom \naturalN_{< N}$
     \State $y_i \gets x_i^2 - N$
     \State $v_i \gets \textsc{smooth}(y_i)$
-    \If{$v_i$} $i \gets i+1$ \EndIf
+    \If{$v_i \neq \strong{nil} $} $i \gets i+1$ \EndIf
   \EndWhile
-  \State $M \gets \texttt{matrix}(v_0, \ldots, v_f)$
+  \State $M \gets \texttt{matrix}(v_0, \ldots, v_{f-1})$
   \For{$\lambda = \{\mu_0, \ldots, \mu_k\}
     \strong{ in } \textsc{ker}(M)$}
     \Comment get relations
     \State $x \gets \prod_{\mu \in \lambda} x_\mu \pmod{N}$
     \State $y, r \gets \dsqrt{\prod_{\mu \in \lambda} y_\mu \pmod{N}}$
     \State $g  \gets \gcd(x+y, N)$
-    \If{$1 < \gcd < N$}
+    \If{$1 < g < N$}
       \State $p \gets g $
       \State $q \gets N//p$
       \State \Return $p, q$
@@ -267,7 +269,7 @@ $12$ of algorithm \ref{alg:dixon:kernel}: the two jobs can be performed
 asynchronously.
 
 Certainly, due to the probabilistic nature of this algorithm, we can even think
-aboutrunning multiple instances of the same program. This solution is fairly
+about running multiple instances of the same program. This solution is fairly
 effective in proportion to the development cost.
 
 %%% Local Variables:
