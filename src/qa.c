@@ -157,11 +157,19 @@ qa_dispose(X509 *crt, RSA *rsa)
   int exit_code;
   RSA *pub;
   qa_question_t *q;
+  EVP_PKEY *pkey;
 #ifdef HAVE_OPENMPI
   int proc, procs, i;
 #endif
 
-  if (!rsa && crt)  pub = X509_get_pubkey(crt)->pkey.rsa;
+  if (!rsa && crt)  {
+    pkey = X509_get_pubkey(crt);
+    if (pkey && pkey->type == EVP_PKEY_RSA) pub = pkey->pkey.rsa;
+    else {
+      fprintf(stderr, "[!] Unsupported certificate\n");
+      goto end;
+    }
+  }
   else pub = rsa;
   printf("[+] Certificate acquired\n");
 
@@ -195,10 +203,10 @@ qa_dispose(X509 *crt, RSA *rsa)
       exit_code = EXIT_SUCCESS;
       break;
     default:
-        fprintf(stderr, "[\\] Key has been Broken using %s.\n", q->pretty_name);
-        exit_code = EXIT_SUCCESS;
-        goto end;
-      }
+      fprintf(stderr, "[\\] Key has been Broken using %s.\n", q->pretty_name);
+      exit_code = EXIT_SUCCESS;
+      goto end;
+    }
   }
 
 end:

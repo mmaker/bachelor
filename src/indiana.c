@@ -14,6 +14,8 @@
 
 extern qa_question_t MetadataQuestion;
 
+#define SITE "site"
+
 int main(int argc, char **argv)
 {
   int proc, procs;
@@ -23,6 +25,7 @@ int main(int argc, char **argv)
   char site[128];
   X509 *crt;
   RSA *rsa;
+  EVP_PKEY *pkey;
 
   QA_library_init();
 
@@ -41,12 +44,20 @@ int main(int argc, char **argv)
       continue;
     }
 
-    rsa = X509_get_pubkey(crt)->pkey.rsa;
+    pkey = X509_get_pubkey(crt);
+    if (!pkey || pkey->type != EVP_PKEY_RSA) {
+      fprintf(stderr, "NO RSA: %s\n", site);
+      continue;
+    }
+
+    rsa = pkey->pkey.rsa;
+    printf("%-10s: %s\n", SITE, site);
     run_question(&MetadataQuestion, crt, rsa);
     X509_free(crt);
   }
 
-  QA_library_del();
+  //  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Finalize();
   return EXIT_SUCCESS;
 
 }
