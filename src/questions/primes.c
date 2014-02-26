@@ -48,8 +48,9 @@ int primes_next(pit_t *it, BIGNUM* p)
 {
   static char sp[10];
   /* overlow on me, yeah */
-  fscanf(it, "%s", sp);
-  BN_dec2bn(&p, sp);
+  if (fscanf(it, "%s", sp) == 1)
+    BN_dec2bn(&p, sp);
+  else return 0;
 
   return 1;
 }

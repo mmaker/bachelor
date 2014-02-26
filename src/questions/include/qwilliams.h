@@ -3,7 +3,9 @@
 
 extern struct qa_question WilliamsQuestion;
 
-void lucas(BIGNUM *v, BIGNUM *w, BIGNUM *h, BIGNUM * tau, BN_CTX *ctx);
+void lucas(BIGNUM *v, BIGNUM *w,
+           BIGNUM *h, BIGNUM *tau,
+           BIGNUM *n, BN_CTX *ctx);
 
 
 #endif /* _QA_WILLIAMS_H_ */

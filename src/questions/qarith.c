@@ -192,32 +192,45 @@ RSA* qa_RSA_recover(const RSA *rsapub,
                     const BIGNUM *p,
                     BN_CTX *ctx)
 {
-  RSA *rsapriv = RSA_new();
+  static const char *errmsg = "[!] Incorrect vaues for RSA recovery\n";
+  RSA *rsapriv = NULL;
   BIGNUM *p1 = BN_new();
   BIGNUM *q1 = BN_new();
   BIGNUM *phi = BN_new();
+  BIGNUM *n = BN_new();
 
   /* guard for most common errors */
   if (BN_is_zero(rsapub->n) ||
+      !BN_is_odd(rsapub->n) ||
       BN_is_zero(p) ||
       !BN_cmp(rsapub->n, p) ||
       !BN_cmp(p, BN_value_one())) {
-    fprintf(stderr, "[!] Incorrect vaues for RSA recovery\n");
-    return NULL;
+    fprintf(stderr, errmsg);
+    goto end;
   }
 
-  /* copy public key informations */
-  rsapriv->n = BN_dup(rsapub->n);
-  rsapriv->e = BN_dup(rsapub->e);
-  /* retrieve the second prime */
+
+  rsapriv = RSA_new();
   rsapriv->p = BN_dup(p);
   rsapriv->q = BN_new();
-  BN_div(rsapriv->q, NULL, rsapriv->n, rsapriv->p, ctx);
+  BN_div(rsapriv->q, NULL, rsapub->n, rsapriv->p, ctx);
+  BN_mul(n, rsapriv->p, rsapriv->q, ctx);
+  if (BN_cmp(n, rsapub->n)) {
+    fprintf(stderr, errmsg);
+    BN_free(rsapriv->p);
+    BN_free(rsapriv->q);
+    RSA_free(rsapriv);
+    rsapriv = NULL;
+    goto end;
+  }
+
+  rsapriv->n = BN_dup(rsapub->n);
   /* retrieve phi */
   BN_sub(p1, rsapriv->p, BN_value_one());
   BN_sub(q1, rsapriv->q, BN_value_one());
   BN_mul(phi, p1, q1, ctx);
   /* retrieve the private exponent */
+  rsapriv->e = BN_dup(rsapub->e);
   rsapriv->d = BN_new();
   BN_mod_inverse(rsapriv->d, rsapriv->e, phi, ctx);
   /* some other openssl shit */
@@ -225,6 +238,8 @@ RSA* qa_RSA_recover(const RSA *rsapub,
   BN_mod(rsapriv->dmp1, rsapriv->d, p1, ctx);
   BN_mod_inverse(rsapriv->iqmp, rsapriv->q, rsapriv->p, ctx);
 
+ end:
+  BN_free(n);
   BN_free(q1);
   BN_free(p1);
   BN_free(phi);

@@ -5,6 +5,7 @@
  */
 #define _GNU_SOURCE
 
+#include <assert.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -43,6 +44,7 @@ pubkey_generation(RSA* rsa)
     rsa->n = BN_new();
     BN_mul(rsa->n, rsa->p, rsa->q, ctx);
   }
+  assert(BN_is_odd(rsa->n));
 
   PEM_write_RSAPublicKey(stdout, rsa);
 

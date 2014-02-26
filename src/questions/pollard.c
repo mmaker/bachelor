@@ -49,36 +49,62 @@ pollard1_question_ask_rsa(const RSA* rsa)
   BN_CTX *ctx = BN_CTX_new();
   pit_t *it;
   long j;
-  /* long back; */
+  struct {
+    BIGNUM *p;
+    BIGNUM *b;
+    int k;
+  } back = {BN_new(), BN_new(), 0};
+
   int e, k, m = 100;
 
-
   BN_pseudo_rand_range(b, rsa->n);
+  /* initialize backup */
+  BN_copy(back.p, BN_value_two());
+  BN_copy(back.b, b);
+
   BN_one(g);
   BN_one(q);
   for (it = primes_init();
        BN_is_one(g) && primes_next(it, p);
        )  {
-    e = BN_num_bits(rsa->n) / BN_num_bits(p);
+    e = BN_num_bits(rsa->n) / BN_num_bits(p) + 1;
     for (k = 0; k < e && BN_is_one(g); k += m) {
-      /* back = primes_tell(it); */
       for (j = (m > e) ? e : m; j; j--) {
         BN_mod_exp(b, b, p, rsa->n, ctx);
         BN_sub(b1, b, BN_value_one());
         BN_mod_mul(q, q, b1, rsa->n, ctx);
       }
       BN_gcd(g, q, rsa->n, ctx);
+
+      /* epoch ended: backup */
+      if (BN_is_one(g)) {
+        BN_copy(back.p, p);
+        BN_copy(back.b, b);
+        back.k = k;
+      }
     }
   }
 
   /* replay latest epoch */
-  /* if (BN_cmp(g, rsa->n)) { */
-  /*   primes_seek(it, back); */
+  if (!BN_cmp(g, rsa->n)) {
+    fprintf(stderr, "rollback!\n");
+    BN_copy(p, back.p);
+    BN_one(g);
+    BN_copy(b, back.b);
+    e = BN_num_bits(rsa->n) / BN_num_bits(p) + 1;
+    for (k = back.k; k < e; k++) {
+      BN_mod_exp(b, b, p, rsa->n, ctx);
+      BN_sub(b1, b, BN_value_one());
+      BN_gcd(g, b1, rsa->n, ctx);
+      if (BN_is_one(g)) break;
+    }
+  }
 
-  /* } */
   if (BN_cmp(g, rsa->n) && !BN_is_one(g))
       ret = qa_RSA_recover(rsa, g, ctx);
 
+  BN_free(back.p);
+  BN_free(back.b);
   BN_free(p);
   BN_free(q);
   BN_free(b);
