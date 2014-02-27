@@ -14,6 +14,7 @@
 #include "qa/questions/primes.h"
 #include "qa/questions/qarith.h"
 #include "qa/questions/questions.h"
+#include "qa/questions/qwilliams.h"
 
 /**
  * \brief Lucas Sequence Multiplier.
