@@ -27,7 +27,7 @@ void usage(void)
   static const char* help_message = "%s usage: %s"
     " [-r HOST:port | -f X509 | -R RSA]"
     " [-a ATTACK]"
-    " \n"
+    " \n\n"
     "If no argument is supplied, by default a public RSA key is expected "
     "to be read from the standard input.\n";
   fprintf(stderr, help_message,
