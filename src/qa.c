@@ -65,7 +65,7 @@ get_local_cert(const char *src)
 /**
  * \brief Loads a valid rsa public key from file.
  *
- * /return NULL in case of error, a X509* structure otherwise.
+ * \return NULL in case of error, a X509* structure otherwise.
  */
 RSA*
 get_local_rsa(const char *src)

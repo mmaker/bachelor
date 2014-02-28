@@ -31,17 +31,10 @@ int test(BIGNUM *n, BIGNUM *m)
   BN_CTX *ctx;
   int ret = 0;
 
+  if (!BN_cmp(n, m)) return 1;
+
   g = BN_new();
   ctx = BN_CTX_new();
-
-  if (!BN_cmp(n, m)) {
-    fprintf(stderr, "%-8s: ", EQUAL_BN);
-    BN_print_fp(stderr, n);
-    fprintf(stderr, "\n");
-    ret = 1;
-    goto end;
-  }
-
   BN_gcd(g, n, m, ctx);
   if (!BN_is_one(g)) {
     fprintf(stdout, "%-8s: ", PRIME);
@@ -52,8 +45,6 @@ int test(BIGNUM *n, BIGNUM *m)
     ret = 1;
   }
 
-
- end:
   BN_CTX_free(ctx);
   BN_free(g);
 
@@ -64,11 +55,16 @@ int main(int argc, char **argv)
 {
   FILE *fst, *snd;
   BIGNUM *n, *m;
+  int i;
+  int proc, procs;
+
 
   n = BN_new();
   m = BN_new();
 
-  MPI_Init(0, NULL);
+  MPI_Init(&argc, &argv);
+  MPI_Comm_rank(MPI_COMM_WORLD, &proc);
+  MPI_Comm_size(MPI_COMM_WORLD, &procs);
 
   if (argc < 2) return EXIT_FAILURE;
   fst = fopen(argv[argc-1], "r");
@@ -81,7 +77,10 @@ int main(int argc, char **argv)
     fseek(snd, ftell(fst), SEEK_SET);
     /* trash first modulus */
     next_mod(&m, snd);
-    while (next_mod(&m, snd)) test(n, m);
+    for (i=0; next_mod(&m, snd); i =(i+1) % procs) {
+      if (i != proc) continue;
+      test(n, m);
+    }
   }
 
   BN_free(n);

@@ -172,6 +172,21 @@ dixon_question_ask_rsa(const RSA *rsa)
     R[i].x = BN_new();
     R[i].y = BN_new();
   }
+/* #else */
+/*   int procs, proc; */
+
+/*   MPI_Comm_rank(MPI_COMM_WORLD, &proc); */
+/*   MPI_Comm_size(MPI_COMM_WORLD, &procs); */
+
+/*   /\* root node fetches, child nodes discovery *\/ */
+/*   if (proc == 0) { */
+
+
+/*   if (proc != 0) { */
+/*     MPI_Finalize(); */
+/*     exit(); */
+/*   } */
+/* #endif */
 
   /** STEP 2 generating R */
   for (i=0; i < m->f; i++) {
