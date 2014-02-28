@@ -209,7 +209,7 @@ $e^{\sqrt{\ln N \ln \ln N}}$.
   \caption{Discovering Smoothness}
   \begin{algorithmic}[1]
     \Require $\factorBase$, the factor base
-    \Procedure{smooth}{$x$}
+    \Function{smooth}{$x$}
       \State $v \gets (\alpha_0 = 0, \ldots, \alpha_{|\factorBase|} = 0)$
 
       \If{$x < 0$} $\alpha_0 \gets 1$ \EndIf
@@ -224,7 +224,7 @@ $e^{\sqrt{\ln N \ln \ln N}}$.
       \Else
         \State \Return \strong{nil}
       \EndIf
-    \EndProcedure
+    \EndFunction
   \end{algorithmic}
 \end{algorithm}
 
