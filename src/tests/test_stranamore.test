@@ -1,0 +1,7 @@
+#!/bin/bash
+
+../stranamore test_stranamore.txt 2>&1 | grep -q 41
+[[ $? == 0 ]] || exit 1
+
+../stranamore test_stranamore.txt  2>&1 | grep -q 97
+[[ $? == 0 ]] || exit 1
