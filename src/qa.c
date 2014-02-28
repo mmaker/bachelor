@@ -70,48 +70,24 @@ get_local_cert(const char *src)
 RSA*
 get_local_rsa(const char *src)
 {
-  RSA *rsa = NULL;
+  EVP_PKEY *pkey = NULL;
   FILE *fp;
 
   if (!strcmp(src, "-")) fp = stdin;
   else if (!(fp = fopen(src, "r")))
     return NULL;
 
-  rsa = PEM_read_RSAPublicKey(fp, &rsa, NULL, NULL);
-  return rsa;
-}
-
-/**
- * \brief Print out a valid RSA Private Key.
- *
- */
-static void
-print_rsa_private(RSA *rsa)
-{
-  size_t i;
-  char *dec, *hex;
-  const struct {
-    const char *desc;
-    BIGNUM *n;
-  } items[5] = {
-    {"Public Modulus", rsa->n},
-    {"Prime Factor p", rsa->p},
-    {"Prime Factor q", rsa->q},
-    {"Public Exponent", rsa->e},
-    {"Private Exponent", rsa->d},
-  };
-
-
-  assert(rsa); /* && rsa->p && rsa->q && rsa->e); */
-  for (i=0; i!=5; i++) {
-    if (!items[i].n) continue;
-    dec = BN_bn2dec(items[i].n);
-    hex = BN_bn2hex(items[i].n);
-    fprintf(stdout, "\t%-22s : %-15s (0x%s)\n", items[i].desc, dec, hex);
-    OPENSSL_free(dec);
-    OPENSSL_free(hex);
+  pkey = PEM_read_PUBKEY(fp, &pkey, NULL, NULL);
+  if (pkey == NULL)
+    return NULL;
+  if (pkey->type != EVP_PKEY_RSA) {
+    EVP_PKEY_free(pkey);
+    return NULL;
   }
+  return pkey->pkey.rsa;
+  // rsa = PEM_read_RSAPublicKey(fp, &rsa, NULL, NULL);
 }
+
 
 /**
  * \brief Given an initial configuration, stuctures the program flow.
