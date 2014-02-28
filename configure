@@ -625,6 +625,8 @@ ac_includes_default="\
 ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
+CLUSTER_FALSE
+CLUSTER_TRUE
 LIBOBJS
 EGREP
 GREP
@@ -4445,9 +4447,21 @@ fi
 
 # Check whether --enable-mpi was given.
 if test "${enable_mpi+set}" = set; then :
-  enableval=$enable_mpi;
+  enableval=$enable_mpi; mpi=true
+fi
+
+
+if test x$mpi = xtrue; then :
+
 $as_echo "#define HAVE_OPENMPI 1" >>confdefs.h
 
+fi
+ if test x$mpi = xtrue; then
+  CLUSTER_TRUE=
+  CLUSTER_FALSE='#'
+else
+  CLUSTER_TRUE='#'
+  CLUSTER_FALSE=
 fi
 
 
@@ -4584,6 +4598,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${am__fastdepCC_TRUE}" && test -z "${am__fastdepCC_FALSE}"; then
   as_fn_error $? "conditional \"am__fastdepCC\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${CLUSTER_TRUE}" && test -z "${CLUSTER_FALSE}"; then
+  as_fn_error $? "conditional \"CLUSTER\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 

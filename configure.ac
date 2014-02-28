@@ -41,7 +41,10 @@ AC_ARG_ENABLE(debug,
 
 AC_ARG_ENABLE(mpi,
    AS_HELP_STRING([--enable-mpi], [enable mpi library, default:no]),
-   AC_DEFINE([HAVE_OPENMPI], [1], [OpenMPI support]))
+   [mpi=true])
+
+AS_IF([test x$mpi = xtrue], AC_DEFINE([HAVE_OPENMPI], [1], [OpenMPI support]))
+AM_CONDITIONAL([CLUSTER], [test x$mpi = xtrue])
 
 AC_OUTPUT([Makefile
            src/Makefile src/questions/Makefile
