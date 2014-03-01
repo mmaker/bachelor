@@ -100,10 +100,18 @@ int main(int argc, char **argv)
 {
   int opt;
   RSA *rsa = RSA_new();
+  char *task;
 
   rsa->n = rsa->e = rsa->p = rsa->q = NULL;
 
   if (argc < 3) usage(EXIT_FAILURE);
+  /* quick shortcut for testing factorization */
+  if (argc == 3) {
+    task = "pub";
+    BN_dec2bn(&rsa->p, argv[1]);
+    BN_dec2bn(&rsa->q, argv[2]);
+    BN_dec2bn(&rsa->e, "65537");
+  } else task = argv[1];
 
   while ((opt = getopt(argc-1, argv+1, "d:e:N:n:p:q:")) != -1)  {
     switch (opt) {
@@ -130,33 +138,10 @@ int main(int argc, char **argv)
 
   SSL_library_init();
 
-  if (!strcmp(argv[1], "pub"))
+  if (!strcmp(task, "pub"))
     return pubkey_generation(rsa);
-  else if (!strcmp(argv[1], "priv"))
+  else if (!strcmp(task, "priv"))
     return privkey_generation(rsa);
   else
     usage(EXIT_FAILURE);
-
-  /* creating public key */
-  /*
-  EVP_PKEY *pk;
-  pk = EVP_PKEY_new();
-  EVP_PKEY_set1_RSA(pk, rsa);
-  */
-  /* creating dummy certificate */
-  /*
-  X509* crt;
-  crt = X509_new();
-  if (!X509_set_pubkey(crt, pk)) exit(EXIT_FAILURE);
-  */
-  /* PEM_write_X509(stdout, crt); */
-  /*
-  X509_free(crt);
-  EVP_PKEY_free(pk);
-  BN_free(q1);
-  BN_free(p1);
-  RSA_free(rsa);
-
-  */
-  return EXIT_SUCCESS;
 }
