@@ -15,10 +15,17 @@
  * while e, d . ed ≡ 1 (mod φ(N))  are respectively the public and the private
  * exponent.
  */
+#include "config.h"
+
 #include <assert.h>
+#include <string.h>
 #include <strings.h>
 
 #include <openssl/bn.h>
+
+#ifdef HAVE_OPENMPI
+#include <mpi.h>
+#endif
 
 #include "qa/questions/questions.h"
 #include "qa/questions/primes.h"
@@ -26,6 +33,13 @@
 #include "qa/questions/qstrings.h"
 #include "qa/questions/qdixon.h"
 
+
+#ifdef HAVE_OPENMPI
+#define ENCLEN 2048
+
+MPI_Datatype MPI_BNPAIR;
+
+#endif
 
 matrix_t*
 identity_matrix_new(int d)
@@ -136,6 +150,7 @@ discover_smooth(BIGNUM *y, BIGNUM *x, BIGNUM *n,
   } while (!dixon_smooth(y, ctx, v, len));
 }
 
+
 static RSA*
 dixon_question_ask_rsa(const RSA *rsa)
 {
@@ -164,6 +179,7 @@ dixon_question_ask_rsa(const RSA *rsa)
   matrix_t *h;
 
 
+#ifndef HAVE_OPENMPI
   /** STEP 1: initialization **/
   /* plus one for the sign */
   m = matrix_new(f, r);
@@ -172,21 +188,6 @@ dixon_question_ask_rsa(const RSA *rsa)
     R[i].x = BN_new();
     R[i].y = BN_new();
   }
-/* #else */
-/*   int procs, proc; */
-
-/*   MPI_Comm_rank(MPI_COMM_WORLD, &proc); */
-/*   MPI_Comm_size(MPI_COMM_WORLD, &procs); */
-
-/*   /\* root node fetches, child nodes discovery *\/ */
-/*   if (proc == 0) { */
-
-
-/*   if (proc != 0) { */
-/*     MPI_Finalize(); */
-/*     exit(); */
-/*   } */
-/* #endif */
 
   /** STEP 2 generating R */
   for (i=0; i < m->f; i++) {
@@ -194,6 +195,74 @@ dixon_question_ask_rsa(const RSA *rsa)
     discover_smooth(R[i].y, R[i].x, rsa->n,
                     ctx, m->M[i], m->r);
   }
+#else
+  int procs, proc;
+  int count;
+  MPI_Comm_rank(MPI_COMM_WORLD, &proc);
+  MPI_Comm_size(MPI_COMM_WORLD, &procs);
+  struct {
+    char x[ENCLEN];
+    char y[ENCLEN];
+    char v[r];
+  } to;
+
+  MPI_Aint offsets[3] = {0, ENCLEN, 2*ENCLEN};
+  MPI_Datatype types[3] = {MPI_CHAR, MPI_CHAR, MPI_CHAR};
+  int lengths[3] = {ENCLEN, ENCLEN, r};
+  MPI_Type_struct(3, lengths, offsets, types, &MPI_BNPAIR);
+  MPI_Type_commit(&MPI_BNPAIR);
+
+  count = procs > 1 ? f / (procs-1) : f;
+  printf("slave %d/%d at your service, sir.\n", proc, procs);
+  /* root node fetches, child nodes discovery */
+  if (proc == 0) {
+    /** STEP 1: initialization **/
+    m = matrix_new(f, r);
+    R = malloc(sizeof(struct bnpair) * f);
+
+    /** STEP 2 generating R */
+    for (i=0; i != f - count; i++) {
+      MPI_Recv(&to, 1, MPI_BNPAIR, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      R[i].x = BN_new();
+      R[i].y = BN_new();
+      BN_hex2bn(&R[i].x, to.x);
+      BN_hex2bn(&R[i].y, to.y);
+      memcpy(m->M[i], to.v, r);
+
+      fprintf(stderr, "received: %s (%zu/%d)\n", to.x, i, f);
+    }
+
+    while (i++ < f) {
+      R[i].x = BN_new();
+      R[i].y = BN_new();
+      discover_smooth(R[i].y, R[i].x, rsa->n, ctx, m->M[i], r);
+    }
+  } else {
+    BIGNUM *x = BN_new(), *y = BN_new();
+    char *s;
+
+    while (count--) {
+      discover_smooth(y, x, rsa->n, ctx, to.v, r);
+      s = BN_bn2hex(x);
+      strcpy(to.x, s);
+      OPENSSL_free(s);
+      s = BN_bn2hex(y);
+      strcpy(to.y, s);
+      OPENSSL_free(s);
+
+      //      fprintf(stderr, "generated: %s (%d)", to.x, count);
+      MPI_Send(&to, 1, MPI_BNPAIR, 0, 0, MPI_COMM_WORLD);
+    }
+    fprintf(stderr, "worker %zu finished.", proc);
+    BN_free(x);
+    BN_free(y);
+  }
+
+  if (proc != 0) {
+    MPI_Finalize();
+    exit(EXIT_SUCCESS);
+  }
+#endif
 
   /** STEP 3: break & enter. */
   h = kernel(m);
