@@ -85,7 +85,7 @@ get_local_rsa(const char *src)
     return NULL;
   }
   return pkey->pkey.rsa;
-  // rsa = PEM_read_RSAPublicKey(fp, &rsa, NULL, NULL);
+  /* rsa = PEM_read_RSAPublicKey(fp, &rsa, NULL, NULL); */
 }
 
 

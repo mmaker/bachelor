@@ -234,8 +234,11 @@ RSA* qa_RSA_recover(const RSA *rsapub,
   rsapriv->d = BN_new();
   BN_mod_inverse(rsapriv->d, rsapriv->e, phi, ctx);
   /* some other openssl shit */
+  rsapriv->dmq1 = BN_new();
   BN_mod(rsapriv->dmq1, rsapriv->d, q1, ctx);
+  rsapriv->dmp1 = BN_new();
   BN_mod(rsapriv->dmp1, rsapriv->d, p1, ctx);
+  rsapriv->iqmp = BN_new();
   BN_mod_inverse(rsapriv->iqmp, rsapriv->q, rsapriv->p, ctx);
 
  end:
