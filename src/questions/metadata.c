@@ -48,34 +48,31 @@ metadata_question_ask_crt(X509* crt)
   EVP_PKEY* pkey = NULL;
   BIGNUM *serial = NULL;
   char *sserial = NULL;
-  char buf[BUFSIZE];
+  char sbuf[BUFSIZE];
+  char ibuf[BUFSIZE];
 
   /* subject informations: country, organization, common name */
-  X509_NAME_oneline(X509_get_subject_name(crt), buf, sizeof(buf));
-  BIO_printf(out, "%-10s: %s\n", SUBJECT, buf);
-
-
+  X509_NAME_oneline(X509_get_subject_name(crt), sbuf, sizeof(sbuf));
   /* issuer informations: country, organization, common name */
-  X509_NAME_oneline(X509_get_issuer_name(crt), buf, sizeof(buf));
-  BIO_printf(out, "%-10s: %s\n", ISSUER, buf);
-
+  X509_NAME_oneline(X509_get_issuer_name(crt), ibuf, sizeof(ibuf));
   /* serial number */
   serial = ASN1_INTEGER_to_BN(X509_get_serialNumber(crt), NULL);
   sserial = BN_bn2hex(serial);
-  BIO_printf(out, "%-10s: %s\n", SERIAL, sserial);
-  OPENSSL_free(sserial);
-  BN_free(serial);
-
   /* public key */
   pkey = X509_get_pubkey(crt);
   /* BIO_printf(out, "%-10s\n", PKEY); */
   /* PEM_write_bio_RSAPublicKey(out, pkey->pkey.rsa); */
   /* BIO_printf(out, "\r\n\r\n"); */
-
-
   /* public key bitlength */
-  BIO_printf(out, "%-10s: %d\n", BITLEN,
-             EVP_PKEY_bits(pkey));
+  BIO_printf(out,
+             "%-10s: %s\n"
+             "%-10s: %s\n"
+             "%-10s: %s\n"
+             "%-10s: %d\n",
+             SUBJECT, sbuf,
+             ISSUER, ibuf,
+             SERIAL, sserial,
+             BITLEN, EVP_PKEY_bits(pkey));
 
   /* XXX.  Compression. TLS version.
    * This needs access to the socket.
@@ -83,29 +80,31 @@ metadata_question_ask_crt(X509* crt)
   /* Note: debian builds withouth sslv2 support
    * <https://lists.debian.org/debian-devel/2011/04/msg00049.html> */
 
-
-    EVP_PKEY_free(pkey);
-    return 0;
+  OPENSSL_free(sserial);
+  BN_free(serial);
+  EVP_PKEY_free(pkey);
+  return 0;
 }
 
 RSA *metadata_question_ask_rsa(const RSA* rsa)
 {
-  char *s;
-
-  BIO_printf(out, "%-10s: %d\n", NBITLEN,
-             BN_num_bits(rsa->n));
-
-  BIO_printf(out, "%-10s: %d\n", EBITLEN,
-             BN_num_bits(rsa->e));
+  char *s, *t;
 
   s = BN_bn2hex(rsa->e);
-  BIO_printf(out, "%-10s: %s\n", E, s);
-  OPENSSL_free(s);
+  t = BN_bn2hex(rsa->n);
 
-  s = BN_bn2hex(rsa->n);
-  BIO_printf(out, "%-10s: %s\n", MODULUS, s);
-  OPENSSL_free(s);
+  BIO_printf(out,
+             "%-10s: %s\n"
+             "%-10s: %s\n"
+             "%-10s: %d\n"
+             "%-10s: %d\n",
+             MODULUS, t,
+             E, s,
+             EBITLEN, BN_num_bits(rsa->e),
+             NBITLEN, BN_num_bits(rsa->n));
 
+  OPENSSL_free(s);
+  OPENSSL_free(t);
   return NULL;
 }
 
