@@ -188,11 +188,13 @@ int BN_sqrtmod(BIGNUM* dv, BIGNUM* rem, BIGNUM* a, BN_CTX* ctx)
 }
 
 
+#define INCORRECT_VALUES_RSA_RECOVERY \
+   "[!] Incorrect vaues for RSA recovery\n"
+
 RSA* qa_RSA_recover(const RSA *rsapub,
                     const BIGNUM *p,
                     BN_CTX *ctx)
 {
-  static const char *errmsg = "[!] Incorrect vaues for RSA recovery\n";
   RSA *rsapriv = NULL;
   BIGNUM *p1 = BN_new();
   BIGNUM *q1 = BN_new();
@@ -205,7 +207,7 @@ RSA* qa_RSA_recover(const RSA *rsapub,
       BN_is_zero(p) ||
       !BN_cmp(rsapub->n, p) ||
       !BN_cmp(p, BN_value_one())) {
-    fprintf(stderr, errmsg);
+    fprintf(stderr, INCORRECT_VALUES_RSA_RECOVERY);
     goto end;
   }
 
@@ -216,7 +218,7 @@ RSA* qa_RSA_recover(const RSA *rsapub,
   BN_div(rsapriv->q, NULL, rsapub->n, rsapriv->p, ctx);
   BN_mul(n, rsapriv->p, rsapriv->q, ctx);
   if (BN_cmp(n, rsapub->n)) {
-    fprintf(stderr, errmsg);
+    fprintf(stderr, INCORRECT_VALUES_RSA_RECOVERY);
     BN_free(rsapriv->p);
     BN_free(rsapriv->q);
     RSA_free(rsapriv);
