@@ -14,7 +14,7 @@
 
 int next_mod(BIGNUM **n, FILE *fp)
 {
-  static char buf[1000];
+  static char buf[2048];
 
   if (fscanf(fp, "%s", buf) != 1)
     return 0;
@@ -56,6 +56,7 @@ int main(int argc, char **argv)
   FILE *fst, *snd;
   BIGNUM *n, *m;
   int i;
+  /* long j=0, k=0; */
   int proc, procs;
 
 
@@ -75,16 +76,21 @@ int main(int argc, char **argv)
 
   while (next_mod(&n, fst)) {
     fseek(snd, ftell(fst), SEEK_SET);
+    /* k++; j=0; */
     /* trash first modulus */
-    next_mod(&m, snd);
+    if (!next_mod(&m, snd)) continue;
     for (i=0; next_mod(&m, snd); i =(i+1) % procs) {
+      /* j++; */
       if (i != proc) continue;
+      /* if (j % 1000 == 0) fprintf(stdout, "(%5ld, %5ld) lines (and counting..)\n", j, k); */
       test(n, m);
     }
   }
 
   BN_free(n);
   BN_free(m);
+  fclose(fst);
+  fclose(snd);
 
   MPI_Finalize();
   return 0;
