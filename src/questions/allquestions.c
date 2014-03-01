@@ -71,7 +71,7 @@ int run_question(qa_question_t *q, X509 *crt, RSA *pub)
   if (crt && q->ask_crt)
     q->ask_crt(crt);
   /* Attempt to attack the RSA public key */
-  if (q->ask_rsa &&
+  if (pub && q->ask_rsa &&
       (priv = q->ask_rsa(pub))) {
 #ifdef DEBUG
     PEM_write_RSAPrivateKey(stdout, priv, NULL, NULL, 0, NULL, NULL);
