@@ -9,7 +9,7 @@
 #include <openssl/x509.h>
 
 #include "qa/questions/questions.h"
-
+#include "qa/questions/qstrings.h"
 
 /* taken from openssl's s_client app source */
 #define BUFSIZE 1024*8
@@ -25,6 +25,8 @@
 #define EBITLEN "e bits"
 #define MODULUS "modulus"
 #define E       "pub exp"
+#define NOTBEF  "not before"
+#define NOTAFT  "not after"
 
 static BIO* out;
 
@@ -50,6 +52,7 @@ metadata_question_ask_crt(X509* crt)
   char *sserial = NULL;
   char sbuf[BUFSIZE];
   char ibuf[BUFSIZE];
+  char not_after[64], not_before[64];
 
   /* subject informations: country, organization, common name */
   X509_NAME_oneline(X509_get_subject_name(crt), sbuf, sizeof(sbuf));
@@ -58,20 +61,28 @@ metadata_question_ask_crt(X509* crt)
   /* serial number */
   serial = ASN1_INTEGER_to_BN(X509_get_serialNumber(crt), NULL);
   sserial = BN_bn2hex(serial);
+  /* time fields */
+  ASN1_TIME_str(not_before, X509_get_notBefore(crt));
+  ASN1_TIME_str(not_after, X509_get_notAfter(crt));
   /* public key */
   pkey = X509_get_pubkey(crt);
+
   /* BIO_printf(out, "%-10s\n", PKEY); */
   /* PEM_write_bio_RSAPublicKey(out, pkey->pkey.rsa); */
   /* BIO_printf(out, "\r\n\r\n"); */
   /* public key bitlength */
   BIO_printf(out,
-             "%-10s: %s\n"
-             "%-10s: %s\n"
-             "%-10s: %s\n"
-             "%-10s: %d\n",
+             "%-10s:%s\n"
+             "%-10s:%s\n"
+             "%-10s:%s\n"
+             "%-10s:%s\n"
+             "%-10s:%s\n"
+             "%-10s:%d\n",
              SUBJECT, sbuf,
              ISSUER, ibuf,
              SERIAL, sserial,
+             NOTBEF, not_before,
+             NOTAFT, not_after,
              BITLEN, EVP_PKEY_bits(pkey));
 
   /* XXX.  Compression. TLS version.
@@ -94,10 +105,10 @@ RSA *metadata_question_ask_rsa(const RSA* rsa)
   t = BN_bn2hex(rsa->n);
 
   BIO_printf(out,
-             "%-10s: %s\n"
-             "%-10s: %s\n"
-             "%-10s: %d\n"
-             "%-10s: %d\n",
+             "%-10s:%s\n"
+             "%-10s:%s\n"
+             "%-10s:%d\n"
+             "%-10s:%d\n",
              MODULUS, t,
              E, s,
              EBITLEN, BN_num_bits(rsa->e),
