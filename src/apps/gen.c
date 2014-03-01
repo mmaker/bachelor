@@ -12,6 +12,7 @@
 #include <unistd.h>
 
 #include <openssl/bn.h>
+#include <openssl/evp.h>
 #include <openssl/ssl.h>
 #include <openssl/rsa.h>
 
@@ -32,12 +33,15 @@ static int
 pubkey_generation(RSA* rsa)
 {
   BN_CTX *ctx = BN_CTX_new();
+  EVP_PKEY *pkey = EVP_PKEY_new();
+  int ret = EXIT_SUCCESS;
 
   /* we need <N, e> to get a valid public key. */
   if (!(rsa->e &&
         (rsa->n ||(rsa->p && rsa->q)))) {
     fprintf(stderr, "Not enough parameter for the public key generation!\n");
-    exit(EXIT_FAILURE);
+    ret = EXIT_FAILURE;
+    goto end;
     }
 
   if (!rsa->n) {
@@ -46,12 +50,19 @@ pubkey_generation(RSA* rsa)
   }
   assert(BN_is_odd(rsa->n));
 
-  PEM_write_RSAPublicKey(stdout, rsa);
+  //  PEM_write_RSAPublicKey(stdout, rsa);
+  if (!EVP_PKEY_set1_RSA(pkey, rsa)) {
+    ret = EXIT_FAILURE;
+    goto end;
+  }
+  PEM_write_PUBKEY(stdout, pkey);
 
-  BN_CTX_free(ctx);
+ end:
   RSA_free(rsa);
+  EVP_PKEY_free(pkey);
+  BN_CTX_free(ctx);
 
-  return EXIT_SUCCESS;
+  return ret;
 }
 
 static int
@@ -116,6 +127,8 @@ int main(int argc, char **argv)
       usage(EXIT_FAILURE);
     }
   }
+
+  SSL_library_init();
 
   if (!strcmp(argv[1], "pub"))
     return pubkey_generation(rsa);
