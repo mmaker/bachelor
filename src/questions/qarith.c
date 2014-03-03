@@ -162,8 +162,8 @@ int BN_sqrtmod(BIGNUM* dv, BIGNUM* rem, BIGNUM* a, BN_CTX* ctx)
   BN_copy(rem, a);
 
   /* hacking into internal sequence to skip some cycles. */
-  /* for  (BN_one(shift);     original */
-  for (bn_wexpand(shift, a->top+1), shift->top=a->top, shift->d[shift->top-1] = 1;
+  for  (BN_one(shift);    /*  original  */
+  /* for (bn_wexpand(shift, a->top+1), shift->top=a->top, shift->d[shift->top-1] = 1; */
        BN_ucmp(shift, rem) != 1;
        /* BN_rshift(shift, shift, 2); */
        BN_lshift1(shift, shift), BN_lshift1(shift, shift));

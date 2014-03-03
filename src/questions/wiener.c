@@ -70,8 +70,7 @@ wiener_question_ask_rsa(const RSA *rsa)
     BN_usub(tmp, phi, BN_value_one());
     BN_div(phi, rem, tmp, t, cf->ctx);
     if (!BN_is_zero(rem)) continue;
-    // XXX. check, is it possible to fall here, assuming N, e are valid?
-    if (BN_is_odd(phi) && BN_cmp(n, phi) == 1)   continue;
+    if (BN_is_odd(phi) && BN_cmp(n, phi) < 0)   continue;
     /*
      * Recovering p, q
      * Solving the equation
@@ -83,7 +82,7 @@ wiener_question_ask_rsa(const RSA *rsa)
      */
     BN_usub(b2, n, phi);
     BN_uadd(b2, b2, BN_value_one());
-    BN_rshift(b2, b2, 1);
+    BN_rshift1(b2, b2);
     if (BN_is_zero(b2)) continue;
     /* delta */
     BN_sqr(tmp, b2, ctx);
@@ -91,13 +90,9 @@ wiener_question_ask_rsa(const RSA *rsa)
 
     if (!BN_sqrtmod(tmp, rem, delta, ctx)) continue;
     /* key found :) */
-    ret = RSA_new();
-    ret->n = rsa->n;
-    ret->e = rsa->e;
-    ret->p = BN_new();
-    ret->q = BN_new();
-    BN_usub(ret->p, b2, tmp);
-    BN_uadd(ret->q, b2, tmp);
+    BN_add(tmp, b2, tmp);
+    ret = qa_RSA_recover(rsa, tmp, ctx);
+    assert(ret);
     break;
   }
 
