@@ -60,6 +60,8 @@ wiener_question_ask_rsa(const RSA *rsa)
        i++, it = cf_next(cf)) {
     t = it->h;
     d = it->k;
+
+    fprintf(stderr, "[-] Testing continued fractions (%zu/%d)\r", i, bits);
     /*
      * Recovering φ(N) = (ed - 1) / t
      * TEST1: obviously the couple {t, d} is correct → (ed-1) | t
@@ -86,6 +88,7 @@ wiener_question_ask_rsa(const RSA *rsa)
     /* delta */
     BN_sqr(tmp, b2, ctx);
     BN_usub(delta, tmp, n);
+
     if (!BN_sqrtmod(tmp, rem, delta, ctx)) continue;
     /* key found :) */
     ret = RSA_new();
@@ -104,6 +107,7 @@ wiener_question_ask_rsa(const RSA *rsa)
   BN_free(b2);
   BN_free(delta);
   BN_free(phi);
+  fprintf(stderr, "\n");
 
   return ret;
 }

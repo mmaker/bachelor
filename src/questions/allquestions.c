@@ -97,12 +97,12 @@ void select_all_questions(void)
   LIST_INIT(&questions);
 
   /* REGISTER_QUESTION(ExampleQuestion); */
-  REGISTER_QUESTION(WienerQuestion);
-  REGISTER_QUESTION(PollardQuestion);
-  REGISTER_QUESTION(FermatQuestion);
-  REGISTER_QUESTION(MetadataQuestion);
-  /* REGISTER_QUESTION(PollardRhoQuestion); */
-  REGISTER_QUESTION(WilliamsQuestion);
   REGISTER_QUESTION(DixonQuestion);
   REGISTER_QUESTION(PollardBrentRhoQuestion);
+  REGISTER_QUESTION(PollardRhoQuestion);
+  REGISTER_QUESTION(WilliamsQuestion);
+  REGISTER_QUESTION(PollardQuestion);
+  REGISTER_QUESTION(FermatQuestion);
+  REGISTER_QUESTION(WienerQuestion);
+  REGISTER_QUESTION(MetadataQuestion);
 }
