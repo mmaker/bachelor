@@ -96,17 +96,22 @@ matrix_free(matrix_t *m)
 matrix_t *
 kernel(matrix_t *m)
 {
-  int i, j, k;
+  int i, j, rg;
   matrix_t *h = identity_matrix_new(m->f);
 
+  rg = 0;
   for (j=0; j!=m->r; j++)
-    for (i=0;  i != m->f; i++)
+    for (i=rg;  i != m->f; i++)
       if (m->M[i][j]) {
-        for (k=i+1; k != m->f; k++)
-          if (m->M[k][j]) {
-            vxor(m->M[k], m->M[k], m->M[i], m->r);
-            vxor(h->M[k], h->M[k], h->M[i], h->r);
+        vswap(m->M[i], m->M[rg], m->r);
+        vswap(h->M[i], h->M[rg], h->r);
+
+        for (i=rg+1; i < m->f; i++)
+          if (m->M[i][j]) {
+            vxor(m->M[i], m->M[i], m->M[rg], m->r);
+            vxor(h->M[i], h->M[i], h->M[rg], h->r);
           }
+        rg++;
         break;
       }
 
@@ -212,8 +217,6 @@ dixon_question_ask_rsa(const RSA *rsa)
   MPI_Type_struct(3, lengths, offsets, types, &MPI_BNPAIR);
   MPI_Type_commit(&MPI_BNPAIR);
 
-  count = procs > 1 ? f / (procs-1) : f;
-  printf("slave %d/%d at your service, sir.\n", proc, procs);
   /* root node fetches, child nodes discovery */
   if (proc == 0) {
     /** STEP 1: initialization **/
@@ -221,6 +224,7 @@ dixon_question_ask_rsa(const RSA *rsa)
     R = malloc(sizeof(struct bnpair) * f);
 
     /** STEP 2 generating R */
+    count = procs > 1 ? f % (procs-1) : f;
     for (i=0; i != f - count; i++) {
       MPI_Recv(&to, 1, MPI_BNPAIR, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
       R[i].x = BN_new();
@@ -229,10 +233,10 @@ dixon_question_ask_rsa(const RSA *rsa)
       BN_hex2bn(&R[i].y, to.y);
       memcpy(m->M[i], to.v, r);
 
-      fprintf(stderr, "received: %s (%zu/%d)\n", to.x, i, f);
+      fprintf(stderr, "[!] discovering relations (%zu/%zu)\r", i, f);
     }
 
-    while (i++ < f) {
+    for (;i < f; i++) {
       R[i].x = BN_new();
       R[i].y = BN_new();
       discover_smooth(R[i].y, R[i].x, rsa->n, ctx, m->M[i], r);
@@ -241,7 +245,7 @@ dixon_question_ask_rsa(const RSA *rsa)
     BIGNUM *x = BN_new(), *y = BN_new();
     char *s;
 
-    while (count--) {
+    for (count = f / (procs-1); count; count--) {
       discover_smooth(y, x, rsa->n, ctx, to.v, r);
       s = BN_bn2hex(x);
       strcpy(to.x, s);
@@ -250,10 +254,9 @@ dixon_question_ask_rsa(const RSA *rsa)
       strcpy(to.y, s);
       OPENSSL_free(s);
 
-      //      fprintf(stderr, "generated: %s (%d)", to.x, count);
+      /* fprintf(stderr, "generated: %s (%d)", to.x, count); */
       MPI_Send(&to, 1, MPI_BNPAIR, 0, 0, MPI_COMM_WORLD);
     }
-    fprintf(stderr, "worker %zu finished.", proc);
     BN_free(x);
     BN_free(y);
   }
@@ -264,26 +267,29 @@ dixon_question_ask_rsa(const RSA *rsa)
   }
 #endif
 
+  fprintf(stderr, "\n[!] breaching the kernel\n");
   /** STEP 3: break & enter. */
   h = kernel(m);
-  BN_one(x);
-  BN_one(sqy);
-  for (i=0; i!=f && !ret; i++)
+  for (i = h->f - 1;
+       !ret && is_vzero(m->M[i], h->r);
+       i--) {
+    BN_one(x);
+    BN_one(sqy);
     /* if we found an even power */
-    if (is_vzero(m->M[i], f)) {
-      /* compute x, y² */
-      for (j=0; j!=f; j++)
-        if (h->M[i][j]) {
-          BN_mul(x, x, R[j].x, ctx);
-          BN_mul(sqy, sqy, R[j].y, ctx);
-        }
-      BN_sqrtmod(y, rem, sqy, ctx);
-      assert(!BN_is_zero(rem));
-      BN_gcd(gcd, x, y, ctx);
-      if (BN_cmp(gcd, rsa->n) < 0 &&
-          BN_cmp(gcd, BN_value_one()) > 0)
-        ret = qa_RSA_recover(rsa, gcd, ctx);
-    }
+    fprintf(stderr, "[!] Examining relation\n");
+    /* compute x, y² */
+    for (j=0; j!=h->r; j++)
+      if (h->M[i][j]) {
+        BN_mul(x, x, R[j].x, ctx);
+        BN_mul(sqy, sqy, R[j].y, ctx);
+      }
+    BN_sqrtmod(y, rem, sqy, ctx);
+    //  assert(!BN_is_zero(rem));
+    BN_gcd(gcd, x, y, ctx);
+    if (BN_cmp(gcd, rsa->n) < 0 &&
+        BN_cmp(gcd, BN_value_one()) > 0)
+      ret = qa_RSA_recover(rsa, gcd, ctx);
+  }
 
   /* free all the shit */
   for (i=0; i!=f; i++) {

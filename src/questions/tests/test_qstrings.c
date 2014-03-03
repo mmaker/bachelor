@@ -1,6 +1,8 @@
 #include <stddef.h>
 #include <assert.h>
 
+#include <openssl/asn1.h>
+
 #include "qa/questions/qstrings.h"
 
 void
@@ -34,11 +36,22 @@ test_vxor(void)
 
 }
 
+void test_vswap(void)
+{
+  char v[10] = "\0\0\0\0\0\0\0\0\0\0";
+  char w[10] = "\1\1\1\1\1\1\1\1\1\2";
+
+  vswap(v, w, 10);
+  assert(v[0] && !w[0]);
+  assert(v[9] == 2);
+}
+
 
 int main(int argc, char **argv)
 {
   test_is_vzero();
   test_vxor();
+  test_vswap();
 
   return 0;
 }

@@ -66,6 +66,25 @@ test_kernel(void)
   assert(h->M[2][1] == 1 && h->M[2][2] == 1);
   assert(h->f == 4 && h->r == 4);
   assert(h->M[3][2] == 0);
+
+  matrix_free(h);
+  matrix_free(m);
+
+  m = matrix_new(10, 6);
+  memcpy(m->M[0], "\1\0\1\0\1\0", 6);
+  memcpy(m->M[1], "\1\0\1\1\1\0", 6);
+  memcpy(m->M[2], "\1\1\1\0\1\0", 6);
+  memcpy(m->M[3], "\1\0\1\0\1\0", 6);
+  memcpy(m->M[4], "\0\1\0\0\1\0", 6);
+  memcpy(m->M[5], "\1\0\1\0\1\0", 6);
+  memcpy(m->M[6], "\1\0\1\0\1\1", 6);
+  memcpy(m->M[7], "\1\0\1\1\1\0", 6);
+  memcpy(m->M[8], "\0\0\1\0\1\0", 6);
+  memcpy(m->M[9], "\0\0\1\1\1\1", 6);
+  h = kernel(m);
+  assert(is_vzero(m->M[9], 6));
+  matrix_free(h);
+  matrix_free(m);
 }
 
 void

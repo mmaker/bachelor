@@ -158,7 +158,7 @@ qa_dispose(X509 *crt, RSA *rsa)
   LIST_FOREACH(q, &questions, qs) {
 
 #ifdef HAVE_OPENMPI
-    if (i++ %  procs != proc) continue;
+    //  if (i++ %  procs != proc) continue;
 #endif
 
     printf( "[-] Running: %s\n", q->pretty_name);

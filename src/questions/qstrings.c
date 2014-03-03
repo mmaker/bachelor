@@ -29,6 +29,24 @@ vxor(void *void_u, const void *void_v, const void *void_w, size_t len)
     *(u++) = *(v++) ^ *(w++);
 }
 
+/**
+ * \brief swap two vectors.
+ *
+ *
+ *
+ */
+void
+vswap(void *void_a, void *void_b, size_t len)
+{
+  char unsigned *a = (char unsigned *) void_a;
+  char unsigned *b = (char unsigned *) void_b;
+  char unsigned c;
+
+  for (; len--; a++, b++) {
+    c = *a;
+    *a = *b; *b = c;
+  }
+}
 
 /**
  * \brief Check v the first len bits of v are filled with zeroes
