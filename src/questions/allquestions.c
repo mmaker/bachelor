@@ -16,6 +16,10 @@
 #include <openssl/rsa.h>
 #include <openssl/ssl.h>
 
+#ifdef HAVE_OPENMPI
+#include <mpi.h>
+#endif
+
 #include "qa/questions/questions.h"
 
 void QA_library_init(void)

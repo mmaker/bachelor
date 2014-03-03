@@ -97,7 +97,6 @@ get_local_rsa(const char *src)
 int
 qa_init(const struct qa_conf* conf)
 {
-  int exitcode;
   X509 *crt = NULL;
   RSA *rsa = NULL;
 
@@ -119,20 +118,21 @@ qa_init(const struct qa_conf* conf)
   if (!crt && !rsa)
     error(EXIT_FAILURE, errno, "Unable to open source \"%s\" :", conf->src);
 
-  exitcode = qa_dispose(crt, rsa);
+  int ret = qa_dispose(crt, rsa);
   X509_free(crt);
-  return exitcode;
+  return ret;
 }
 
 static int
 qa_dispose(X509 *crt, RSA *rsa)
 {
-  int exit_code;
+  int exit_code = EXIT_SUCCESS;
   RSA *pub;
   qa_question_t *q;
   EVP_PKEY *pkey;
 #ifdef HAVE_OPENMPI
-  int proc, procs, i;
+  int proc, procs;
+  /* i; */
 #endif
 
   if (!rsa && crt)  {
@@ -149,7 +149,7 @@ qa_dispose(X509 *crt, RSA *rsa)
 #ifdef HAVE_OPENMPI
   MPI_Comm_rank(MPI_COMM_WORLD, &proc);
   MPI_Comm_size(MPI_COMM_WORLD, &procs);
-  i = 0;
+  /* i = 0; */
 #endif
 
   LIST_FOREACH(q, &questions, qs) {

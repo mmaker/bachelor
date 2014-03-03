@@ -52,7 +52,7 @@ int main(int argc, char **argv)
 
     rsa = pkey->pkey.rsa;
     printf("%-10s: %s\n", SITE, site);
-    run_question(&MetadataQuestion, crt, NULL);
+    run_question(&MetadataQuestion, crt, rsa);
     X509_free(crt);
   }
 

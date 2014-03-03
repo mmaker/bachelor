@@ -179,8 +179,8 @@ dixon_question_ask_rsa(const RSA *rsa)
   struct bnpair {
     BIGNUM *x;
     BIGNUM *y;
-  } *R;
-  matrix_t *m;
+  } *R = NULL;
+  matrix_t *m = NULL;
   matrix_t *h;
 
 
