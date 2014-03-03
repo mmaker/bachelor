@@ -249,6 +249,7 @@ X509* get_remote_cert(char *address)
   X509 *crt = NULL;
   qa_connection_t *c;
 
+  fprintf(stderr, "[-] connecting to %s\n", address);
   c = qa_connection_new(address);
   if (!c) return NULL;
 
