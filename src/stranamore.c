@@ -59,10 +59,6 @@ int main(int argc, char **argv)
   /* long j=0, k=0; */
   int proc, procs;
 
-
-  n = BN_new();
-  m = BN_new();
-
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &proc);
   MPI_Comm_size(MPI_COMM_WORLD, &procs);
@@ -72,6 +68,9 @@ int main(int argc, char **argv)
   if (!fst) return EXIT_FAILURE;
   snd = fopen(argv[argc-1], "r");
   if (!snd) return EXIT_FAILURE;
+
+  n = BN_new();
+  m = BN_new();
 
 
   while (next_mod(&n, fst)) {
