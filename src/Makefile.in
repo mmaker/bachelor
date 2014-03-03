@@ -78,7 +78,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 @CLUSTER_FALSE@bin_PROGRAMS = qa$(EXEEXT)
 @CLUSTER_TRUE@bin_PROGRAMS = qa$(EXEEXT) indiana$(EXEEXT) \
-@CLUSTER_TRUE@	stranamore$(EXEEXT)
+@CLUSTER_TRUE@	stranamore$(EXEEXT) despicable$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/depcomp
@@ -92,6 +92,10 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
+am__despicable_SOURCES_DIST = despicable.c
+@CLUSTER_TRUE@am_despicable_OBJECTS = despicable.$(OBJEXT)
+despicable_OBJECTS = $(am_despicable_OBJECTS)
+@CLUSTER_TRUE@despicable_DEPENDENCIES = questions/libquestions.a
 am__indiana_SOURCES_DIST = indiana.c qa_sock.c
 @CLUSTER_TRUE@am_indiana_OBJECTS = indiana.$(OBJEXT) qa_sock.$(OBJEXT)
 indiana_OBJECTS = $(am_indiana_OBJECTS)
@@ -131,8 +135,10 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(indiana_SOURCES) $(qa_SOURCES) $(stranamore_SOURCES)
-DIST_SOURCES = $(am__indiana_SOURCES_DIST) $(qa_SOURCES) \
+SOURCES = $(despicable_SOURCES) $(indiana_SOURCES) $(qa_SOURCES) \
+	$(stranamore_SOURCES)
+DIST_SOURCES = $(am__despicable_SOURCES_DIST) \
+	$(am__indiana_SOURCES_DIST) $(qa_SOURCES) \
 	$(am__stranamore_SOURCES_DIST)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
@@ -294,6 +300,8 @@ SUBDIRS = questions/ apps/ tests/
 @CLUSTER_TRUE@indiana_LDADD = questions/libquestions.a -lssl -lcrypto
 @CLUSTER_TRUE@stranamore_SOURCES = stranamore.c
 @CLUSTER_TRUE@stranamore_LDADD = -lssl -lcrypto
+@CLUSTER_TRUE@despicable_SOURCES = despicable.c
+@CLUSTER_TRUE@despicable_LDADD = questions/libquestions.a -lssl -lcrypto
 qa_SOURCES = qa.c qa_sock.c cmdline.c
 qa_LDADD = questions/libquestions.a -lssl -lcrypto
 all: all-recursive
@@ -373,6 +381,10 @@ uninstall-binPROGRAMS:
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
 
+despicable$(EXEEXT): $(despicable_OBJECTS) $(despicable_DEPENDENCIES) $(EXTRA_despicable_DEPENDENCIES) 
+	@rm -f despicable$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(despicable_OBJECTS) $(despicable_LDADD) $(LIBS)
+
 indiana$(EXEEXT): $(indiana_OBJECTS) $(indiana_DEPENDENCIES) $(EXTRA_indiana_DEPENDENCIES) 
 	@rm -f indiana$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(indiana_OBJECTS) $(indiana_LDADD) $(LIBS)
@@ -392,6 +404,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cmdline.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/despicable.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/indiana.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/qa.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/qa_sock.Po@am__quote@
