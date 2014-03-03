@@ -181,7 +181,9 @@ wiener_question_ask_rsa(const RSA *rsa)
     t = it->h;
     d = it->k;
 
+#ifdef DEBUG
     fprintf(stderr, "[-] Testing continued fractions (%zu/%d)\r", i, bits);
+#endif
     /*
      * Recovering φ(N) = (ed - 1) / t
      * TEST1: obviously the couple {t, d} is correct → (ed-1) | t
@@ -222,7 +224,9 @@ wiener_question_ask_rsa(const RSA *rsa)
   BN_free(b2);
   BN_free(delta);
   BN_free(phi);
+#ifdef DEBUG
   fprintf(stderr, "\n");
+#endif
 
   return ret;
 }
