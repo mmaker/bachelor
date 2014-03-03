@@ -28,6 +28,8 @@ void QA_library_init(void)
   MPI_Init(0 , NULL);
 #endif
 
+  select_all_questions();
+
 }
 
 /**
@@ -38,7 +40,6 @@ void select_question(const char *sq)
 {
   qa_question_t *q, *tmpq;
 
-  select_all_questions();
   assert(questions.lh_first);
 
   LIST_FOREACH_SAFE(q, &questions, qs, tmpq)

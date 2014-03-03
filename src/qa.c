@@ -105,10 +105,7 @@ qa_init(const struct qa_conf* conf)
   bio_out = BIO_new_fp(stdout, BIO_NOCLOSE);
   bio_err = BIO_new_fp(stderr, BIO_NOCLOSE);
 
-  QA_library_init();
-
-  if (!conf->attacks) select_all_questions();
-  else select_question(conf->attacks);
+  if (conf->attacks) select_question(conf->attacks);
   if (!questions.lh_first) error(EXIT_FAILURE, 0, "No valid question selected.");
 
   if (conf->src_type == REMOTE)

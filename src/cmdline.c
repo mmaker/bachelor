@@ -14,7 +14,10 @@
 #include <string.h>
 #include <errno.h>
 
+#include <bsd/sys/queue.h>
+
 #include "qa/qa.h"
+#include "qa/questions/questions.h"
 
 /**
  * \brief Prints the usage message, then exit.
@@ -24,15 +27,20 @@
  */
 void usage(void)
 {
+  qa_question_t *q;
   static const char* help_message = "%s usage: %s"
     " [-r HOST:port | -f X509 | -R RSA]"
     " [-a ATTACK]"
     " \n\n"
     "If no argument is supplied, by default a public RSA key is expected "
-    "to be read from the standard input.\n";
+    "to be read from the standard input.\n\n"
+    "Available attacks: \n";
   fprintf(stderr, help_message,
           program_invocation_short_name,
           program_invocation_name);
+  LIST_FOREACH(q, &questions, qs)
+    fprintf(stderr, "%-10s\t\t%s\n", q->name, q->pretty_name);
+  fprintf(stderr, "\n");
 }
 
 void conflicting_args(void)
@@ -60,6 +68,8 @@ int main(int argc, char** argv)
     .src_type = NONE,
     .attacks = NULL,
   };
+
+  QA_library_init();
 
   while ((opt=getopt_long(argc, argv,
                           short_options, long_options,
