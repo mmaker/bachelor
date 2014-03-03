@@ -1,8 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 
-cd `dirname $0`/../../
-
-cat /dev/null > primes.txt
+> primes.txt
 
 for i in {1..16}
 do

@@ -31,6 +31,7 @@ test_*
 qa
 gen
 unittest
+primes.txt
 
 # latex-generated files.
 book/*.pdf
