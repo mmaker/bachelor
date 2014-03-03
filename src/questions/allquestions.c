@@ -15,9 +15,6 @@
 #include <openssl/x509.h>
 #include <openssl/rsa.h>
 #include <openssl/ssl.h>
-#ifdef HAVE_OPENMPI
-#include <mpi.h>
-#endif
 
 #include "qa/questions/questions.h"
 
