@@ -214,7 +214,6 @@ wiener_question_ask_rsa(const RSA *rsa)
     /* key found :) */
     BN_add(tmp, b2, tmp);
     ret = qa_RSA_recover(rsa, tmp, ctx);
-    assert(ret);
     break;
   }
 
