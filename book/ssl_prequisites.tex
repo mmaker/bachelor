@@ -118,47 +118,50 @@ found or no trusted authority is found. In the latter case, the connection is ab
   subsequent records will be protected under the just negotiated keys and
   \texttt{Cipher Spec}.
 \end{itemize}
-We will proceed with a brief synopsis of the first two of these protocols, due to
-their relevant role inside the connection and furthermore, because they were the
-only two we actually used during our investigations.
+We will now proceed with a brief synopsis of the first two of these protocols,
+due to their relevant role inside the connection, but will not proceed further,
+as they were the only two we actually used in our research.
 
 
 \section{The \texttt{handshake} protocol}
 As mentioned above, the handshake occurs whenever a machine attempts to start
-a TLS connection. If there is no session identifier, a new one is being build
+a TLS connection. If there is no session identifier, a new one is being built
 up; otherwise the client will include the session-id in the initial
 communication and the server will eventually skip the key agreement phase since
 %% XXX. check the use of verb happened
-it has happened recently.\footnote{``recently'' is not well-defined in
+it has happened recently\footnote{``recently'' is not well-defined in
   the standard - it is suggested an upper limit of 24-hours lifetime, but the
-  only constraint is that both client and server agree on it.}\\
-A new session-id identifier gets built via a challenge-response mechanism: the
-client issues a challenge, the server chooses a connection-id and presents it
-with its certificate. The client verifies the server's identity, and then
-chooses both a session key and the security specifications for the current
-session. Note that the session key should be different for any connection and
-direction. At this point the server can either send back the challenge and
-generate a session-id, or it can ask for the client
-certificate and finally ask for it (client authentication).
+  only actual constraint is that both client and server agree on it.}.\\
+A new session identifier gets built as follows. Once a communication channel
+over the transport layer has been established, the client sends a hello
+message, to which the server must respond with a server hello, or else a fatal error
+will occurr. The above hello messages agree the two parties on the TLS protocol
+version, compression and encryption methods, and  establish a session identifier
+(\cite{rfc2246} \S 7.3).
 
-\vfill
+Following the hello messages, the server will send its certificate,
+if it is to be authenticated. If the client is happy with it, a RSA or
+Diffie-Hellmann key exchange is initiated by the client to establish the
+symmetric key to be used for the ensuing session.
+
 \section{The \texttt{record} protocol}
+Once the two parties share a common secret, called \emph{premaster secret},
+they can generate a new key to be used for symmetric encryption of message, and
+another for message authentication.
+
 All TLS protocol messages move in records of up to 16K, containing 3
 main components: MAC-data, data, and padding.
-\\
-{MAC-data} is no other than the Message Authentication Code over the
+\begin{itemize}
+\item {MAC-data} is no other than the Message Authentication Code over the
 encrypted \emph{data} sent
 (SSL performs the encrypt-then-mac mode of operation).
 It provides \strong{authenticity} and \strong{integrity} of the message.
+\item {Data} is the actual message, encrypted after an eventual compression.
+\item The {Padding} section contains informations about the padding algorithm
+adopted, and the padding size.
+\end{itemize}
 Failure to authenticate, decrypt will result in I/O error and a close of the
 connection.
-\\
-{Data} is the actual message, compressed and encrypted. Compression comes
-for free in order to mitigate the cryptanalysis of the cipher, since protocols
-such as HTTP have a common set of standard messages.
-\\
-The {Padding} section contains informations about the padding algorithm
-adopted, and the padding size.
 
 \section{What is inside a certificate \label{sec:ssl:x509}}
 SSL certificates employed the X.509 PKI standard, which specifies, among other
