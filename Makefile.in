@@ -682,7 +682,7 @@ distcleancheck: distclean
 	       exit 1; } >&2
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(DATA)
+all-am: Makefile $(DATA) all-local
 installdirs: installdirs-recursive
 installdirs-am:
 	for dir in "$(DESTDIR)$(docdir)"; do \
@@ -789,7 +789,7 @@ uninstall-am: uninstall-dist_docDATA
 
 .MAKE: $(am__recursive_targets) install-am install-strip
 
-.PHONY: $(am__recursive_targets) CTAGS GTAGS TAGS all all-am \
+.PHONY: $(am__recursive_targets) CTAGS GTAGS TAGS all all-am all-local \
 	am--refresh check check-am clean clean-cscope clean-generic \
 	cscope cscopelist-am ctags ctags-am dist dist-all dist-bzip2 \
 	dist-gzip dist-lzip dist-shar dist-tarZ dist-xz dist-zip \
@@ -805,6 +805,9 @@ uninstall-am: uninstall-dist_docDATA
 	mostlyclean mostlyclean-generic pdf pdf-am ps ps-am tags \
 	tags-am uninstall uninstall-am uninstall-dist_docDATA
 
+
+all-local:
+	test -f primes.txt || ./src/apps/primes.sh
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
