@@ -4465,7 +4465,7 @@ else
 fi
 
 
-ac_config_files="$ac_config_files Makefile src/Makefile src/questions/Makefile src/apps/Makefile src/tests/Makefile src/questions/tests/Makefile"
+ac_config_files="$ac_config_files Makefile src/Makefile src/questions/Makefile src/apps/Makefile src/tests/Makefile src/questions/tests/Makefile book/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -5204,6 +5204,7 @@ do
     "src/apps/Makefile") CONFIG_FILES="$CONFIG_FILES src/apps/Makefile" ;;
     "src/tests/Makefile") CONFIG_FILES="$CONFIG_FILES src/tests/Makefile" ;;
     "src/questions/tests/Makefile") CONFIG_FILES="$CONFIG_FILES src/questions/tests/Makefile" ;;
+    "book/Makefile") CONFIG_FILES="$CONFIG_FILES book/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac

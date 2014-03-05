@@ -309,7 +309,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 #AUTOMAKE_OPTIONS = foereign
-SUBDIRS = src/
+SUBDIRS = src/ book/
 AUTOMAKE_ARGS = --add-missing
 dist_doc_DATA = README
 all: all-recursive

@@ -1,0 +1,27 @@
+#!/bin/bash
+
+cat <<Esercizi | cat - question_authority.pdf | sponge question_authority.pdf
+Tradurre
+parole
+normali
+in parole
+d'amore.
+
+Interpreti,
+il candidato,
+la bellezza
+del mondo
+in pochi
+versi
+
+e torni
+poi
+ad
+ammirare
+mirare
+rare
+stelle
+malate
+di nostalgia.
+Esercizi
+# --Ida V.

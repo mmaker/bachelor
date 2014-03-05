@@ -50,4 +50,5 @@ AC_OUTPUT([Makefile
            src/Makefile src/questions/Makefile
            src/apps/Makefile
            src/tests/Makefile src/questions/tests/Makefile
+           book/Makefile
            ])
