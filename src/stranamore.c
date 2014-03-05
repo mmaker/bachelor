@@ -36,6 +36,7 @@ int test(BIGNUM *n, BIGNUM *m)
   g = BN_new();
   ctx = BN_CTX_new();
   BN_gcd(g, n, m, ctx);
+
   if (!BN_is_one(g)) {
     fprintf(stdout, "%-8s: ", PRIME);
     BN_print_fp(stdout, n);
@@ -56,7 +57,6 @@ int main(int argc, char **argv)
   FILE *fst, *snd;
   BIGNUM *n, *m;
   int i;
-  /* long j=0, k=0; */
   int proc, procs;
 
   MPI_Init(&argc, &argv);
@@ -73,17 +73,13 @@ int main(int argc, char **argv)
   m = BN_new();
 
 
-  while (next_mod(&n, fst)) {
+  for (i=0; next_mod(&n, fst); i=(i+1) % procs) {
+    if (i != proc) continue;
+
     fseek(snd, ftell(fst), SEEK_SET);
-    /* k++; j=0; */
     /* trash first modulus */
-    if (!next_mod(&m, snd)) continue;
-    for (i=0; next_mod(&m, snd); i =(i+1) % procs) {
-      /* j++; */
-      if (i != proc) continue;
-      /* if (j % 1000 == 0) fprintf(stdout, "(%5ld, %5ld) lines (and counting..)\n", j, k); */
+    while (next_mod(&m, snd))
       test(n, m);
-    }
   }
 
   BN_free(n);
