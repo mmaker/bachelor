@@ -120,11 +120,12 @@ mathematical tests performed in the university cluster.
 
 \paragraph{Wiener.} The attack described in chapter \ref{chap:wiener} was the
 first employed, being the fastest one above all others. Recalling the different
-public exponents we probed (discussed in the previous sections), we expected all
-private exponents to be $>  \rfrac{1}{3}\sqrt[4]{N}$; there is still the
-possibility that the attack works, but there is no guarantee.
-For what concerns our tests, we found no weak keys that could be recovered using
-Wiener's attack.
+public exponents we probed and discussed in the preceeding section (all $\leq
+65537$), we expected all private expenents to be $>  \rfrac{1}{3}\sqrt[4]{N}$
+and therefore not vulnerable to this particular version of Wiener's attack.
+Indeed, we found no weak keys with respect to this attack. Though, as
+pointed out in \cite{20years} \S 3, there is still the possibilty that the
+public keys we collected could be broken employing some variants of it.
 
 \paragraph{GCD.} On the wave of \cite{ron:whit}, whe attempted also to perform
 the $\gcd$ of every possible pair of dinstinct public modulus present in the
