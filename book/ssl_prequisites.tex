@@ -156,12 +156,12 @@ main components: MAC-data, data, and padding.
 encrypted \emph{data} sent
 (SSL performs the encrypt-then-mac mode of operation).
 It provides \strong{authenticity} and \strong{integrity} of the message.
-\item {Data} is the actual message, encrypted after an eventual compression.
+\item {Data} is the actual message, encrypted after a possible compression.
 \item The {Padding} section contains informations about the padding algorithm
 adopted, and the padding size.
 \end{itemize}
-Failure to authenticate, decrypt will result in I/O error and a close of the
-connection.
+Failure to authentication, or decryption will result in I/O error and a close of
+the connection.
 
 \vfill
 \section{What is inside a certificate \label{sec:ssl:x509}}
@@ -191,7 +191,8 @@ algorithms.
   }
 \end{center}
 
-It is a pretty old standard, defined in the eighties by the ITU.
+It is a pretty old standard, defined in the eighties by the International
+Telecommunication Union.
 Born before HTTP, it was initially thought \emph{in abstracto} to be
 extremely flexible and general\footnote{
   \textit{``X.509 certificates can contain just anything''} ~\cite{SSLiverse}
@@ -203,7 +204,7 @@ difficult to write good, reliable software parsing a X.509 certificate.
 \section{Remarks among SSL/TLS versions}
 
 The first, important difference to point out here is that SSLv2 is no more
-considered secure. There are known attacks on the ciphers adopted (md5, for
+considered secure. There are known attacks on the primitives adopted (MD5, for
 example \cite{rfc6176}) as well as protocol flaws.
 SSLv2 would allow a connection to be closed via a not-authenticated TCP segment
 with the \texttt{FIN} flag set (\cite{rfc6176} \S 2). Padding informations are sent in
@@ -224,7 +225,7 @@ browser now mitigates its spectrum of action.
 Even if TLS 1.1, and TLS 1.2 are considered safe as of today, attacks such as
 CRIME, and lately BREACH constitute a new and valid instance of threat for HTTP
 compressions mechanisms. However, as their premises go beyond the scope of this
-document, all these attacks have not been analyzed. For forther informations, see
+document, all these attacks have not been analyzed. For further informations, see
 \url{http://breachattack.com/}.
 
 %%% Local Variables:

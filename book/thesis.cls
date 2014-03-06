@@ -10,7 +10,7 @@
 \RequirePackage{fancyhdr}
 
 
-\bibliographystyle{amsalpha}
+%%\bibliographystyle{amsalpha}
 
 \newcommand\@ptsize{}
 \newif\if@restonecol

@@ -2,7 +2,8 @@
 
 Analogously to Pollard's $p-1$ factorization described in chapter
 ~\ref{chap:pollard-1}, this method will allow the determination of the divisor
-$p$ of a number $N$, if $p$ is such that $p+1$ has only small prime divisors.
+$p$ of a number $N$, if $p$ is such that $p+1$ has only small prime power
+divisors.
 This method was presented in ~\cite{Williams:p+1} together with the results of
 the application of this method to a large number of composite numbers.
 
@@ -60,14 +61,16 @@ Two foundamental properties interpolate terms of Lucas Sequences, namely
 \end{align}
 
 All these identities can be verified by direct substitution with
-\ref{eq:williams:ls}. What's interesting about the ones of above, is that we can
+\ref{eq:williams:ls}. What is interesting about the ones of above, is that we can
 exploit them to efficiently compute the product $V_{hk}$ if we are provided with
-`$V_k$ by considering the binary representation of the number
+$V_k$ by considering the binary representation of the number
 $h$. In other words, we can consider each bit of $h$, starting from second most
 significant one: if it is zero, we compute $\angular{V_{2k}, V_{(2+1)k}}$ using
 \ref{eq:ls:duplication} and \ref{eq:ls:addition} respectively; otherwise we
 compute $\angular{V_{(2+1)k}, V_{2(k+1)}}$ using \ref{eq:ls:addition} and
 \ref{eq:ls:duplication}.
+
+Notice that $V_{(2+1)k} = V_{2k +k} = V_{2k}V_k - V_k$.
 
 \begin{algorithm}[H]
   \caption{Lucas Sequence Multiplier}
@@ -126,18 +129,16 @@ At this point the factorization proceeds just by substituting the
 exponentiation and Fermat's theorem with Lucas sequences and Lehmer's theorem
 introduced in the preceeding section. If we find a $Q$ satisfying $p+1 \mid Q
 \text{ or } p-1 \mid Q$ then, due to Lehmer's theorem $p \mid V_Q -2$ and thus
-$\gcd(V_Q -2, N)$ is a non-trial divisor of $N$.
+$\gcd(V_Q -2, N)$ is a non-trivial divisor of $N$.
 
 \begin{enumerate}[(i)]
-\item take a random, initial $\tau = V_1$; now let the \emph{base} be
-  $\angular{V_1}$.
-\item take the $i$-th prime in $\mathcal{P}$, starting from $0$, and call it
-  $p_i$;
-\item assuming the current state is $\angular{V_k}$, compute the
+\item Take a random, initial $\tau$ and let it the \emph{base} $V_1$.
+\item Take the $i$-th prime in the pool $\mathcal{P}$, and call it $\pi$;
+\item assuming the current state is $V_k$, compute the
   successive terms of the sequence using additions and multiplications formula,
-  until you have $\angular{V_{p_ik}}$.
+  until you have $V_{\pi k}$.
 \item just like with the Pollard $p-1$ method, repeat step (iii) for $e =
-  \ceil{\frac{\log N}{\log p_i}}$ times;
+  \ceil{\frac{\log N}{\log \pi}}$ times;
 \item select $Q = V_k - 2 \pmod{N}$ and check the $gcd$ with $N$, hoping this
   leads to one of the two prime factors:
 \begin{align}
@@ -160,11 +161,11 @@ if $g = N$ start back from scratch, as $pq \mid g$.
     \Require $\mathcal{P}$, the prime pool
     \Function{Factorize}{$N, \tau$}
       \State $V \gets \tau$
-      \For{$p_i \strong{ in } \mathcal{P}$}
+      \For{$\pi \strong{ in } \mathcal{P}$}
       \Comment step (i)
-        \State $e \gets \log \sqrt{N} // \log p_i$
+        \State $e \gets \log \sqrt{N} // \log \pi$
         \For{$e \strong{ times }$}
-          \State $V \gets \textsc{lucas}(V, p_i, N)$
+          \State $V \gets \textsc{lucas}(V, \pi, N)$
           \Comment step (ii)
           \State $Q \gets V -2$
           \State $g \gets \gcd(Q, N)$
