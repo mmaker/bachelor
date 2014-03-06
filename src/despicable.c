@@ -1,15 +1,19 @@
 /**
- * \file donnie.c
+ * \file despicable.c
  * \brief Perform specific factorization attacks on the cluster.
  *
  *
- * For now, just using wiener, expecting a csv file composed of pairs <n, e>.
+ * Given a cvs file composed of public keys - pairs <n, e> - this file
+ * iteratively runs a pre-selected attack (see global var *question), eventually
+ * reporting broken keys to the standard output.
  */
 #include <openssl/rsa.h>
 #include <mpi.h>
 
 #include "qa/questions/questions.h"
-#include "qa/questions/qwiener.h"
+
+extern qa_question_t PollardQuestion;
+qa_question_t *question = &PollardQuestion;
 
 int next_pkey(RSA *pub, FILE *fp)
 {
@@ -42,7 +46,7 @@ int main(int argc, char **argv)
   rsa->e = BN_new();
   for (i=0; next_pkey(rsa, fp); i = (i+1) % procs) {
     if (i != proc) continue;
-    if (run_question(&WienerQuestion, NULL, rsa) == 1) {
+    if (run_question(question, NULL, rsa) == 1) {
       BN_print_fp(stdout, rsa->n);
       fprintf(stdout, "\t broken\n");
     }
