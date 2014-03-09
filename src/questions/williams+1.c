@@ -29,41 +29,38 @@ lucas(BIGNUM *v, BIGNUM *h,
   BIGNUM *w;
   BIGNUM *vv;
   BIGNUM *vw;
-  BIGNUM *u;
   BIGNUM *tau;
   int i;
 
-  w = BN_dup(BN_value_two());
-  tau = BN_dup(v);
-
+  w = BN_new();
   vv = BN_new();
   vw = BN_new();
-  u = BN_new();
+
+  tau = BN_dup(v);
+  BN_mod_sqr(vv, v, n, ctx);
+  BN_mod_sub(w, vv, BN_value_two(), n, ctx);
 
   for (i = BN_num_bits(h); !BN_is_bit_set(h, i); i--);
   for (i--; i >= 0; i--) {
     if (BN_is_bit_set(h, i)) {
-      BN_mod_sqr(vv, v, n, ctx);
-      /* v = τv² - vw - τ */
-      BN_mod_mul(u, tau, vv, n, ctx);
+      /* v = vw - τ (mod N) */
       BN_mod_mul(vw, v, w, n, ctx);
-      BN_mod_sub(u, u, vw, n, ctx);
-      BN_mod_sub(u, u, tau, n, ctx);
+      BN_mod_sub(v, vw, tau, n, ctx);
       /* w = w² - 2 */
-      BN_sub(w, vv, BN_value_two());
+      BN_mod_sqr(vv, w, n, ctx);
+      BN_mod_sub(w, vv, BN_value_two(), n, ctx);
     } else {
-      BN_sqr(vv, v, ctx);
-      /* v = v² - 2 */
-      BN_sub(u, vv, BN_value_two());
-      /* w = vw - τ */
+      /* w = vw - τ (mod N) */
       BN_mul(vw, v, w, ctx);
-      BN_sub(w, vw, tau);
+      BN_mod_sub(w, vw, tau, n, ctx);
+      /* v = v² - 2 */
+      BN_mod_sqr(vv, v, n, ctx);
+      BN_mod_sub(v, vv, BN_value_two(), n, ctx);
     }
-    BN_copy(v, u);
   }
 
   BN_free(w);
-  BN_free(u);
+  BN_free(tau);
   BN_free(vv);
   BN_free(vw);
 }
