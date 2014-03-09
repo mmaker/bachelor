@@ -36,18 +36,25 @@ pubkey_generation(RSA* rsa)
   EVP_PKEY *pkey = EVP_PKEY_new();
   int ret = EXIT_SUCCESS;
 
-  /* we need <N, e> to get a valid public key. */
-  if (!(rsa->e &&
-        (rsa->n ||(rsa->p && rsa->q)))) {
-    fprintf(stderr, "Not enough parameter for the public key generation!\n");
-    ret = EXIT_FAILURE;
-    goto end;
-    }
+  /* if not specified, use the default rsa public exponent */
+  if (!rsa->e)
+    BN_dec2bn(&rsa->e, "65537");
+
+  if (!rsa->n && !rsa->p) {
+    rsa->p = BN_new();
+    BN_generate_prime(rsa->p, 512, 0, NULL, NULL, NULL, NULL);
+  }
+
+  if (!rsa->n && !rsa->q) {
+    rsa->q = BN_new();
+    BN_generate_prime(rsa->q, 512, 0, NULL, NULL, NULL, NULL);
+  }
 
   if (!rsa->n) {
     rsa->n = BN_new();
     BN_mul(rsa->n, rsa->p, rsa->q, ctx);
   }
+
   assert(BN_is_odd(rsa->n));
 
   //  PEM_write_RSAPublicKey(stdout, rsa);
@@ -100,18 +107,10 @@ int main(int argc, char **argv)
 {
   int opt;
   RSA *rsa = RSA_new();
-  char *task;
 
   rsa->n = rsa->e = rsa->p = rsa->q = NULL;
 
-  if (argc < 3) usage(EXIT_FAILURE);
-  /* quick shortcut for testing factorization */
-  if (argc == 3) {
-    task = "pub";
-    BN_dec2bn(&rsa->p, argv[1]);
-    BN_dec2bn(&rsa->q, argv[2]);
-    BN_dec2bn(&rsa->e, "65537");
-  } else task = argv[1];
+  if (argc < 2) usage(EXIT_FAILURE);
 
   while ((opt = getopt(argc-1, argv+1, "d:e:N:n:p:q:")) != -1)  {
     switch (opt) {
@@ -138,9 +137,9 @@ int main(int argc, char **argv)
 
   SSL_library_init();
 
-  if (!strcmp(task, "pub"))
+  if (!strcmp(argv[1], "pub"))
     return pubkey_generation(rsa);
-  else if (!strcmp(task, "priv"))
+  else if (!strcmp(argv[1], "priv"))
     return privkey_generation(rsa);
   else
     usage(EXIT_FAILURE);
