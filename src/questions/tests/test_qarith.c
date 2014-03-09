@@ -157,7 +157,6 @@ void test_BN_value_two(void)
 
 int main(int argc, char **argv)
 {
-  test_cf();
   test_BN_sqrtmod();
   test_qa_RSA_recover();
   test_BN_min();

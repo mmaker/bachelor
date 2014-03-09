@@ -130,10 +130,8 @@ void test_wiener(void)
 
 int main(int argc, char **argv)
 {
-  if (WienerQuestion.setup) WienerQuestion.setup();
-
+  test_cf();
   test_wiener();
 
-  if (WienerQuestion.teardown) WienerQuestion.teardown();
   return 0;
 }
