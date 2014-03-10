@@ -12,6 +12,7 @@
 #include <qa/questions/qarith.h>
 #include <qa/questions/questions.h>
 
+#define ATTEMPTS 20
 
 static inline void f(BIGNUM *y, BIGNUM *n, BN_CTX *ctx)
 {
@@ -44,7 +45,7 @@ pollardbrent_question_ask_rsa(const RSA *rsa)
     *k = BN_new(),
     *diff = BN_new();
   BN_CTX *ctx = BN_CTX_new();
-
+  int lim;
 
   BN_one(r);
   BN_one(q);
@@ -52,7 +53,7 @@ pollardbrent_question_ask_rsa(const RSA *rsa)
   BN_dec2bn(&m, "100");
   BN_pseudo_rand_range(y, rsa->n);
 
-  while (BN_is_one(g)) {
+  for (lim = ATTEMPTS; BN_is_one(g) && lim; lim--) {
     BN_copy(x, y);
     for (BN_copy(i, r);
          !BN_is_zero(i);
@@ -85,7 +86,7 @@ pollardbrent_question_ask_rsa(const RSA *rsa)
       BN_gcd(g, diff, rsa->n, ctx);
     } while (BN_is_one(g));
 
-  if (BN_cmp(g, rsa->n))
+  if (!BN_is_one(g) && BN_cmp(g, rsa->n))
     ret = qa_RSA_recover(rsa, g, ctx);
 
 

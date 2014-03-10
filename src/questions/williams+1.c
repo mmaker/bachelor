@@ -20,6 +20,7 @@
 
 
 #define MAX_ATTEMPTS 10
+#define PRIMES_LIM 1000
 
 /**
  * \brief Lucas Sequence Multiplier.
@@ -92,9 +93,17 @@ williams_factorize(BIGNUM *n, BIGNUM *v, BN_CTX *ctx)
 
   BN_one(g);
   BN_one(q);
+#ifdef HAVE_OPENMPI
   for (pit = primes_init();
        BN_is_one(g) && primes_next(pit, p);
        ) {
+#else
+  pit = primes_init();
+  for (int lim=PRIMES_LIM;
+       lim && BN_is_one(g) && primes_next(pit, p);
+       lim--) {
+#endif
+
 #ifdef DEBUG
     fprintf(stderr, "Testing prime: ");
     BN_print_fp(stderr, p);

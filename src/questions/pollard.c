@@ -30,6 +30,8 @@
 #include "qa/questions/qarith.h"
 #include "qa/questions/qpollard.h"
 
+/* limits of primes. NOT used in cluster. */
+#define PRIMES_LIM 1000
 
 /**
  * \brief Pollard (p-1) factorization.
@@ -64,9 +66,17 @@ pollard1_question_ask_rsa(const RSA* rsa)
 
   BN_one(g);
   BN_one(q);
+#ifdef HAVE_OPENMPI
   for (it = primes_init();
        BN_is_one(g) && primes_next(it, p);
-       )  {
+       ) {
+#else
+  it = primes_init();
+  for (int lim=PRIMES_LIM;
+       lim && BN_is_one(g) && primes_next(it, p);
+       lim--) {
+#endif
+
     e = BN_num_bits(rsa->n) / BN_num_bits(p) + 1;
     for (k = 0; k < e && BN_is_one(g); k += m) {
       for (j = (m > e) ? e : m; j; j--) {
@@ -87,7 +97,9 @@ pollard1_question_ask_rsa(const RSA* rsa)
 
   /* replay latest epoch */
   if (!BN_cmp(g, rsa->n)) {
+#ifdef DEBUG
     fprintf(stderr, "rollback!\n");
+#endif
     BN_copy(p, back.p);
     BN_one(g);
     BN_copy(b, back.b);

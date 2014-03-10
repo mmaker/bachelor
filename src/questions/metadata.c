@@ -3,6 +3,7 @@
  * \brief Certificate Metadata Probe.
  *
  */
+#include <string.h>
 
 #include <openssl/pem.h>
 #include <openssl/rsa.h>
@@ -91,6 +92,13 @@ metadata_question_ask_crt(X509* crt)
   /* Note: debian builds withouth sslv2 support
    * <https://lists.debian.org/debian-devel/2011/04/msg00049.html> */
 
+  /* brands and trivial sanity check for defaults */
+  if (strstr(sbuf, "localhost")  ||
+      strstr(sbuf, "none") ||
+      strstr(sbuf, "test"))
+    fprintf(stderr,
+            "The certificate contains dummy informations.\n");
+
   OPENSSL_free(sserial);
   BN_free(serial);
   EVP_PKEY_free(pkey);
@@ -113,6 +121,14 @@ RSA *metadata_question_ask_rsa(const RSA* rsa)
              E, s,
              EBITLEN, BN_num_bits(rsa->e),
              NBITLEN, BN_num_bits(rsa->n));
+
+
+  if (BN_num_bits(rsa->n) < 2048)
+    fprintf(stdout,
+            "RSA keys < 2048 are disallowed after 2013.\n"
+            "For more informations, see "
+            "<http://csrc.nist.gov/publications/nistpubs/800-131A/sp800-131A.pdf>\n");
+
 
   OPENSSL_free(s);
   OPENSSL_free(t);
