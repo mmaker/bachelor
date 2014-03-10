@@ -9,6 +9,7 @@
  *  N = (a-b)(a+b), where p = (a-b) q = (a+b)
  *                  and by construction a ~ ⌈√N⌉
  */
+#include "config.h"
 #include <assert.h>
 
 #include <openssl/bn.h>
@@ -37,7 +38,10 @@ fermat_question_ask(const RSA *rsa)
 
   BN_sqrtmod(tmp, rem, n, ctx);
   /* Δ = |p - q| = |a + b - a + b| = |2b| > √N  2⁻¹⁰⁰ */
-  BN_rshift(dssdelta, tmp, 101);
+  /* BN_rshift(dssdelta, tmp, 101); */
+  BN_one(dssdelta);
+  BN_lshift(dssdelta, dssdelta, BN_num_bits(n) / 4 + 10);
+
   BN_copy(a, tmp);
   BN_sqr(a2, a, ctx);
 
@@ -45,14 +49,14 @@ fermat_question_ask(const RSA *rsa)
     /* a² += 2a + 1 */
     BN_lshift1(tmp, a);
     BN_uiadd1(tmp);
-    BN_uadd(a2, a2, tmp);
+    BN_add(a2, a2, tmp);
     /* a += 1 */
     BN_uiadd1(a);
     /* b² = a² - N */
     BN_usub(b2, a2, n);
     /* b */
     BN_sqrtmod(b, rem, b2, ctx);
-  } while (!BN_is_zero(rem) && BN_ucmp(b, dssdelta) < 1);
+  } while (!BN_is_zero(rem) && BN_cmp(b, dssdelta) < 1);
 
   if (BN_is_zero(rem)) {
     BN_uadd(a, a, b);
