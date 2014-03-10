@@ -6,6 +6,8 @@
  * based on lucas sequences and Lehmer's theorem.
  *
  */
+#include "config.h"
+
 #include <stdint.h>
 
 #include <openssl/rsa.h>
@@ -15,6 +17,9 @@
 #include "qa/questions/qarith.h"
 #include "qa/questions/questions.h"
 #include "qa/questions/qwilliams.h"
+
+
+#define MAX_ATTEMPTS 10
 
 /**
  * \brief Lucas Sequence Multiplier.
@@ -65,24 +70,16 @@ lucas(BIGNUM *v, BIGNUM *h,
   BN_free(vw);
 }
 
-
-/**
- * \brief William's p+1 factorization.
- *
- */
-static RSA*
-williams_question_ask_rsa(const RSA* rsa)
+static BIGNUM*
+williams_factorize(BIGNUM *n, BIGNUM *v, BN_CTX *ctx)
 {
-  RSA *ret = NULL;
+  BIGNUM *ret = NULL;
   BIGNUM
-    *v = BN_new(),
     *v2 = BN_new(),
-    *n = rsa->n,
     *q = BN_new(),
     *p = BN_new(),
     *g = BN_new();
   int e, k, j, m = 100;
-  BN_CTX *ctx = BN_CTX_new();
   pit_t *pit;
   struct {
     BIGNUM *p;
@@ -90,7 +87,6 @@ williams_question_ask_rsa(const RSA* rsa)
     int k;
   } back = {BN_new(), BN_new(), 0};
 
-  BN_pseudo_rand(v, BN_num_bits(n) / 2 + 2, 0, 0);
   BN_copy(back.v, v);
   BN_copy(back.p, BN_value_two());
 
@@ -99,7 +95,13 @@ williams_question_ask_rsa(const RSA* rsa)
   for (pit = primes_init();
        BN_is_one(g) && primes_next(pit, p);
        ) {
-    e = BN_num_bits(n) / BN_num_bits(p) + 1;
+#ifdef DEBUG
+    fprintf(stderr, "Testing prime: ");
+    BN_print_fp(stderr, p);
+    fprintf(stderr, "\r");
+#endif
+
+    e = 10; // BN_num_bits(n) / BN_num_bits(p) + 1;
     for (k = 0; k < e && BN_is_one(g); k += m) {
       for (j = (m > e) ? e : m; j; j--) {
         lucas(v, p, n, ctx);
@@ -119,7 +121,9 @@ williams_question_ask_rsa(const RSA* rsa)
   }
 
   if (!BN_cmp(g, n)) {
+#ifdef DEBUG
     printf("rollback!\n");
+#endif
     BN_copy(p, back.p);
     BN_one(g);
     BN_copy(v, back.v);
@@ -132,19 +136,46 @@ williams_question_ask_rsa(const RSA* rsa)
     }
   }
   if (!BN_is_one(g) && BN_cmp(g, n))
-    ret = qa_RSA_recover(rsa, g, ctx);
+    ret = g;
+  else
+    BN_free(g);
 
   BN_free(back.v);
   BN_free(back.p);
-  BN_free(v);
   BN_free(v2);
   BN_free(p);
   BN_free(q);
-  BN_free(g);
   prime_iterator_free(pit);
 
   return ret;
 }
+
+/**
+ * \brief William's p+1 factorization.
+ *
+ */
+static RSA*
+williams_question_ask_rsa(const RSA* rsa)
+{
+  int i;
+  BIGNUM* v = BN_new();
+  BN_CTX *ctx = BN_CTX_new();
+  BIGNUM *g;
+  RSA *ret = NULL;
+
+  for (i=0; !ret &&  i!= MAX_ATTEMPTS; i++) {
+    BN_pseudo_rand_range(v, rsa->n);
+    g = williams_factorize(rsa->n, v, ctx);
+    if (g)
+      ret = qa_RSA_recover(rsa, g, ctx);
+  }
+
+  BN_free(v);
+  BN_CTX_free(ctx);
+  return ret;
+}
+
+
 
 qa_question_t WilliamsQuestion = {
   .name = "p+1",

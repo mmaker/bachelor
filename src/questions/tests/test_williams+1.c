@@ -68,7 +68,7 @@ void test_lehmer_thm(void)
     *g = BN_new();
   BN_CTX *ctx = BN_CTX_new();
 
-  BN_dec2bn(&v, "1");
+  BN_dec2bn(&v, "2");
   BN_dec2bn(&p,
             "181857351165158586099319592412492032999818333818932850952491024"
             "131283899677766672100915923041329384157985577418702469610834914"
@@ -88,9 +88,28 @@ void test_lehmer_thm(void)
   BN_gcd(g, v2, n, ctx);
   assert(!BN_is_one(g));
 
+  /* another test */
+  BN_dec2bn(&v, "3");
+  BN_dec2bn(&p,
+            "181857351165158586099319592412492032999818333818932850952491024"
+            "131283899677766672100915923041329384157985577418702469610834914"
+            "62963937435544948718405055999");
+  BN_generate_prime(q, 512, 1, NULL, NULL, NULL, NULL);
+  BN_mul(n, p, q, ctx);
+
+  BN_sub(h, p, BN_value_one());
+  BN_mul(h, h, BN_value_two(), ctx);
+  lucas(v, h, n, ctx);
+
+  BN_mod_sub(v2, v, BN_value_two(), n, ctx);
+  BN_gcd(g, v2, n, ctx);
+  assert(!BN_is_one(g));
+  assert(BN_cmp(g, n));
+
   BN_free(q);
   BN_free(p);
   BN_free(v);
+  BN_free(v2);
   BN_free(h);
 
   BN_CTX_free(ctx);
