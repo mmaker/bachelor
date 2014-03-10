@@ -806,8 +806,11 @@ uninstall-am: uninstall-dist_docDATA
 	tags-am uninstall uninstall-am uninstall-dist_docDATA
 
 
-all-local:
-	test -f primes.txt || ./src/apps/primes.sh
+@CLUSTER_TRUE@all-local:
+@CLUSTER_TRUE@	test -f primes.txt || ./src/apps/primes.sh 20
+
+@CLUSTER_FALSE@all-local:
+@CLUSTER_FALSE@	test -f primes.txt || ./src/apps/primes.sh 1
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
