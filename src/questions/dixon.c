@@ -20,6 +20,7 @@
 #include <assert.h>
 #include <string.h>
 #include <strings.h>
+#include <time.h>
 
 #include <openssl/bn.h>
 
@@ -156,8 +157,8 @@ discover_smooth(BIGNUM *y, BIGNUM *x, BIGNUM *n,
 }
 
 
-static RSA*
-dixon_question_ask_rsa(const RSA *rsa)
+RSA*
+dixon_factorize(const RSA *rsa)
 {
   /*
    * take exp(sqrt(ln N ln ln N))
@@ -308,6 +309,57 @@ dixon_question_ask_rsa(const RSA *rsa)
   return ret;
 }
 
+
+/**
+ * \brief Measuring the strength of a RSA key.
+ *
+ * Note that I assume this function to be shit. I did not have had enough time
+ * to discuss this with my professor, and furthermore I believe this to be an
+ * incorrect measure: inaffidable, defective, and misleading. It is being
+ * written anyway in order to make him happy.
+ */
+static RSA*
+dixon_question_ask_rsa(const RSA* rsa)
+{
+#ifdef HAVE_OPENMPI
+  return dixon_factorize(rsa);
+#else
+  time_t start, end;
+  /* see factorization function */
+  int primes = 3 * (BN_num_bits(rsa->n) * 10) / 2;
+  BIGNUM
+    *x = BN_new(),
+    *y = BN_new();
+  BN_CTX *ctx = BN_CTX_new();
+  char *v;
+  int count;
+  static const int wait = 60;
+
+
+  v = malloc(sizeof(char) * primes);
+  /* XXX. control error (return -1) here. */
+  time(&start);
+  end = start;
+  for (count = 0; end - wait < start; time(&end)) {
+    fprintf(stderr, "discovering: %dth..\r", count);
+    BN_pseudo_rand_range(x, rsa->n);
+    /* yᵢ = xᵢ² - N */
+    BN_sqr(y, x, ctx);
+    BN_sub(y, y, rsa->n);
+
+    if (dixon_smooth(y, ctx, v, primes)) count++;
+  }
+
+  fprintf(stderr,
+          "\nIn %.2f minutes %d smooth numbers"
+          "have been discovered\n", (float) end - start, count);
+
+  BN_CTX_free(ctx);
+  BN_free(x);
+  BN_free(y);
+  return NULL;
+#endif
+}
 qa_question_t DixonQuestion = {
   .name = "dixon",
   .pretty_name = "Dixon's Factorization",

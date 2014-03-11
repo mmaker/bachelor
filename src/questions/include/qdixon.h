@@ -23,4 +23,6 @@ void discover_smooth(BIGNUM *y, BIGNUM *x, BIGNUM *n,
 
 int dixon_smooth(BIGNUM *x, BN_CTX *ctx, char *v, size_t len);
 
+
+RSA *dixon_factorize(const RSA *rsa);
 #endif /* _QA_DIXON_H_ */
